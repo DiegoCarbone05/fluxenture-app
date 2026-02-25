@@ -42,6 +42,10 @@ body {
   height: 100%;
 }
 
+td {
+  font-size: 1rem;
+}
+
 // Material Symbols (MD3) configuration
 // Default icon weight: 400 (Regular)
 $icon-weight-default: 400;
@@ -136,6 +140,9 @@ mat-icon {
     'opsz' 24;
 }
 
+button{
+  border-radius: 55px !important;
+}
 
 mat-drawer {
   width: 30vw !important;

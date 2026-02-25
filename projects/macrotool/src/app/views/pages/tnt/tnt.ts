@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { CdService } from '../../../core/services/cd-api/cd.service';
 import { EmployeeService } from '../../../core/services/employees/employee.service';
 import { Prompt } from '../../dialogs/prompt/prompt';
+import { StorageService } from '../../../core/services/storage/storage.service';
 
 @Component({
   selector: 'app-tnt',
@@ -19,7 +20,7 @@ import { Prompt } from '../../dialogs/prompt/prompt';
 export class Tnt {
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = [ 'name', 'follow_number','emission_date', 'obs', 'last_status', 'actions'];
+  displayedColumns: string[] = ['name', 'follow_number', 'emission_date', 'obs', 'last_status', 'actions'];
   dataSource = new MatTableDataSource<Cd>([]);
 
   cdsSignal = computed(() => this.cdService.getCdsSignal());
@@ -30,44 +31,25 @@ export class Tnt {
   readonly addPdfDialog = inject(MatDialog);
   readonly promptDialog = inject(MatDialog);
 
-  constructor(private trackAndTrace: TrackAndTrace, private router: Router, private cdService: CdService, private employeeService: EmployeeService) {
+  constructor(
+    private trackAndTrace: TrackAndTrace,
+    private router: Router,
+    private cdService: CdService,
+    private employeeService: EmployeeService,
+    private storageService: StorageService) {
 
     effect(() => {
       const cds = this.cdsSignal();
       this.dataSource.data = cds.reverse();
-      this.fetchStatusesForNewCds(cds);
     });
   }
 
-  private fetchStatusesForNewCds(cds: Cd[]) {
-    const cache = this.statusMap();
-    const toFetch = cds.filter((cd) => cd.trackingNumber != null && !cache.has(String(cd.trackingNumber)));
-    if (toFetch.length === 0) return;
-
-    toFetch.forEach((cd) => {
-      const key = String(cd.trackingNumber);
-      this.trackAndTrace.trackPackage(key).then((tnts) => {
-        const lastStatus = tnts.length > 0 ? tnts[tnts.length - 1].status : 'No hay status';
-        this.statusMap.update((map) => {
-          const next = new Map(map);
-          next.set(key, lastStatus);
-          return next;
-        });
-      }).catch(() => {
-        this.statusMap.update((map) => {
-          const next = new Map(map);
-          next.set(key, 'Error al cargar');
-          return next;
-        });
-      });
-    });
-  }
 
   openCdsViewer(element: Cd) {
     this.router.navigate(['/main', 'cds-viewer', element.trackingNumber]);
   }
 
-  deleteCd(id: string) {
+  deleteCd(cd: Cd) {
     this.promptDialog.open(Prompt, {
       data: {
         title: 'Eliminar CD',
@@ -75,8 +57,14 @@ export class Tnt {
       }
     }).afterClosed().subscribe((result) => {
       if (result) {
-        this.cdService.deleteCd(id).subscribe(() => {
-          this.cdService.refreshCds().subscribe();
+        this.cdService.deleteCd(cd.id).subscribe({
+          next: () => {
+            this.cdService.refreshCds().subscribe();
+            this.storageService.deleteFile(cd.fileId).subscribe();
+          },
+          error: (error) => {
+            console.error(error);
+          }
         });
       }
     });

@@ -1,0 +1,37 @@
+.prompt-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+
+  .text{
+    padding: 20px;
+    box-sizing: border-box;  
+    
+    p{
+        margin-bottom: 0;
+    }
+
+    h2{
+        margin: 0;
+      }
+
+  }
+
+
+  .buttons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    background-color: #f4f4f4;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+
+    button{
+        width: 100%;
+    }
+  }
+}

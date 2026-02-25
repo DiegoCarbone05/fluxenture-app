@@ -14,4 +14,8 @@ export class StorageService extends BaseApiService<string> {
     formData.append('folderPath', path);
     return this.http.post<string>(this.endpoint + '/upload', formData);
   }
+
+  deleteFile(id:string){
+    return this.http.delete<string>(this.endpoint+'/'+id)
+  }
 }

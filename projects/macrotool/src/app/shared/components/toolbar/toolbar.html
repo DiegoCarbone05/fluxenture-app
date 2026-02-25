@@ -1,11 +1,17 @@
 <mat-toolbar class="toolbar-custom">
     <div class="toolbar-content">
-        <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon"
+        <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon" *ngIf="menuButton"
             (click)="clickMenu()">
             <mat-icon>menu</mat-icon>
         </button>
+        <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon" *ngIf="backButton"
+            (click)="clickBack()">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
         <span>{{title}}</span>
     </div>
-    <ng-content></ng-content>
+    <div class="wrapper-content">
+        <ng-content></ng-content>
+    </div>
 
 </mat-toolbar>

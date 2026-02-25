@@ -1,9 +1,11 @@
-import { AfterViewInit, Component, computed, effect, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, inject, signal, ViewChild } from '@angular/core';
 import { EmployeeService } from '../../../core/services/employees/employee.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { EGender, Employee, ESector } from '../../../shared/models/Employee';
 import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { AddEmployee } from '../../dialogs/add-employee/add-employee';
 
 
 @Component({
@@ -17,6 +19,28 @@ export class Eployees implements AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   searchFormControl = new FormControl<string>('');
+  readonly addPdfDialog = inject(MatDialog);
+  readonly addEmployeeDialog = inject(MatDialog);
+
+  openAddEmployeeDialog(employee?: Employee) {
+    const dialog = this.addEmployeeDialog.open(AddEmployee, {
+      panelClass: 'full-screen-dialog',
+      data: { employee },
+    });
+
+    dialog.afterClosed().subscribe((result: Employee | undefined) => {
+      if (result) {
+        if (result.id) {
+          this.employeeService.updateEmployee(result.id, result).subscribe(()=>{
+            this.clearForms();
+          });
+        } else {
+          this.employeeService.createEmployee(result).subscribe();
+        }
+
+      }
+    });
+  }
 
   findByOptions: { attr: keyof Employee; text: string }[] = [
     { attr: 'name', text: 'Nombre empleado' },
@@ -42,31 +66,32 @@ export class Eployees implements AfterViewInit {
   ];
 
   employees = computed(() => this.employeeService.getEmployeesSignal()());
-  displayedColumns: string[] = ['employeeID', 'documentNumber', 'name', 'isOperational', 'sector', 'city'];
+  displayedColumns: string[] = ['employeeID', 'documentNumber', 'name', 'isOperational', 'sector', 'city', 'actions'];
   dataSource = new MatTableDataSource<Employee>([]);
 
   searchBy = signal<keyof Employee>('name');
   filters = signal<keyof Employee | null>(null);
 
   constructor(private employeeService: EmployeeService) {
-    // effect(() => {
-    //   const data = this.employees();
-    //   if (!this.searchFormControl.value) {
-    //     this.dataSource.data = data;
-    //     this.connectPaginator();
-    //   }
-    // });
 
     this.searchFormControl.valueChanges.subscribe((value) => {
-      
       if (value?.length === 0) {
         this.dataSource.data = [];
         this.connectPaginator();
         return;
-      } else {
+      } else if (value?.length && value.length > 2) {
         this.search();
       }
     });
+  }
+
+
+
+
+  clearForms(){
+    this.searchFormControl.reset();
+    this.dataSource.data = [];
+    this.connectPaginator();
   }
 
   ngAfterViewInit(): void {

@@ -3,7 +3,7 @@
   <form class="example-form" [formGroup]="form">
     <!-- CD EMPLOYEE -->
 
-    <mat-form-field class="example-full-width">
+    <mat-form-field class="example-full-width" appearance="outline">
       <mat-label>Nombre del empleado</mat-label>
       <input type="text" matInput formControlName="cdEmployee" [matAutocomplete]="auto">
       <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
@@ -14,15 +14,15 @@
     </mat-form-field>
 
     <!-- cd number -->
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       <mat-label>Numero de CD</mat-label>
       <input matInput formControlName="cdNumber" />
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       <mat-label>Fecha de emisión</mat-label>
       <input matInput type="date" formControlName="emissionDate" (paste)="onDatePaste($event)" />
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       <mat-label>Observacion</mat-label>
       <input matInput formControlName="obs" />
     </mat-form-field>

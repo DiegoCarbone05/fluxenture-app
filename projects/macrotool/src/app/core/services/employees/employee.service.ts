@@ -1,4 +1,4 @@
-import { Injectable, Signal, signal } from '@angular/core';
+import { effect, Injectable, Signal, signal } from '@angular/core';
 import { BaseApiService } from '../base-api.service';
 import { Employee } from '../../../shared/models/Employee';
 import { tap } from 'rxjs';

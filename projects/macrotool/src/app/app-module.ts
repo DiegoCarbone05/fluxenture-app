@@ -8,12 +8,14 @@ import { App } from './app';
 import { AddPdf } from './views/dialogs/add-pdf/add-pdf';
 import { Prompt } from './views/dialogs/prompt/prompt';
 import { SharedModule } from './shared/shared.module';
+import { AddEmployee } from './views/dialogs/add-employee/add-employee';
 
 @NgModule({
   declarations: [
     App,
     AddPdf,
     Prompt,
+    AddEmployee,
   ],
   imports: [
     BrowserModule,

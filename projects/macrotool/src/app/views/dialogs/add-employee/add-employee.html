@@ -1,0 +1,161 @@
+<div class="add-employee-container">
+    <div class="header">
+        <h1>{{ isEditMode ? 'Editar empleado' : 'Agregar empleado' }}</h1>
+        <button mat-icon-button (click)="closeDialog()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <form [formGroup]="form">
+        <mat-stepper #stepper="matStepper" [linear]="isEditMode ? false : true">
+
+            <!-- Step 1: Identification -->
+            <mat-step [stepControl]="identificationForm" label="Identificación">
+                <ng-template matStepLabel>Identificación</ng-template>
+                <div formGroupName="identification" class="step-content">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Nombre</mat-label>
+                        <input matInput formControlName="name" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>CUIL</mat-label>
+                        <input matInput type="number" formControlName="cuil" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Número de documento</mat-label>
+                        <input matInput formControlName="documentNumber" />
+                    </mat-form-field>
+                </div>
+                <div class="step-actions" *ngIf="!isEditMode">
+                    <button mat-button matStepperNext type="button">Siguiente</button>
+                </div>
+            </mat-step>
+
+            <!-- Step 2: Personal info -->
+            <mat-step [stepControl]="personalForm" label="Datos personales">
+                <ng-template matStepLabel>Datos personales</ng-template>
+                <div formGroupName="personal" class="step-content">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fecha de nacimiento</mat-label>
+                        <input matInput type="date" formControlName="birthDate" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Género</mat-label>
+                        <mat-select formControlName="gender">
+                            @for (opt of genderOptions; track opt.value) {
+                            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Estado civil</mat-label>
+                        <mat-select formControlName="civilStatus">
+                            @for (opt of civilStatusOptions; track opt) {
+                            <mat-option [value]="opt">{{ opt }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Nacionalidad</mat-label>
+                        <input matInput formControlName="nationality" />
+                    </mat-form-field>
+                </div>
+                <div class="step-actions" *ngIf="!isEditMode">
+                    <button mat-button matStepperPrevious type="button">Anterior</button>
+                    <button mat-button matStepperNext type="button">Siguiente</button>
+                </div>
+            </mat-step>
+
+            <!-- Step 3: Work info -->
+            <mat-step [stepControl]="workForm" label="Datos laborales">
+                <ng-template matStepLabel>Datos laborales</ng-template>
+                <div formGroupName="work" class="step-content">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Legajo</mat-label>
+                        <input matInput type="number" formControlName="employeeID" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Sector</mat-label>
+                        <mat-select formControlName="sector" [compareWith]="compareSector">
+                            @for (opt of sectorOptions; track opt.value) {
+                            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-checkbox formControlName="isOperational">Operativo</mat-checkbox>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fecha de ingreso</mat-label>
+                        <input matInput type="date" formControlName="entryDate" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fecha de egreso</mat-label>
+                        <input matInput type="date" formControlName="leaveDate" />
+                    </mat-form-field>
+                </div>
+                <div class="step-actions" *ngIf="!isEditMode">
+                    <button mat-button matStepperPrevious type="button">Anterior</button>
+                    <button mat-button matStepperNext type="button">Siguiente</button>
+                </div>
+            </mat-step>
+
+            <!-- Step 4: Address -->
+            <mat-step [stepControl]="addressForm" label="Dirección">
+                <ng-template matStepLabel>Dirección</ng-template>
+                <div formGroupName="address" class="step-content">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Dirección</mat-label>
+                        <input matInput formControlName="adress" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Ciudad</mat-label>
+                        <input matInput formControlName="city" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Provincia</mat-label>
+                        <input matInput formControlName="province" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>País</mat-label>
+                        <input matInput formControlName="country" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Código postal</mat-label>
+                        <input matInput formControlName="zipCode" />
+                    </mat-form-field>
+                </div>
+                <div class="step-actions" *ngIf="!isEditMode">
+                    <button mat-button matStepperPrevious type="button">Anterior</button>
+                    <button mat-button matStepperNext type="button">Siguiente</button>
+                </div>
+            </mat-step>
+
+            <!-- Step 5: Contact -->
+            <mat-step [stepControl]="contactForm" label="Contacto">
+                <ng-template matStepLabel>Contacto</ng-template>
+                <div formGroupName="contact" class="step-content">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Teléfono</mat-label>
+                        <input matInput formControlName="phone" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Celular</mat-label>
+                        <input matInput formControlName="cellPhone" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Email</mat-label>
+                        <input matInput type="email" formControlName="email" />
+                    </mat-form-field>
+                </div>
+                <div class="step-actions" *ngIf="!isEditMode">
+                    <button mat-button matStepperPrevious type="button">Anterior</button>
+                    <button mat-flat-button color="primary" (click)="saveEmployee()" [disabled]="form.invalid">
+                        Guardar
+                    </button>
+                </div>
+            </mat-step>
+        </mat-stepper>
+        <div class="actions-edit" *ngIf="isEditMode">
+            <button mat-flat-button color="primary" (click)="saveEmployee()" [disabled]="form.invalid">Guardar cambios</button>
+        </div>
+    </form>
+
+</div>

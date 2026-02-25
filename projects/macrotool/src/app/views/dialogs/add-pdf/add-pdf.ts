@@ -30,8 +30,6 @@ export class AddPdf {
   pdfPath = signal<string>('');
 
   constructor(
-    private electron: Electron,
-    private trackAndTrace: TrackAndTrace,
     private cdService: CdService,
     private employeeService: EmployeeService,
     private storageService: StorageService
@@ -141,7 +139,7 @@ export class AddPdf {
     explorer.type = 'file';
     explorer.accept = 'application/pdf';
 
-    const fileName = `[${this.employeeSelected.name}] - ${this.form.value.cdNumber} - ${this.form.value.emissionDate} - ${this.form.value.obs} | (EN PROCESO DE SEGUIMIENTO)`;
+    const fileName = `[${this.employeeSelected.name}] ${this.form.value.cdNumber}_${this.form.value.emissionDate}_${this.form.value.obs}`;
 
     explorer.click();
     explorer.onchange = (event) => {

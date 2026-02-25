@@ -41,6 +41,16 @@ export class CdService extends BaseApiService<Cd>{
     );
   }
 
+  exportCd(tnt: string, fileId: string) {
+    const formData = new FormData();
+    formData.append('tnt', tnt);
+    formData.append('fileId', fileId);
+    
+    return this.http.post<Cd>(this.endpoint+'/export', formData).pipe(
+      tap(() => this.refreshCds().subscribe())
+    );
+  }
+
   getLocalCdByTrackingNumber(trackingNumber: number) {
     return this.cds().find((cd) => cd.trackingNumber === trackingNumber);
   }

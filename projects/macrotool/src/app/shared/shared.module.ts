@@ -20,7 +20,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSortModule } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { TntStatusPipePipe } from './pipes/tnt-status.pipe-pipe';
+import {MatStepperModule} from '@angular/material/stepper';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [
@@ -50,6 +54,10 @@ import { TntStatusPipePipe } from './pipes/tnt-status.pipe-pipe';
     FormsModule,
     MatMenuModule,
     MatAutocompleteModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatStepperModule,
+    MatDatepickerModule,
   ],
   exports: [
     Sidenav,
@@ -75,8 +83,11 @@ import { TntStatusPipePipe } from './pipes/tnt-status.pipe-pipe';
     FormsModule,
     MatMenuModule,
     MatAutocompleteModule,
-    TntStatusPipePipe
-
+    MatSelectModule,
+    MatCheckboxModule,
+    TntStatusPipePipe,
+    MatStepperModule,
+    MatDatepickerModule,
   ]
 })
 export class SharedModule { }

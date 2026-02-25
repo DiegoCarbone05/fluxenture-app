@@ -1,15 +1,16 @@
+<flux-toolbar [backButton]="true" title="Carta de documento de: {{ employee()?.name }}" (backClick)="goBack()">
+  <button matButton color="primary"> Descargar PDF</button>
+  <button matButton="filled" color="primary" (click)="exportPDF()"> <strong>EXPORTAR</strong></button>
+</flux-toolbar>
+
 <div class="app-container">
-  <button matButton="outlined" (click)="goBack()">
-    <mat-icon>arrow_back</mat-icon>
-    Volver
-  </button>
 
   <div #imprZone>
     <h1>{{ employee()?.name }}</h1>
     <p><b>Sector: </b>{{ employee()?.sector }}</p>
     <p><b>CD Number: </b>{{ cd()?.trackingNumber }}</p>
     <p><b>Fecha de emisión: </b>{{ cd()?.emissionDate }}</p>
-  
+
     <table mat-table [dataSource]="dataSource" class="tabla-custom-hover">
       <ng-container matColumnDef="date">
         <th mat-header-cell *matHeaderCellDef>Fecha</th>
