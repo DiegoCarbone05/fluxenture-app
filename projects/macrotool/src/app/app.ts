@@ -1,8 +1,8 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, computed } from '@angular/core';
 import { Electron } from './shared/services/electron';
 import { AuthService } from './core/services/auth/auth.service';
 import { Router } from '@angular/router';
-
+import { AppService } from './core/services/app.service';
 
 
 @Component({
@@ -11,8 +11,12 @@ import { Router } from '@angular/router';
   standalone: false,
   styleUrl: './app.scss'
 })
-export class App{
+export class App {
 
-  constructor(private electron: Electron,  private authService: AuthService, private router: Router ) {}
+  isElectron = computed(() => this.appService.isElectron());
+
+  constructor(private electron: Electron, private authService: AuthService, private router: Router, private appService: AppService) {
+    this.appService.init();
+  }
 
 }

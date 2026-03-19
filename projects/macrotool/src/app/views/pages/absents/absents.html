@@ -1,0 +1,10 @@
+<mat-drawer-container class="example-container">
+    <mat-drawer mode="side" #sideNav opened>
+        <flux-navbar [menuButton]="true" (menuClick)="sideNav.toggle()" title="Ausencias"></flux-navbar>
+    </mat-drawer>
+    <mat-drawer-content class="app-content">
+        <flux-toolbar title="Ausencias">
+        </flux-toolbar>
+        <h1>Ausencias</h1>
+    </mat-drawer-content>
+</mat-drawer-container>

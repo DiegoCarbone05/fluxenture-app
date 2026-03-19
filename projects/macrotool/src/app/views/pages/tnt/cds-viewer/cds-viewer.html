@@ -1,13 +1,15 @@
 <flux-toolbar [backButton]="true" title="Carta de documento de: {{ employee()?.name }}" (backClick)="goBack()">
-  <button matButton color="primary"> Descargar PDF</button>
+  <button matButton color="primary" (click)="downloadFile()"> Descargar PDF</button>
   <button matButton="filled" color="primary" (click)="exportPDF()"> <strong>EXPORTAR</strong></button>
 </flux-toolbar>
 
 <div class="app-container">
 
+  @if(isElectron()){
   <mat-checkbox color="primary" (change)="changeTrackingCompleted($event)" [checked]="cd()?.trackingCompleted">
     <mat-checkbox-label>Seguimiento completo</mat-checkbox-label>
   </mat-checkbox>
+  }
 
   <div #imprZone>
     <h1>{{ employee()?.name }}</h1>
@@ -35,5 +37,11 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
+
+    @if (!isElectron() && dataSource.data.length === 0){
+    <div class="message-box">
+      Ingrese a la aplicación de escritorio para poder ver el seguimiento completo.
+    </div>
+    }
   </div>
 </div>

@@ -4,6 +4,10 @@
 // Note: This intentionally avoids the Material 3 `mat.theme()` API.
 @include mat.core();
 
+:root {
+  --primary: #0468d7;
+}
+
 // Custom palette based on #0468D7
 $fluxenture-primary-palette: (
   50: #e8f4fd,
@@ -16,8 +20,7 @@ $fluxenture-primary-palette: (
   700: #0355ad,
   800: #024a98,
   900: #013a7a,
-  contrast: (
-    50: rgba(black, 0.87),
+  contrast: (50: rgba(black, 0.87),
     100: rgba(black, 0.87),
     200: rgba(black, 0.87),
     300: rgba(black, 0.87),
@@ -72,6 +75,11 @@ body {
 
 td {
   font-size: 1rem;
+}
+
+mat-drawer {
+  background-color: #ffffff !important;
+  border: none !important;
 }
 
 // Material Symbols (MD3) configuration
@@ -168,7 +176,7 @@ mat-icon {
     'opsz' 24;
 }
 
-button{
+button {
   border-radius: 55px !important;
 }
 
@@ -186,6 +194,6 @@ mat-drawer {
   }
 }
 
-mat-drawer-container{
+mat-drawer-container {
   height: 100%;
 }

@@ -1,17 +1,14 @@
-<flux-toolbar [menuButton]="true" (menuClick)="sideNav.toggle()" title="Track And Trace">
-    <button matButton="filled" color="primary" (click)="loadPDF()"> <mat-icon>add</mat-icon> <strong>AGREGAR
-            CD</strong></button>
-</flux-toolbar>
-
-
 <mat-drawer-container class="example-container">
     <mat-drawer mode="side" #sideNav opened>
         <flux-navbar></flux-navbar>
     </mat-drawer>
     <mat-drawer-content class="app-content">
-        <br>
+        <flux-toolbar title="Track And Trace">
+            <button matButton="filled" color="primary" (click)="loadPDF()"> <mat-icon>add</mat-icon> <strong>AGREGAR
+                    CD</strong></button>
+        </flux-toolbar>
         <div class="table-container">
-            <table mat-table [dataSource]="dataSource" matSort matSortActive="emission_date" class="tabla-custom-hover">
+            <table mat-table [dataSource]="dataSource" matSort matSortActive="emission_date" matSortDirection="desc" class="tabla-custom-hover">
                 <ng-container matColumnDef="follow_number">
                     <th mat-header-cell *matHeaderCellDef>Numero de seguimiento</th>
                     <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">{{ element.trackingNumber }}
@@ -34,8 +31,7 @@
 
                 <ng-container matColumnDef="cd_path">
                     <th mat-header-cell *matHeaderCellDef>Carta de documento</th>
-                    <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">nombre del archivo
-                    </td>
+                    <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">{{element.cdPath}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="obs">

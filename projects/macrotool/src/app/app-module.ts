@@ -1,6 +1,7 @@
 import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing-module';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
@@ -21,6 +22,8 @@ import { AddEmployee } from './views/dialogs/add-employee/add-employee';
     BrowserModule,
     AppRoutingModule,
     SharedModule,
+    FormsModule,
+    ReactiveFormsModule,
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),

@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Cd } from '../../../../shared/models/Cd.model';
 import { TrackAndTrace } from '../../../../shared/services/track-and-trace';
@@ -11,6 +11,8 @@ import { EmployeeService } from '../../../../core/services/employees/employee.se
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { Prompt } from '../../../dialogs/prompt/prompt';
+import { StorageService } from '../../../../core/services/storage/storage.service';
+import { AppService } from '../../../../core/services/app.service';
 
 @Component({
   selector: 'app-cds-viewer',
@@ -24,6 +26,8 @@ export class CdsViewer {
 
   cd = signal<Cd | null>(null);
   employee = signal<Employee | null>(null)
+  isElectron = computed(() => this.appService.isElectron());
+
   readonly promptDialog = inject(MatDialog);
   displayedColumns: string[] = ['date', 'plant', "historyData", 'status',];
   dataSource = new MatTableDataSource<Tnt>([]);
@@ -49,7 +53,9 @@ export class CdsViewer {
     private trackAndTrace: TrackAndTrace,
     private router: Router,
     private cdService: CdService,
-    private employeeSvc: EmployeeService
+    private employeeSvc: EmployeeService,
+    private storageService: StorageService,
+    private appService: AppService
   ) {
     this.route.params.subscribe((params) => {
 
@@ -68,15 +74,21 @@ export class CdsViewer {
         if (employee) this.employee.set(employee)
       }
 
-      if (this.cd() && this.cd()?.trackingCompleted) {
-        this.loadTrackingFromLocal(this.cd()!.tnt)
+      if (this.isElectron()) {
+        if ((this.cd() && this.cd()?.trackingCompleted)) {
+          this.loadTrackingFromLocal(this.cd()!.tnt)
+        } else {
+          console.log("trackingCompleted false");
+          this.trackAndTrace.trackPackage(trackingNumber as string).then((res) => {
+            const tnt: Tnt[] = res as unknown as Tnt[];
+            this.loadTracking(tnt)
+          })
+        }
       } else {
-        this.trackAndTrace.trackPackage(trackingNumber as string).then((res) => {
-          const tnt: Tnt[] = res as unknown as Tnt[];
-          this.loadTracking(tnt)
-
-        })
+        this.loadTrackingFromLocal(this.cd()!.tnt)
       }
+
+
 
     });
   }
@@ -101,6 +113,21 @@ export class CdsViewer {
     }
   }
 
+
+  downloadFile() {
+    const fileId = this.cd()?.fileId;
+    if (fileId) {
+      this.storageService.downloadFile(fileId).subscribe((res) => {
+        const blob = new Blob([res], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${this.cd()?.trackingNumber} - ${this.employee()?.name}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+  }
 
   loadTrackingFromLocal(tnt: Tnt[]) {
     this.dataSource.data = tnt

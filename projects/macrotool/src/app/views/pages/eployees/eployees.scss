@@ -39,9 +39,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%;
+    height: calc(100% - 64px);
 
-    .search-content{
+    .search-content {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -58,29 +58,30 @@
             display: unset;
 
 
-            &.finded{
+            &.finded {
                 display: none;
                 transition: all 0.3s;
             }
         }
-    
+
         .search-description {
             font-size: 1.2rem;
             margin: 0;
             margin-bottom: 40px;
             display: unset;
 
-            &.finded{
+            &.finded {
                 display: none;
                 transition: all 0.3s;
             }
         }
+
         .search-input-container {
             width: 70%;
             display: flex;
             max-width: 800px;
             gap: 12px;
-        
+
             & input {
                 width: 100%;
                 padding: 10px 30px;
@@ -91,7 +92,7 @@
                 outline: none;
                 border-radius: 10px;
             }
-        
+
             & button {
                 background-color: #0468D7;
                 color: #ffffff;
@@ -103,9 +104,9 @@
                 text-transform: uppercase;
                 font-weight: 600;
                 // padding: 0 26px;
-        
+
             }
-        
+
         }
 
         .table-container {
@@ -114,7 +115,7 @@
             margin: 0 auto;
             margin-top: 40px;
 
-            .status-sign{
+            .status-sign {
                 width: fit-content;
                 padding: 0 10px;
                 border-radius: 30px;
@@ -126,12 +127,12 @@
                 text-transform: uppercase;
 
 
-                &.active{
+                &.active {
                     color: #11734B;
                     background-color: #D4EDBC;
                 }
 
-                &.not-active{
+                &.not-active {
                     color: #B10202;
                     background-color: #FFCFC9;
                 }
@@ -148,10 +149,9 @@
 
         }
 
-        &.finded{
+        &.finded {
             margin-top: 20px !important;
             transition: all 0.3s;
         }
     }
 }
-

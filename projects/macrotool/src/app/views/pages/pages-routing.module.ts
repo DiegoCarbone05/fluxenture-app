@@ -4,6 +4,8 @@ import { Tnt } from './tnt/tnt';
 import { CdsViewer } from './tnt/cds-viewer/cds-viewer';
 import { Eployees } from './eployees/eployees';
 import { Pages } from './pages';
+import { Absents } from './absents/absents';
+import { Docs } from './docs/docs';
 
 const routes: Routes = [
   {
@@ -22,6 +24,14 @@ const routes: Routes = [
         path: 'eployees',
         component: Eployees
       },
+      {
+        path: 'absents',
+        component: Absents
+      },
+      {
+        path: 'docs',
+        component: Docs
+      }
     ]
   },
   // {

@@ -10,6 +10,7 @@ import { CdService } from '../../../core/services/cd-api/cd.service';
 import { EmployeeService } from '../../../core/services/employees/employee.service';
 import { Prompt } from '../../dialogs/prompt/prompt';
 import { StorageService } from '../../../core/services/storage/storage.service';
+import { AppService } from '../../../core/services/app.service';
 
 @Component({
   selector: 'app-tnt',
@@ -23,6 +24,7 @@ export class Tnt implements AfterViewInit {
   displayedColumns: string[] = ['name', 'follow_number', 'emission_date', 'obs', 'last_status', 'actions'];
   dataSource = new MatTableDataSource<Cd>([]);
 
+  isElectron = computed(() => this.appService.isElectron());
   cdsSignal = computed(() => this.cdService.getCdsSignal());
 
   /** Cached status for each tracking number to avoid repeated API calls in template */
@@ -47,7 +49,9 @@ export class Tnt implements AfterViewInit {
     private router: Router,
     private cdService: CdService,
     private employeeService: EmployeeService,
-    private storageService: StorageService) {
+    private storageService: StorageService,
+    private appService: AppService
+  ) {
 
     effect(() => {
       const cds = this.cdsSignal();

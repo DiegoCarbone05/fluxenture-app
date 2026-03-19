@@ -26,7 +26,8 @@ import { TntStatusPipePipe } from './pipes/tnt-status.pipe-pipe';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { CdStatusChip } from './components/cd-status-chip/cd-status-chip';
-
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -61,6 +62,8 @@ import { CdStatusChip } from './components/cd-status-chip/cd-status-chip';
     MatCheckboxModule,
     MatStepperModule,
     MatDatepickerModule,
+    MatProgressBarModule,
+    MatTooltipModule
   ],
   exports: [
     Sidenav,
@@ -92,6 +95,8 @@ import { CdStatusChip } from './components/cd-status-chip/cd-status-chip';
     MatStepperModule,
     MatDatepickerModule,
     CdStatusChip,
+    MatProgressBarModule,
+    MatTooltipModule
   ]
 })
 export class SharedModule { }

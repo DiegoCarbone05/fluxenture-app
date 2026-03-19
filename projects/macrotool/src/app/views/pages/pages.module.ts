@@ -22,6 +22,9 @@ import { MatListModule } from '@angular/material/list';
 
 import { SharedModule } from '../../shared/shared.module';
 import { Pages } from './pages';
+import { Absents } from './absents/absents';
+import { Docs } from './docs/docs';
+import { AddDocDialog } from '../dialogs/add-doc-dialog/add-doc-dialog';
 
 @NgModule({
   declarations: [
@@ -29,6 +32,9 @@ import { Pages } from './pages';
     CdsViewer,
     Eployees,
     Pages,
+    Absents,
+    Docs,
+    AddDocDialog,
   ],
   imports: [
     CommonModule,
@@ -50,4 +56,4 @@ import { Pages } from './pages';
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class PagesModule {}
+export class PagesModule { }
