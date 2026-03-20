@@ -1,10 +1,50 @@
 <mat-drawer-container class="example-container">
-    <mat-drawer mode="side" #sideNav opened>
+    <mat-drawer mode="side" #sideNav opened="true">
         <flux-navbar [menuButton]="true" (menuClick)="sideNav.toggle()" title="Ausencias"></flux-navbar>
     </mat-drawer>
     <mat-drawer-content class="app-content">
         <flux-toolbar title="Ausencias">
+            <button matButton="filled" color="primary" (click)="openAddAbsentDialog()">
+                <mat-icon>add</mat-icon>
+                <span>Agregar</span>
+            </button>
         </flux-toolbar>
-        <h1>Ausencias</h1>
+
+        <div class="absent-calendar">
+            <div class="calendar-container">
+                <div class="days">
+                    <div class="day-of-week">Dom</div>
+                    <div class="day-of-week">Lun</div>
+                    <div class="day-of-week">Mar</div>
+                    <div class="day-of-week">Mie</div>
+                    <div class="day-of-week">Jue</div>
+                    <div class="day-of-week">Vie</div>
+                    <div class="day-of-week">Sab</div>
+                </div>
+                <div class="calendar">
+                    <div class="week">
+                        @for (day of daysOfMonth(); track $index) {
+                        <div class="day">
+                            <span>{{ day.day }}</span>
+                            @if (day.hasAbsence) {
+                            @for (item of day.absences; track $index) {
+                            <div (mouseover)="onAbsentClick(item.id)" (mouseleave)="onAbsentLeave(item.id)"
+                                id="{{item.id}}" [attr.absent-id]="item.id" class="absent" [matTooltip]="item.type"
+                                [class]="'absent-' + item.type">
+                                {{getEmployeeName(item.employeeId)}}
+                            </div>
+                            }
+                            }
+                        </div>
+
+                        }
+                    </div>
+
+                </div>
+            </div>
+            <!-- <div class="absents">
+
+            </div> -->
+        </div>
     </mat-drawer-content>
 </mat-drawer-container>

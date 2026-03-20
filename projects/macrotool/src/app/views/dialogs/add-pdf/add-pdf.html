@@ -1,5 +1,5 @@
 <div class="add-pdf-container">
-  <h1>Agregar seguimiento</h1>
+  <h1>{{ data ? 'Modificar seguimiento' : 'Agregar seguimiento' }}</h1>
   <form class="example-form" [formGroup]="form">
     <!-- CD EMPLOYEE -->
 
@@ -36,5 +36,5 @@
   } @else {
   <button matButton (click)="addPDF()">Cargar PDF</button>
   }
-  <button matButton="filled" (click)="saveCd()" [disabled]="form.invalid || pdfPath().length === 0">Agregar</button>
+  <button matButton="filled" color="primary" (click)="saveCd()" [disabled]="form.invalid || pdfPath().length === 0">{{ data ? 'Guardar' : 'Agregar' }}</button>
 </div>

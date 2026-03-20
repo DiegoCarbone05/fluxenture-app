@@ -112,6 +112,12 @@ export class Tnt implements AfterViewInit {
     this.addPdfDialog.open(AddPdf);
   }
 
+  editCd(cd: Cd) {
+    this.addPdfDialog.open(AddPdf, {
+      data: cd
+    });
+  }
+
 
 
 }

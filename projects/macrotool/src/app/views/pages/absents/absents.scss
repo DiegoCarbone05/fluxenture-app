@@ -1,0 +1,211 @@
+.absent-calendar {
+    display: grid;
+    grid-template-columns: 3fr auto;
+    width: 100%;
+    height: calc(100% - 64px);
+    background: rgb(255, 255, 255);
+    overflow: hidden;
+}
+
+.calendar-container {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    border-top: 1px solid #e4e4e4;
+    border-left: 1px solid #e4e4e4;
+
+    .days {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        width: 100%;
+        height: 100%;
+
+        .day-of-week {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid #e4e4e4;
+            height: 50px;
+        }
+    }
+
+
+
+    .calendar {
+        height: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+
+        // border-top-left-radius: 10px;
+        .week {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            grid-template-rows: repeat(5, 1fr);
+            height: 100%;
+
+            .day {
+                border-right: 1px solid #e4e4e4;
+                border-bottom: 1px solid #e4e4e4;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                min-width: 0;
+                overflow: hidden;
+
+                span {
+                    margin-top: 10px;
+                    color: rgb(94, 94, 94);
+                    font-weight: 500;
+                    text-overflow: clip;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-align: center;
+                    display: block;
+                }
+
+                .absent {
+                    width: 100%;
+                    padding: 0 5px;
+                    box-sizing: border-box;
+                    height: fit-content;
+                    font-size: 10px;
+                    background-color: #3da8ff2d;
+                    color: #126bb4;
+                    font-weight: 700;
+                    text-overflow: clip;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    cursor: pointer;
+                    transition: all 0.3s ease-in-out;
+
+                    &.highlight {
+                        background-color: var(--primary) !important;
+                        color: #ffffff !important;
+                        animation: highlight 1s ease-in-out;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.unselected {
+                        background-color: #e6e6e6 !important;
+                        color: #00000054 !important;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-VACATIONS {
+                        background-color: #D2F0E4;
+                        color: #0EAD6D;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-MEDICAL {
+                        background-color: #ECF2FD;
+                        color: #3d7dc7;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-LICENSE {
+                        background-color: #D2EFF0;
+                        color: #0EA8AD;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-SUSPENSION {
+                        background-color: #F3E597;
+                        color: #655814;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-FT {
+                        background-color: #F0D2D2;
+                        color: #AD0E0E;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-DT {
+                        background-color: #F0D2D2;
+                        color: #AD0E0E;
+                        transition: all 0.3s ease-in-out;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-DG {
+                        background-color: #EBEBEB;
+                        color: #828282;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-PG {
+                        background-color: #EBEBEB;
+                        color: #828282;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-DESPIDO {
+                        background-color: #313131;
+                        color: #ffffff;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-RENUNCIA {
+                        background-color: white;
+                        border: 1px solid #313131;
+                        color: #313131;
+                        transition: all 0.3s ease-in-out;
+                    }
+
+                    &.absent-FERIADO {
+                        background-color: #D89A64;
+                        color: #603D35;
+                        transition: all 0.3s ease-in-out;
+                    }
+                }
+
+            }
+
+
+        }
+    }
+
+
+}
+
+.absents {
+    width: 20vw;
+    max-width: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    border-left: 1px solid #e4e4e4;
+}
+
+@media screen and (min-width: 768px) {
+    .calendar-container {
+        .calendar {
+
+            .week {
+
+                .day {
+                    gap: 5px;
+
+                    span {}
+
+                    .absent {
+                        width: 90%;
+                        border-radius: 50px;
+                        padding: 0 10px;
+                        font-size: 12px;
+                        text-overflow: ellipsis;
+                    }
+
+                }
+
+
+            }
+        }
+    }
+}

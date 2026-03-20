@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Electron } from '../../../shared/services/electron';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TrackAndTrace } from '../../../shared/services/track-and-trace';
 import { CdService } from '../../../core/services/cd-api/cd.service';
 import { Employee } from '../../../shared/models/Employee';
@@ -20,6 +20,7 @@ import { StorageService } from '../../../core/services/storage/storage.service';
 })
 export class AddPdf {
   readonly dialogRef = inject(MatDialogRef<AddPdf>);
+  readonly data = inject<Cd>(MAT_DIALOG_DATA, { optional: true });
 
   form = new FormGroup({
     cdEmployee: new FormControl('', Validators.required),
@@ -42,6 +43,16 @@ export class AddPdf {
 
 
   ngOnInit() {
+    if (this.data) {
+      this.form.patchValue({
+        cdEmployee: this.data.employeeId,
+        cdNumber: String(this.data.trackingNumber),
+        obs: this.data.obs,
+        emissionDate: this.data.emissionDate,
+      });
+      this.pdId.set(this.data.fileId);
+      this.pdfPath.set('Archivo existente'); // Or you can try to fetch the file name if needed
+    }
 
     this.filteredOptions = (this.form.get('cdEmployee')?.valueChanges as Observable<string | number>).pipe(
       startWith(''),
@@ -159,19 +170,35 @@ export class AddPdf {
 
   async saveCd() {
     const input = this.form.value
-    const cd = new Cd(
-      Number(input.cdNumber),
-      input.emissionDate || '',
-      input.cdEmployee || '',
-      this.pdId(),
-      input.obs || '',
-      false
-    )
 
-    this.cdService.saveCd(cd).subscribe({
-      next: () => this.closeDialog(),
-      error: (err) => console.error('Error saving CD:', err),
-    });
+    if (this.data) {
+      // Editing existing CD
+      this.data.trackingNumber = Number(input.cdNumber);
+      this.data.emissionDate = input.emissionDate || '';
+      this.data.employeeId = input.cdEmployee || '';
+      this.data.fileId = this.pdId() || this.data.fileId;
+      this.data.obs = input.obs || '';
+      
+      this.cdService.putCd(this.data).subscribe({
+        next: () => this.closeDialog(),
+        error: (err) => console.error('Error updating CD:', err),
+      });
+    } else {
+      // Creating new CD
+      const cd = new Cd(
+        Number(input.cdNumber),
+        input.emissionDate || '',
+        input.cdEmployee || '',
+        this.pdId(),
+        input.obs || '',
+        false
+      )
+
+      this.cdService.saveCd(cd).subscribe({
+        next: () => this.closeDialog(),
+        error: (err) => console.error('Error saving CD:', err),
+      });
+    }
   }
 
   closeDialog() {

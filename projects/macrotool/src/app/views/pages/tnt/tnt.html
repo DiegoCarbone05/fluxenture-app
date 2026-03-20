@@ -19,7 +19,7 @@
                     <th mat-header-cell *matHeaderCellDef>Name</th>
                     <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)"><strong>{{
                             returnEmployeeName(element.employeeId) }}</strong>
-                    <td>
+                    </td>
                 </ng-container>
                 <ng-container matColumnDef="emission_date">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de emisión</th>
@@ -51,7 +51,8 @@
                 <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef>Acciones</th>
                     <td mat-cell *matCellDef="let element">
-                        <button matButton="text" (click)="deleteCd(element)">Eliminar</button>
+                        <button matButton="text" color="primary" (click)="editCd(element)">Modificar</button>
+                        <button matButton="text" color="warn" (click)="deleteCd(element)">Eliminar</button>
                     </td>
                 </ng-container>
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

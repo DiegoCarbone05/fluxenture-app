@@ -1,0 +1,116 @@
+@if (uploadStatus() === UploadStatus.IDLE) {
+<h2 mat-dialog-title>Agregar Ausencia</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="form-container">
+
+    <!-- Employee Selection -->
+    <mat-form-field class="full-width">
+      <mat-label>Empleado</mat-label>
+      <input type="text" placeholder="Buscar empleado..." matInput formControlName="employee" [matAutocomplete]="auto">
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onEmployeeSelected($event)">
+        @for (emp of filteredEmployees | async; track emp.id) {
+        <mat-option [value]="emp">
+          {{emp.name}} ({{emp.employeeID}})
+        </mat-option>
+        }
+      </mat-autocomplete>
+      @if (form.get('employee')?.hasError('required')) {
+      <mat-error>El empleado es requerido</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Absence Type -->
+    <mat-form-field class="full-width">
+      <mat-label>Tipo de Ausencia</mat-label>
+      <mat-select formControlName="type">
+        @for (type of absentTypes; track type.value) {
+        <mat-option [value]="type.value">{{type.label}}</mat-option>
+        }
+      </mat-select>
+      @if (form.get('type')?.hasError('required')) {
+      <mat-error>El tipo es requerido</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Date Range -->
+    <div style="display: flex; gap: 8px;">
+      <mat-form-field class="full-width">
+        <mat-label>Fecha Inicio</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="startDate" [max]="form.get('endDate')?.value">
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+        @if (form.get('startDate')?.hasError('required')) {
+        <mat-error>La fecha de inicio es requerida</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Fecha Fin</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="endDate" [min]="form.get('startDate')?.value">
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+        @if (form.get('endDate')?.hasError('required')) {
+        <mat-error>La fecha de fin es requerida</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Observations -->
+    <mat-form-field class="full-width">
+      <mat-label>Observaciones</mat-label>
+      <textarea matInput formControlName="observations" rows="3"></textarea>
+    </mat-form-field>
+
+    <!-- Justified -->
+    <div style="margin-bottom: 16px;">
+      <mat-checkbox formControlName="justified">Justificada</mat-checkbox>
+    </div>
+
+    <!-- File Upload -->
+    <div class="file-upload-section">
+      <span class="file-label">Comprobante / Justificativo (Opcional)</span>
+      <div class="file-input-wrapper">
+        <button type="button" mat-stroked-button (click)="fileInput.click()">
+          <mat-icon>attach_file</mat-icon>
+          Seleccionar Archivo
+        </button>
+        <input #fileInput type="file" (change)="onFileSelected($event)" accept=".pdf, .jpg, .jpeg, .png"
+          style="display: none;">
+        @if (form.get('file')?.value) {
+        <span class="file-name">{{ form.get('file')?.value?.name }}</span>
+        }
+      </div>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="onSave()">Guardar</button>
+</mat-dialog-actions>
+}
+
+@if (uploadStatus() === UploadStatus.UPLOADING) {
+<div class="loading-screen">
+  <mat-spinner></mat-spinner>
+  <span>Guardando ausencia...</span>
+</div>
+}
+
+@if (uploadStatus() === UploadStatus.SUCCESS) {
+<div class="success-screen">
+  <mat-icon class="success-icon">check_circle</mat-icon>
+  <span>Ausencia guardada con éxito</span>
+</div>
+}
+
+@if (uploadStatus() === UploadStatus.ERROR) {
+<div class="error-screen">
+  <mat-icon class="error-icon">error</mat-icon>
+  <span>{{ errorMessage() }}</span>
+</div>
+}

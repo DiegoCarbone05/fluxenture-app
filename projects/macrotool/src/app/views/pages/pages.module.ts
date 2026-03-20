@@ -25,6 +25,7 @@ import { Pages } from './pages';
 import { Absents } from './absents/absents';
 import { Docs } from './docs/docs';
 import { AddDocDialog } from '../dialogs/add-doc-dialog/add-doc-dialog';
+import { AddAbsentDialog } from '../dialogs/add-absent-dialog/add-absent-dialog';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { AddDocDialog } from '../dialogs/add-doc-dialog/add-doc-dialog';
     Absents,
     Docs,
     AddDocDialog,
+    AddAbsentDialog,
   ],
   imports: [
     CommonModule,
