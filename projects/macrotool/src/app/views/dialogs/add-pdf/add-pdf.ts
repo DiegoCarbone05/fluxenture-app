@@ -178,7 +178,7 @@ export class AddPdf {
       this.data.employeeId = input.cdEmployee || '';
       this.data.fileId = this.pdId() || this.data.fileId;
       this.data.obs = input.obs || '';
-      
+
       this.cdService.putCd(this.data).subscribe({
         next: () => this.closeDialog(),
         error: (err) => console.error('Error updating CD:', err),
@@ -200,6 +200,7 @@ export class AddPdf {
       });
     }
   }
+
 
   closeDialog() {
     this.dialogRef.close();

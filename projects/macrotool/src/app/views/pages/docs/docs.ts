@@ -75,7 +75,9 @@ export class Docs implements OnInit {
    * Abre el diálogo para agregar un documento
    */
   openDialog() {
-    const ref = this.dialog.open(AddDocDialog);
+    const ref = this.dialog.open(AddDocDialog, {
+      disableClose: true
+    });
     ref.afterClosed().subscribe(result => {
       if (result) this.loadDocs();
     });

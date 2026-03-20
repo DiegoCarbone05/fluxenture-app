@@ -18,7 +18,9 @@ export class Absents implements OnInit {
   constructor(private absentService: AbsentService, private employeeService: EmployeeService) { }
 
   openAddAbsentDialog() {
-    const dialogRef = this.dialog.open(AddAbsentDialog);
+    const dialogRef = this.dialog.open(AddAbsentDialog, {
+      disableClose: true
+    });
     dialogRef.afterClosed().subscribe(
       {
         next: (response) => {

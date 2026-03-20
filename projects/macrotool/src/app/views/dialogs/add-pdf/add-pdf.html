@@ -34,7 +34,9 @@
     <button matButton (click)="removePDF()">Eliminar</button>
   </div>
   } @else {
-  <button matButton (click)="addPDF()">Cargar PDF</button>
+  <button matButton="outlined" (click)="addPDF()">Cargar PDF</button>
   }
-  <button matButton="filled" color="primary" (click)="saveCd()" [disabled]="form.invalid || pdfPath().length === 0">{{ data ? 'Guardar' : 'Agregar' }}</button>
+  <button matButton="filled" color="primary" (click)="saveCd()" [disabled]="form.invalid || pdfPath().length === 0">{{
+    data ? 'Guardar' : 'Agregar' }}</button>
+  <button matButton="filled" (click)="closeDialog()">Cancelar</button>
 </div>

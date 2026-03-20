@@ -109,7 +109,9 @@ export class Tnt implements AfterViewInit {
   }
 
   async loadPDF() {
-    this.addPdfDialog.open(AddPdf);
+    this.addPdfDialog.open(AddPdf, {
+      disableClose: true
+    });
   }
 
   editCd(cd: Cd) {

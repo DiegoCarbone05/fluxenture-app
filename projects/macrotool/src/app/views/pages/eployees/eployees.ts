@@ -26,12 +26,13 @@ export class Eployees implements AfterViewInit {
     const dialog = this.addEmployeeDialog.open(AddEmployee, {
       panelClass: 'full-screen-dialog',
       data: { employee },
+      disableClose: true
     });
 
     dialog.afterClosed().subscribe((result: Employee | undefined) => {
       if (result) {
         if (result.id) {
-          this.employeeService.updateEmployee(result.id, result).subscribe(()=>{
+          this.employeeService.updateEmployee(result.id, result).subscribe(() => {
             this.clearForms();
           });
         } else {
@@ -88,7 +89,7 @@ export class Eployees implements AfterViewInit {
 
 
 
-  clearForms(){
+  clearForms() {
     this.searchFormControl.reset();
     this.dataSource.data = [];
     this.connectPaginator();
