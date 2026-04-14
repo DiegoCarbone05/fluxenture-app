@@ -16,3 +16,4 @@ export abstract class BaseApiService<T> {
     return this.http.get<T[]>(this.endpoint);
   }
 }
+// 

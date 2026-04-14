@@ -1,0 +1,26 @@
+<div class="date-container">
+    <p>Seleccione el mes y el año</p>
+    <form>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 150px;">
+            <mat-label>Mes</mat-label>
+            <mat-select [(value)]="currentDate.month" (selectionChange)="onDateChange()">
+                @for (month of months; track month; let i = $index) {
+                <mat-option [value]="i + 1">{{month}}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 100px;">
+            <mat-label>Año</mat-label>
+            <mat-select [(value)]="currentDate.year" (selectionChange)="onDateChange()">
+                @for (year of years; track year) {
+                <mat-option [value]="year">{{year}}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </form>
+    <div class="actions">
+        <button matButton="filled" (click)="cancelDialog()">Cancelar</button>
+        <button matButton="filled" cdkFocusInitial color="primary" (click)="acept()">Aceptar</button>
+    </div>
+</div>

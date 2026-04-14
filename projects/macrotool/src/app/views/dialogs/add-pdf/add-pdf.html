@@ -1,5 +1,10 @@
 <div class="add-pdf-container">
-  <h1>{{ data ? 'Modificar seguimiento' : 'Agregar seguimiento' }}</h1>
+  <div class="header-dialog">
+    <h1>{{ data ? 'Modificar seguimiento' : 'Agregar seguimiento' }}</h1>
+    <button mat-icon-button (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
   <form class="example-form" [formGroup]="form">
     <!-- CD EMPLOYEE -->
 
@@ -34,9 +39,10 @@
     <button matButton (click)="removePDF()">Eliminar</button>
   </div>
   } @else {
-  <button matButton="outlined" (click)="addPDF()">Cargar PDF</button>
+  <button class="upload-pdf-btn" matButton="outlined" (click)="addPDF()">Cargar PDF</button>
   }
-  <button matButton="filled" color="primary" (click)="saveCd()" [disabled]="form.invalid || pdfPath().length === 0">{{
-    data ? 'Guardar' : 'Agregar' }}</button>
-  <button matButton="filled" (click)="closeDialog()">Cancelar</button>
+  <div class="actions">
+    <button matButton="filled" color="primary" (click)="saveCd()" [disabled]="form.invalid || pdfPath().length === 0">{{
+      data ? 'Guardar' : 'Agregar' }}</button>
+  </div>
 </div>

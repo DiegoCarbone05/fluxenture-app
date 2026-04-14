@@ -1,14 +1,18 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, Inject, OnInit, signal } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { map, Observable, startWith } from 'rxjs';
 import { EmployeeService } from '../../../core/services/employees/employee.service';
 import { Employee } from '../../../shared/models/Employee';
 import { Absent, AbsentType } from '../../../shared/models/Absent.model';
 import { StorageService } from '../../../core/services/storage/storage.service';
 import { AbsentService } from '../../../core/services/absents/absent.service';
-import { EDocType } from '../../../shared/models/Doc';
+import { Doc, EDocType } from '../../../shared/models/Doc';
+import { AddDocDialog } from '../add-doc-dialog/add-doc-dialog';
+import { ABSENT_TYPES, DOC_TYPES } from '../../../shared/constants/typesValues.constant';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DocsService } from '../../../core/services/docs/docs.service';
 
 export enum UploadStatus {
   IDLE,
@@ -29,6 +33,10 @@ export class AddAbsentDialog implements OnInit {
   UploadStatus = UploadStatus;
   uploadStatus = signal<UploadStatus>(UploadStatus.IDLE);
   errorMessage = signal<string>('');
+  documentSelected = signal<Doc | null>(null);
+
+  readonly dialog = inject(MatDialog);
+
 
   form = new FormGroup({
     employee: new FormControl('', Validators.required),
@@ -41,22 +49,7 @@ export class AddAbsentDialog implements OnInit {
     file: new FormControl<File | null>(null),
   });
 
-  absentTypes = [
-    { value: AbsentType.VACATIONS, label: 'Vacaciones' },
-    { value: AbsentType.MEDICAL, label: 'Médico' },
-    { value: AbsentType.LICENSE, label: 'Licencia' },
-    { value: AbsentType.SUSPENSION, label: 'Suspención' },
-    { value: AbsentType.UNJUSTIFIED, label: 'Injustificado' },
-    { value: AbsentType.FT, label: 'Feriado Trabajado' },
-    { value: AbsentType.DT, label: 'Domingo Trabajado' },
-    { value: AbsentType.DG, label: 'Dia Gremial' },
-    { value: AbsentType.PG, label: 'Permiso Gremial' },
-    { value: AbsentType.DESPIDO, label: 'Despido' },
-    { value: AbsentType.RENUNCIA, label: 'Renuncia' },
-    { value: AbsentType.FERIADO, label: 'Feriado' },
-    { value: AbsentType.OTHER, label: 'Otro' }
-  ];
-
+  absentTypes = ABSENT_TYPES; // Lista de tipos
   filteredEmployees!: Observable<Employee[]>;
   employeeSelected!: Employee;
 
@@ -64,10 +57,29 @@ export class AddAbsentDialog implements OnInit {
     private employeeService: EmployeeService,
     private dialogRef: MatDialogRef<AddAbsentDialog>,
     private storageService: StorageService,
-    private absentService: AbsentService
+    private absentService: AbsentService,
+    private docsSvc: DocsService,
+    private snackBar: MatSnackBar,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
+    if (this.data) {
+      const emp = this.employeeService.getLocalEmployeeById(this.data.employeeId);
+      if (emp) {
+        this.employeeSelected = emp;
+        this.form.patchValue({
+          employee: emp as any,
+          employeeId: emp.id ?? '',
+          type: this.data.type,
+          startDate: new Date(this.data.originalStartDate + 'T00:00:00'),
+          endDate: new Date(this.data.originalEndDate + 'T00:00:00'),
+          observations: this.data.observations,
+          justified: this.data.justified
+        });
+      }
+    }
+
     this.filteredEmployees = (this.form.get('employee')?.valueChanges as Observable<string>).pipe(
       startWith(''),
       map((value) => {
@@ -80,6 +92,64 @@ export class AddAbsentDialog implements OnInit {
         );
       })
     );
+  }
+
+
+  addDocument() {
+    const { employeeId, type } = this.form.value;
+    if (!employeeId || !type) return;
+
+    const compatibleTypes = DOC_TYPES.map(t => t.value);
+
+    let docType = compatibleTypes.includes(type as EDocType) ? type : EDocType.OTHER;
+
+
+    //OMISIONES DE DOCUMENTOS PARA CIERTOS TIPOS DE AUSENCIAS
+    switch (type) {
+      case AbsentType.DESPIDO:
+        docType = EDocType.CD;
+        break;
+      case AbsentType.RENUNCIA:
+        docType = EDocType.TELEGRAMA;
+        break;
+    }
+    //
+
+    console.log(docType);
+
+    const ref = this.dialog.open(AddDocDialog, {
+      disableClose: true,
+      data: {
+        employeeId,
+        employee: this.employeeSelected,
+        type: docType,
+      }
+    });
+    ref.afterClosed().subscribe(result => {
+      this.documentSelected.set(result);
+      this.form.get('file')?.setValue(result.id);
+      this.form.get('file')?.markAsTouched();
+    });
+  }
+
+  //NOTA: ESTA FUNCION DEBE SER REVISADA Y ESTANDARIZADA
+  /**
+   * Elimina el documento seleccionado de todos lados (Dialog, Drive y DB)
+   */
+  deleteDocument() {
+    if (!this.documentSelected()) return;
+    this.docsSvc.deleteDocAndFile(this.documentSelected()?.id ?? '', this.documentSelected()?.driveFileId ?? '').subscribe({
+      next: () => {
+        this.documentSelected.set(null);
+        this.form.get('file')?.setValue(null);
+        this.form.get('file')?.markAsTouched();
+        this.snackBar.open('Documento y archivo eliminado correctamente', 'OK', { duration: 2000 });
+      },
+      error: (err) => {
+        this.snackBar.open('Error borrando archivo', 'OK', { duration: 2000 });
+        console.error(err);
+      }
+    });
   }
 
   displayFn = (empOrStr: Employee | string | null): string => {
@@ -99,14 +169,6 @@ export class AddAbsentDialog implements OnInit {
     });
   }
 
-  onFileSelected(event: any): void {
-    const file: File = event.target.files[0];
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
-    if (file && allowedTypes.includes(file.type)) {
-      this.form.patchValue({ file });
-      this.form.get('file')?.markAsTouched();
-    }
-  }
 
   onSave(): void {
     if (this.form.valid && this.uploadStatus() === UploadStatus.IDLE) {
@@ -115,32 +177,32 @@ export class AddAbsentDialog implements OnInit {
 
       if (!employeeId || !type || !startDate || !endDate) return;
 
-      const saveAbsent = (documentId: string = '') => {
+      const saveAbsent = () => {
         const payload = new Absent(
           employeeId,
           type as AbsentType,
           startDate.toISOString(),
           endDate.toISOString(),
-          documentId,
+          this.documentSelected()?.id || (this.data ? this.data.documentId : ''),
           observations ?? '',
           justified ?? false
         );
 
+        if (this.data && this.data.id) {
+          payload.id = this.data.id;
+        }
+
         this.absentService.saveAbsent(payload).subscribe({
           next: (absent) => {
-            console.log(absent);
-
             this.uploadStatus.set(UploadStatus.SUCCESS);
             setTimeout(() => {
               this.dialogRef.close(absent);
             }, 2000);
           },
           error: (err) => {
+            this.deleteDocument() //BORRA EL DOCUMENTIO DE DRIVE
             this.uploadStatus.set(UploadStatus.ERROR);
             this.errorMessage.set(err?.error?.message || err?.message || 'Error al guardar la ausencia');
-            if (documentId) {
-              this.storageService.deleteFile(documentId).subscribe();
-            }
             setTimeout(() => {
               this.uploadStatus.set(UploadStatus.IDLE);
             }, 3000);
@@ -148,26 +210,13 @@ export class AddAbsentDialog implements OnInit {
         });
       };
 
-      if (file) {
-        this.storageService.uploadDoc(file, this.employeeSelected, EDocType.OTROS).subscribe({
-          next: (fileId: any) => {
-            saveAbsent(fileId.response);
-          },
-          error: (err) => {
-            this.uploadStatus.set(UploadStatus.ERROR);
-            this.errorMessage.set(err?.message ?? 'Error al subir el archivo');
-            setTimeout(() => {
-              this.uploadStatus.set(UploadStatus.IDLE);
-            }, 3000);
-          }
-        });
-      } else {
-        saveAbsent();
-      }
+      saveAbsent();
+
     }
   }
 
   onCancel(): void {
+    this.deleteDocument() //BORRA EL DOCUMENTIO DE DRIVE
     this.dialogRef.close();
   }
 }

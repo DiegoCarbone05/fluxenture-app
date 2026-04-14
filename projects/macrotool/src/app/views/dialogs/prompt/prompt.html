@@ -3,17 +3,8 @@
     <h2>{{data?.title}}</h2>
     <p>{{data?.desc}}</p>
   </div>
-  <div class="buttons-container"> 
+  <div class="buttons-container">
     <button matButton [mat-dialog-close]="false">Cancelar</button>
     <button matButton="filled" color="primary" [mat-dialog-close]="true" cdkFocusInitial>Aceptar</button>
   </div>
 </div>
-
-<!-- <h2 mat-dialog-title>{{data?.title}}</h2>
-<mat-dialog-content>
-  {{ data?.desc }}
-</mat-dialog-content>
-<mat-dialog-actions>
-  <button matButton [mat-dialog-close]="false">Cancelar</button>
-  <button matButton [mat-dialog-close]="true" cdkFocusInitial>Aceptar</button>
-</mat-dialog-actions> -->

@@ -28,17 +28,19 @@ export class Absent {
 }
 
 export enum AbsentType {
+    MEDICAL_CERTIFICATE = 'MEDICAL_CERTIFICATE',
     VACATIONS = 'VACATIONS',
-    MEDICAL = 'MEDICAL',
-    LICENSE = 'LICENSE',
-    UNJUSTIFIED = 'UNJUSTIFIED',
+    CERTIFICATE = 'CERTIFICATE',
     SUSPENSION = 'SUSPENSION',
+    LICENSE = 'LICENSE',
     OTHER = 'OTHER',
     FT = 'FT',
     DT = 'DT',
     DG = 'DG',
     PG = 'PG',
+
     DESPIDO = 'DESPIDO',
     RENUNCIA = 'RENUNCIA',
-    FERIADO = 'FERIADO'
+    FERIADO = 'FERIADO',
+    ART = 'ART'
 }

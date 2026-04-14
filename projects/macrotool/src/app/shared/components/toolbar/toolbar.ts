@@ -1,5 +1,6 @@
 import { Component, computed, effect, EventEmitter, Input, Output } from '@angular/core';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { ViewsService } from '../../../views/views.service';
 
 
 @Component({
@@ -10,15 +11,19 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 })
 export class Toolbar {
 
+  @Input() bgColor!: string;
+  @Input() theme: "light" | "dark" = 'light';
   @Output() menuClick = new EventEmitter<void>();
-  @Input() menuButton: boolean = false;
+  @Input() menuButton: boolean = true;
   @Input() title: string = '';
+  @Input() subTitle: string = '';
   @Output() backClick = new EventEmitter<void>();
   @Input() backButton: boolean = false;
 
   user = computed(() => this.authService.getUserSignal()());
+  isMobile = computed(() => this.viewService.getIsMobile());
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private viewService: ViewsService) {
   }
 
   logout() {
@@ -26,10 +31,10 @@ export class Toolbar {
   }
 
   clickBack() {
-    this.backClick.emit();
+    window.history.back();
   }
   clickMenu() {
-    this.menuClick.emit();
+    this.viewService.openSidenav();
   }
 
 }

@@ -28,6 +28,11 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { CdStatusChip } from './components/cd-status-chip/cd-status-chip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTabsModule } from '@angular/material/tabs';
+import { AbstentTypePipe } from './pipes/abstent-type-pipe';
+import { DocTypePipe } from './pipes/doc-type-pipe';
+import { DragDropFileDirective } from './directives/drag-drop-file';
+import { EmpSectorPipePipe } from './pipes/emp-sector-pipe-pipe';
 
 @NgModule({
   declarations: [
@@ -36,7 +41,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     StatusChip,
     Titlebar,
     TntStatusPipePipe,
-    CdStatusChip
+    CdStatusChip,
+    AbstentTypePipe,
+    DocTypePipe,
+    DragDropFileDirective,
+    EmpSectorPipePipe,
   ],
   imports: [
     CommonModule,
@@ -63,7 +72,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatStepperModule,
     MatDatepickerModule,
     MatProgressBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatTabsModule
   ],
   exports: [
     Sidenav,
@@ -96,7 +106,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatDatepickerModule,
     CdStatusChip,
     MatProgressBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatTabsModule,
+    AbstentTypePipe,
+    DocTypePipe,
+    DragDropFileDirective,
+    EmpSectorPipePipe,
+
   ]
 })
 export class SharedModule { }

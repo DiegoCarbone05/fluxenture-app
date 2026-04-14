@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild, signal } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, signal, computed } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
@@ -9,6 +9,9 @@ import { EmployeeService } from '../../../core/services/employees/employee.servi
 import { Doc } from '../../../shared/models/Doc';
 import { StorageService } from '../../../core/services/storage/storage.service';
 import { Prompt } from '../../dialogs/prompt/prompt';
+import { DatepickerDialog } from '../../dialogs/datepicker-dialog/datepicker-dialog';
+import { MONTHS, YEARS } from '../../../shared/constants/general-constant';
+import { AppService } from '../../../core/services/app.service';
 
 @Component({
   selector: 'app-docs',
@@ -19,6 +22,10 @@ import { Prompt } from '../../dialogs/prompt/prompt';
 export class Docs implements OnInit {
 
   readonly dialog = inject(MatDialog);
+
+  months = MONTHS
+  years = YEARS;
+  currentDate = computed(() => this.appSvc.dateOfData());
 
   @ViewChild(MatSort) set sort(matSort: MatSort) {
     if (matSort) {
@@ -32,7 +39,7 @@ export class Docs implements OnInit {
     }
   }
 
-  displayedColumns = ['employee', 'type', 'uploadDate', 'description', 'actions'];
+  displayedColumns = ['employee', 'type', 'uploadDate', 'description', 'user', 'actions'];
   dataSource = new MatTableDataSource<Doc>([]);
   isLoading = signal(true);
 
@@ -40,11 +47,43 @@ export class Docs implements OnInit {
     private docsService: DocsService,
     private employeeService: EmployeeService,
     private snackBar: MatSnackBar,
-    private storageSvc: StorageService
-  ) { }
+    private storageSvc: StorageService,
+    private appSvc: AppService
+  ) {
+  }
 
   ngOnInit(): void {
     this.loadDocs();
+  }
+
+  editDoc(docId: string) {
+    const dialogRef = this.dialog.open(AddDocDialog, {
+      data: {
+        editDocId: docId
+      },
+      disableClose: true
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) this.loadDocs();
+    });
+  }
+
+
+  openDatePickerDialog() {
+    const dialogRef = this.dialog.open(DatepickerDialog, {
+      disableClose: true,
+      data: this.currentDate()
+    });
+    dialogRef.afterClosed().subscribe(
+      {
+        next: (result) => {
+          if (result) {
+            this.appSvc.setDateOfData(result)
+            this.loadDocs();
+          }
+        }
+      }
+    );
   }
 
   /**
@@ -54,12 +93,36 @@ export class Docs implements OnInit {
     this.isLoading.set(true);
     this.docsService.getDocs().subscribe({
       next: (docs) => {
+        docs = docs.filter(doc => {
+          const docDate = new Date(doc.uploadDate);
+          return docDate.getMonth() + 1 === this.currentDate().month && docDate.getFullYear() === this.currentDate().year;
+        });
         this.dataSource.data = docs;
         this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Error cargando docs', err);
         this.isLoading.set(false);
+      }
+    });
+  }
+
+  openFile(docId: string) {
+    if (docId == "") return;
+
+    const link = document.createElement('a');
+
+    this.docsService.getDoc(docId).subscribe({
+      next: (doc) => {
+        link.href = 'https://drive.google.com/file/d/' + doc.driveFileId + '/view';
+        link.target = '_blank';
+        link.click();
+      },
+      error: (err) => {
+        console.error('Error cargando doc', err);
+        link.href = 'https://drive.google.com/file/d/' + docId + '/view';
+        link.target = '_blank';
+        link.click();
       }
     });
   }

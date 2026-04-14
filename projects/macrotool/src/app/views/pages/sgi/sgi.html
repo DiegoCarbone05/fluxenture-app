@@ -1,0 +1,779 @@
+<flux-toolbar title="SGI">
+    <button matButton="filled" color="primary" (click)="export()">Exportar</button>
+</flux-toolbar>
+
+<div class="container" #content>
+    <header>
+        <div class="logo-container">
+            <img src="assets/res/logo.png" alt="ServiSub">
+        </div>
+        <div class="header-center">
+            <h1>Registro del Sistema de Gestión Integral</h1>
+            <h2>PLANILLA DE ANALISIS DE INCIDENTES</h2>
+        </div>
+        <div class="header-right">
+            F-SEG-03<br>Ver. 02<br>Vig. 08/2022
+        </div>
+    </header>
+
+    <form>
+        <fieldset>
+            <!-- Datos Iniciales -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Técnico que investiga el accidente/incidente:</label>
+                    <input type="text" value="SANCHES FERRE">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Datos de la empresa:</label><input type="text" value="SERVISUB S.R.L">
+                </div>
+                <div class="form-group"><label>Servicio:</label><input type="text"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Supervisor:</label><input type="text"></div>
+                <div class="form-group"><label>Nombre del trabajador accidentado:</label>
+                    <input type="text" [formControl]="employeeName">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Tipo de accidente/incidente:</label><input type="text"
+                        value="LUGAR DE TRABAJO"></div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Descripción de la tarea</legend>
+            <div class="form-group" style="margin-bottom:15px;">
+                <label>TAREA: DESMALEZADO //</label>
+            </div>
+
+            <div class="question-block">
+                <label>Actividad que realizaba la persona accidentada en el momento del
+                    accidente/incidente</label>
+                <textarea rows="2"></textarea>
+            </div>
+
+            <div class="question-block">
+                <span class="question-text">1. Era una tarea habitual en el trabajo ( que se realiza varias
+                    veces
+                    durante el desarrollo normal del trabajo)?</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox"> Si</label>
+                    <label class="checkbox-item"><input type="checkbox"> No</label>
+                    <label class="checkbox-item"><input type="checkbox"> No corresponde por tratarse de trabajo
+                        in
+                        itinere</label>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="question-block">
+                    <span class="question-text">2.1 Se realizaba la tarea de la foma habitual (de la misma
+                        manera
+                        con la que se venía realizando)</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">2.2 Desarrollando la tarea de la forma habitual ¿era posible que
+                        ocurriera el accidente/incidente?</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <span class="question-text">2.3 ¿Por qué la persona accidentada realizaba la tarea de forma no
+                    habitual?</span>
+                <ul class="list-options">
+                    <li><label class="checkbox-item"><input type="checkbox"> No era posible realizarla de la
+                            forma
+                            habitual.</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Desconocía la forma habitual de
+                            realizar la tarea.</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Había recibido instrucciones de
+                            realizarla de esta manera</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Otros
+                            ............................</label></li>
+                </ul>
+            </div>
+
+            <div class="grid-2">
+                <div class="question-block">
+                    <span class="question-text">3. ¿La tarea que desarrollaba en el momento del
+                        accidente/incidente
+                        era propia de su puesto de trabajo?</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">4. ¿Con qué frecuencia había desarrollado durante su vida
+                        laboral
+                        esta misma tarea?</span>
+                    <ul class="list-options">
+                        <li><label class="checkbox-item"><input type="checkbox"> Era la primera vez</label></li>
+                        <li><label class="checkbox-item"><input type="checkbox"> De manera esporádica</label>
+                        </li>
+                        <li><label class="checkbox-item"><input type="checkbox"> Frecuentemente</label></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <div class="question-block">
+                    <span class="question-text">5.1. ¿Había recibido en la empresa instrucciones sobre como
+                        realizar
+                        la tarea?</span>
+                    <ul class="list-options">
+                        <li><label class="checkbox-item"><input type="checkbox"> No (pasar a preg. 6.3)</label>
+                        </li>
+                        <li><label class="checkbox-item"><input type="checkbox"> Si</label></li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">5.2.¿Qué tipo de instrucciones?</span>
+                    <ul class="list-options">
+                        <li><label class="checkbox-item"><input type="checkbox"> Escritas</label></li>
+                        <li><label class="checkbox-item"><input type="checkbox"> Verbales</label></li>
+                        <li><label class="checkbox-item"><input type="checkbox"> Ambas</label></li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">5.3. ¿De quién recibió las instrucciones?</span>
+                    <ul class="list-options">
+                        <li><label class="checkbox-item"><input type="checkbox"> Instrucciones de la
+                                Empresa</label>
+                        </li>
+                        <li><label class="checkbox-item"><input type="checkbox"> Instrucciones del
+                                Supervisor</label></li>
+                        <li><label class="checkbox-item"><input type="checkbox"> Instrucciones de
+                                compañeros</label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <span class="question-text">5.4. ¿Estaba realizando la tarea de acuerdo con las
+                    instrucciones?</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox"> Si</label>
+                    <label class="checkbox-item"><input type="checkbox"> No</label>
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <div class="question-block">
+                    <span class="question-text">6.1.¿La tarea se realiza habitualmente con algún tipo de
+                        protección
+                        personal?</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si</label>
+                        <label class="checkbox-item"><input type="checkbox"> No (pasar a la preg. 6.3)</label>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">6.2. ¿ La persona accidentada utilizaba estos equipos en el
+                        momento
+                        del accidente/incidente?</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">6.3. ¿Hubiera evitado el accidente/incidente la utilización de
+                        algún
+                        otro tipo de protección personal</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Descripción del hecho/Observaciones:</label>
+                <textarea rows="3"></textarea>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>LUGAR</legend>
+            <p style="font-size:0.8rem; color:#666; margin-top:-10px;">Espacio físico en el que sucedió el
+                accidente/incidente</p>
+
+            <div class="grid-2">
+                <div class="question-block">
+                    <span class="question-text">7.1. ¿La tarea se realizaba en el lugar habitual?</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">7.2 Desarrollando la tarea en el lugar habitual, ¿era posible
+                        que
+                        ocurriera el accidente/incidente?</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <span class="question-text">7.3 ¿Por qué la persona accidentada no realizaba la tarea en el
+                    lugar
+                    habitual?</span>
+                <ul class="list-options">
+                    <li><label class="checkbox-item"><input type="checkbox"> No era posible realizarla en el
+                            lugar
+                            habitual</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Desconocía el lugar
+                            habitual</label>
+                    </li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Había recibido instrucciones de
+                            realizarla en un lugar no habitual</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Otros ....................</label>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="question-block">
+                <span class="question-text">8. ¿Existe relación entre el accidente/incidente ocurrido y alguna
+                    de
+                    las circunstancias siguientes?</span>
+                <ul class="list-options grid-2">
+                    <li><label class="checkbox-item"><input type="checkbox"> Aberturas y huecos
+                            desprotegidos</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Zonas de trabajo, tránsito y
+                            almacenamiento no delimitadas</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Dificultad en el acceso al puesto
+                            de
+                            trabajo</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Dificultad en el movimiento en el
+                            puesto de trabajo</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox" checked> Escaleras en mal
+                            estado</label>
+                    </li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Pavimento deficiente (discontinuo,
+                            resbaladizo)</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Vías de evacuación insuficientes o
+                            no
+                            practicables</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Falta de orden y limpieza</label>
+                    </li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Otros</label></li>
+                </ul>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group"><label>FECHA:</label><input [formControl]="date" type="date"></div>
+                <div class="form-group"><label>Alta:</label><input type="text"></div>
+            </div>
+            <div class="form-group">
+                <label>Momento en que sucede el accidente/incidente</label>
+                <input type="text" value="LUGAR DE TRABAJO">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Momentos y Jornada</legend>
+            <div class="grid-2">
+                <div class="question-block">
+                    <span class="question-text">9.1. ¿La tarea relacionada con el accidente/incidente se estaba
+                        realizando en el momento habitual en que solía realizarse</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si (pasar a preg. 10)</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">9.2. Desarrollando la tarea en el momento habitual¿era posible
+                        que
+                        ocurriera el accidente/incidente?</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+            </div>
+            <div class="question-block">
+                <span class="question-text">9.3. ¿Por qué la persona accidentada no realizaba la tarea en el
+                    momento
+                    habitual?</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox"> Había surgido algún imprevisto</label>
+                    <label class="checkbox-item"><input type="checkbox"> Había recibido instrucciones</label>
+                    <label class="checkbox-item"><input type="checkbox"> Otros</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <span class="question-text">10. ¿Existe relación entre el accidente/incidente ocurrido y alguna
+                    de
+                    las circunstancias siguientes?</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox"> Realizando horas extra</label>
+                    <label class="checkbox-item"><input type="checkbox"> Doblando un turno</label>
+                    <label class="checkbox-item"><input type="checkbox"> Realizando una jornada superior a las 8
+                        horas</label>
+                    <label class="checkbox-item"><input type="checkbox"> Otros</label>
+                </div>
+            </div>
+            <div class="form-group"><label>Observaciones:</label><textarea rows="2"></textarea></div>
+        </fieldset>
+
+        <fieldset>
+            <legend>DIAGNOSTICO - EQUIPO DE TRABAJO</legend>
+            <div class="question-block">
+                <span class="question-text">12. ¿Se estaba utilizando máquina, herramienta, accesorio, vehículo,
+                    etc. en la realización de la tarea relacionada con el accidente/incidente?</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox"> Sí</label>
+                    <label class="checkbox-item"><input type="checkbox"> No</label>
+                </div>
+            </div>
+            <div class="grid-3">
+                <div class="question-block">
+                    <span class="question-text">12.1. ¿El equipo de trabajo utilizado era el habitual para el
+                        desarrollo de la tarea (el que se utiliza normalmente para esa tarea)?</span>
+                    <ul class="list-options">
+                        <li><label class="checkbox-item"><input type="checkbox"> Sí (pasar a la preg.
+                                13)</label>
+                        </li>
+                        <li><label class="checkbox-item"><input type="checkbox"> No</label></li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">12.2. Utilizando el equipo de trabajo habitual, ¿era posible que
+                        ocurriera el accidente/incidente?</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Si</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">12.3. ¿Por qué la persona accidentada no utilizaba el equipo de
+                        trabajo habitual?</span>
+                    <ul class="list-options">
+                        <li><label class="checkbox-item"><input type="checkbox"> Desconocía la existencia de un
+                                equipo habitual</label></li>
+                        <li><label class="checkbox-item"><input type="checkbox"> El equipo habitual lo estaba
+                                utilizando otra area</label></li>
+                        <li><label class="checkbox-item"><input type="checkbox"> El equipo habitual estaba
+                                estropeado o en mal estado</label></li>
+                        <li><label class="checkbox-item"><input type="checkbox"> Otros
+                                ......................</label></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <span class="question-text">13. ¿Existe relación entre el accidente/incidente ocurrido y alguno
+                    de
+                    los elementos siguientes?</span>
+                <div class="grid-2">
+                    <div>
+                        <strong>Máquinas</strong>
+                        <ul class="list-options">
+                            <li><label class="checkbox-item"><input type="checkbox"> Organos móviles alejados
+                                    del
+                                    punto de operación accesibles</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Zona de operación
+                                    desprotegida
+                                    o parcialmente protegida</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Arranque
+                                    intempestivo</label>
+                            </li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Anulación de
+                                    protectores</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Inexistencia de elementos o
+                                    dispositivos de control (indicador de nivel, limitador de ...)</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Ausencia de alarmas (puesta
+                                    en
+                                    marcha máquinas peligrosas, marcha atrás, vehículos, etc.)</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Paro de emergencia
+                                    inexistente</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Paro de emergencia no
+                                    accesible</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Ausencia de medios para la
+                                    consignación de la máquina</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Ausencia de protecciones
+                                    antivuelco (R.O.P.S)</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Deficiencia de protecciones
+                                    antivuelco en máquinas automotrices</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Ausencia de cabina de
+                                    protección contra caída de materiales</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Deficiencia de cabina de
+                                    protección contra caída de materiales</label></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <strong>Materiales / Instalaciones</strong>
+                        <ul class="list-options">
+                            <li><label class="checkbox-item"><input type="checkbox"> Materiales muy pesados en
+                                    relación con los medios de manutención utilizados</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Materiales con aristas,
+                                    perfiles cortantes</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Inestabilidad en
+                                    almacenamiento
+                                    por apilado</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Manipulación manual de
+                                    cargas</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Protección frente a
+                                    contactos
+                                    eléctricos directos inexistente</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Protección frente a
+                                    contactos
+                                    eléctricos indirectos inexistente</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Protección frente a
+                                    contactos
+                                    eléctricos indirectos defectuosa</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Focos de ignición no
+                                    controlados</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Inexistencia de
+                                    sectorización
+                                    de áreas de riesgo</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Insuficiencia de
+                                    sectorización
+                                    de áreas de riesgo</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Sistemas de detección
+                                    incendios-transmisión de alarmas incorrectos</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Instalaciones de extinción
+                                    de
+                                    incendio incorrectas</label></li>
+                            <li><label class="checkbox-item"><input type="checkbox"> Otros</label></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group"><label>Observaciones:</label><textarea rows="2"></textarea></div>
+        </fieldset>
+
+        <fieldset>
+            <legend>SUSTANCIAS/PRODUCTOS</legend>
+            <div class="question-block">
+                <span class="question-text">14. ¿Estaba implicado en el accidente/incidente algunas sustancia o
+                    producto peligroso?</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox"> Si</label>
+                    <label class="checkbox-item"><input type="checkbox"> No</label>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="question-block">
+                    <span class="question-text">15.1. ¿Es habitual la utilización o presencia de esa
+                        sustancia/producto para el desarrollo de la tarea relacionada con el
+                        accidente/incidente?</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Sí (pasa a la preg. 16)</label>
+                        <label class="checkbox-item"><input type="checkbox"> No</label>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <span class="question-text">15.2. ¿Por qué se estaba utilizando una sustancia/producto que
+                        no
+                        era de uso habitual?</span>
+                    <ul class="list-options">
+                        <li><label class="checkbox-item"><input type="checkbox"> Porque la habitual estaba
+                                agotada</label></li>
+                        <li><label class="checkbox-item"><input type="checkbox"> Normalmente no se utiliza
+                                ninguna
+                                sustancia, pero por circunstancias excepcionales se estaba utilizando.</label>
+                        </li>
+                        <li><label class="checkbox-item"><input type="checkbox"> Otros</label></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="question-block">
+                <span class="question-text">16. ¿Existe relación entre el accidente/incidente ocurrido y alguno
+                    de
+                    los elementos siguientes?</span>
+                <ul class="list-options grid-2">
+                    <li><label class="checkbox-item"><input type="checkbox"> Sustancia/producto
+                            explosivo</label>
+                    </li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Sustancia/producto
+                            inflamable</label>
+                    </li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Sustancia/producto tóxico</label>
+                    </li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Sustancia/producto
+                            corrosivo</label>
+                    </li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Sustancia/producto
+                            irritante</label>
+                    </li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Sustancia/producto sensibilizante
+                            por
+                            inhalación o cutánea</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Sustancia/producto que reacciona
+                            peligrosamente con el agua</label></li>
+                    <li><label class="checkbox-item"><input type="checkbox"> Otros .......</label></li>
+                </ul>
+            </div>
+            <div class="form-group"><label>Observaciones:</label><textarea rows="2"></textarea></div>
+        </fieldset>
+
+        <fieldset>
+            <legend>AMBIENTE DE TRABAJO</legend>
+            <span class="question-text">16. ¿Cuál de las siguientes condiciones del ambiente físico estaba
+                presente?</span>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="text-center" colspan="2">En el momento del accidente/incidente</th>
+                        <th class="text-center" colspan="2">Habitualmente</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th class="text-center">Si</th>
+                        <th class="text-center">No</th>
+                        <th class="text-center">Si</th>
+                        <th class="text-center">No</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Agresión térmica por frío /calor</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Nivel de ruido elevado</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Iluminación incorrecta (insuficiente, deslumbramientos, efecto estroboscópico, etc.)
+                        </td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Nivel de vibración que provoca pérdida de tacto o fatiga.</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Exposición a sustancias/productos tóxicos</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Exposición a contaminantes biológicos</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Agresiones por seres vivos</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Otros......</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>FACTORES ERGONOMICOS</legend>
+            <span class="question-text">17. ¿Cuál de las siguientes condiciones relacionadas con factores
+                ergonómicos estaba presente?</span>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="text-center" colspan="2">En el momento del accidente/incidente</th>
+                        <th class="text-center" colspan="2">Habitualmente</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Exceso de esfuerzo físico</td>
+                        <td class="text-center"><input type="checkbox"> Si</td>
+                        <td class="text-center"><input type="checkbox"> No</td>
+                        <td class="text-center"><input type="checkbox"> Si</td>
+                        <td class="text-center"><input type="checkbox"> No</td>
+                    </tr>
+                    <tr>
+                        <td>Manipulación de cargas</td>
+                        <td class="text-center"><input type="checkbox"> Si</td>
+                        <td class="text-center"><input type="checkbox"> No</td>
+                        <td class="text-center"><input type="checkbox"> Si</td>
+                        <td class="text-center"><input type="checkbox"> No</td>
+                    </tr>
+                    <tr>
+                        <td>Posturas forzadas</td>
+                        <td class="text-center"><input type="checkbox"> Si</td>
+                        <td class="text-center"><input type="checkbox"> No</td>
+                        <td class="text-center"><input type="checkbox"> Si</td>
+                        <td class="text-center"><input type="checkbox"> No</td>
+                    </tr>
+                    <tr>
+                        <td>Movimientos repetitivos</td>
+                        <td class="text-center"><input type="checkbox"> Si</td>
+                        <td class="text-center"><input type="checkbox"> No</td>
+                        <td class="text-center"><input type="checkbox"> Si</td>
+                        <td class="text-center"><input type="checkbox"> No</td>
+                    </tr>
+                    <tr>
+                        <td>Otros......</td>
+                        <td class="text-center"><input type="checkbox"> Si</td>
+                        <td class="text-center"><input type="checkbox"> No</td>
+                        <td class="text-center"><input type="checkbox"> Si</td>
+                        <td class="text-center"><input type="checkbox"> No</td>
+                    </tr>
+                </tbody>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>ORGANIZACIÓN DEL TRABAJO</legend>
+            <span class="question-text">18. ¿Cuál de las siguientes condiciones relacionadas con la organización
+                del
+                trabajo estaba presente?</span>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="text-center">Accidente Si/No</th>
+                        <th class="text-center">Habitualmente Si/No</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Simultaneidad de tareas el mismo operario</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Trabajo a velocidad o ritmo elevado</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Primas por productividad</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Trabajo monótono</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Trabajo aislado/solitario</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Falta de supervisión</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Trabajo a turnos</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Trabajo nocturno</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Trabajo temporal</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Exceso de horas de trabajo</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Exceso de esfuerzo mental</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>Otros......</td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="form-group" style="margin-top:10px;"><label>Observaciones:</label><textarea rows="2"></textarea>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Finalización</legend>
+            <div class="question-block">
+                <span class="question-text">Cumplimentado por:</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox"> Trabajador accidentado</label>
+                    <label class="checkbox-item"><input type="checkbox"> Servicio de Higiene y Seguridad</label>
+                    <label class="checkbox-item"><input type="checkbox"> Supervisor</label>
+                    <label class="checkbox-item"><input type="checkbox"> Trabajador testigo</label>
+                    <label class="checkbox-item"><input type="checkbox"> Trabajador designado</label>
+                    <label class="checkbox-item"><input type="checkbox"> Jefe</label>
+                </div>
+            </div>
+            <div class="grid-3">
+                <div class="form-group"><label>Testigo 1:</label><input type="text"></div>
+                <div class="form-group"><label>Testigo 2:</label><input type="text"></div>
+                <div class="form-group"><label>Testigo 3:</label><input type="text"></div>
+            </div>
+            <div class="form-group"><label>ANÁLISIS Y DETERMINACIÓN DE CAUSAS</label><textarea rows="3"></textarea>
+            </div>
+            <div class="form-group"><label>MEDIDAS A ADOPTAR EN RELACION AL ACCIDENTE/INCIDENTE - ACCIÓN
+                    CORRECTIVA</label><textarea rows="3"></textarea></div>
+            <div class="form-group"><label>OTRA MEDIDAS A ADOPTAR EN LUGAR DE TRABAJO</label><textarea
+                    rows="3"></textarea></div>
+        </fieldset>
+
+        <div class="footer-info">
+            <div><label>FECHA DE INVESTIGACION:</label><input type="text"></div>
+            <div>
+                <label>FIRMA del Profesional que investiga el accidente/incidente:</label>
+                <div style="text-align:right; font-weight:bold; margin-top:10px;">SERVISUB S.R.L.</div>
+            </div>
+        </div>
+
+        <!-- <div style="text-align:center; margin-top:30px;">
+                    <button type="button"
+                        style="padding:10px 40px; background:var(--primary-color); color:white; border:none; border-radius:4px; cursor:pointer;">Guardar
+                        Registro</button>
+                </div> -->
+    </form>
+</div>

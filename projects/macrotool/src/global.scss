@@ -1,0 +1,103 @@
+.header-dialog {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background-color: var(--primary);
+    color: white;
+    padding-left: 16px;
+    box-sizing: border-box;
+
+    h1 {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    button {
+        cursor: pointer;
+    }
+}
+
+.absent-type-chip {
+    width: fit-content;
+    height: fit-content;
+    padding: 2px 10px;
+    border-radius: 50px;
+    background-color: var(--primary);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    text-overflow: clip;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+
+    &.chip-VACATIONS {
+        background-color: #0EAD6D;
+        color: #D2F0E4;
+        transition: all 0.3s ease-in-out;
+    }
+
+    &.chip-MEDICAL_CERTIFICATE {
+        background-color: #3d7dc7;
+        color: #ECF2FD;
+        transition: all 0.3s ease-in-out;
+    }
+
+    &.chip-LICENSE {
+        background-color: #0EA8AD;
+        color: #D2EFF0;
+        transition: all 0.3s ease-in-out;
+    }
+
+    &.chip-SUSPENSION {
+        background-color: #F3E597;
+        color: #655814;
+        transition: all 0.3s ease-in-out;
+    }
+
+    &.chip-FT {
+        background-color: #AD0E0E;
+        color: #F0D2D2;
+        transition: all 0.3s ease-in-out;
+    }
+
+    &.chip-DT {
+        background-color: #AD0E0E;
+        color: #F0D2D2;
+        transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+    }
+
+    &.chip-DG {
+        background-color: #828282;
+        color: #EBEBEB;
+        transition: all 0.3s ease-in-out;
+    }
+
+    &.chip-PG {
+        background-color: #828282;
+        color: #EBEBEB;
+        transition: all 0.3s ease-in-out;
+    }
+
+    &.chip-DESPIDO {
+        background-color: #313131;
+        color: #ffffff;
+        transition: all 0.3s ease-in-out;
+    }
+
+    &.chip-RENUNCIA {
+        background-color: white;
+        border: 1px solid #313131;
+        color: #313131;
+        transition: all 0.3s ease-in-out;
+    }
+
+    &.chip-FERIADO {
+        background-color: #D89A64;
+        color: #603D35;
+        transition: all 0.3s ease-in-out;
+    }
+}

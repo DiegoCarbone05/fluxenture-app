@@ -6,6 +6,12 @@ import { EGender, Employee, ESector } from '../../../shared/models/Employee';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { AddEmployee } from '../../dialogs/add-employee/add-employee';
+import { MatSidenav } from '@angular/material/sidenav';
+import { ViewsService } from '../../views.service';
+import { CreateEmployeeHistoryDialogComponent } from '../../dialogs/create-employee-history/create-employee-history';
+import { EmployeeHistoryService } from '../../../core/services/employee-history/employee-history.service';
+import { EmployeeHistory } from '../../../shared/models/EmployeeHistory.model';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -16,6 +22,8 @@ import { AddEmployee } from '../../dialogs/add-employee/add-employee';
 })
 export class Eployees implements AfterViewInit {
 
+  isMobile = computed(() => this.viewsSvc.getIsMobile());
+  @ViewChild("sideNav") sideNav!: MatSidenav;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   searchFormControl = new FormControl<string>('');
@@ -54,7 +62,6 @@ export class Eployees implements AfterViewInit {
     { attr: 'email', text: 'Email' },
   ];
 
-
   filterByOptions: { attr: keyof Employee; value: any; text: string }[] = [
     { attr: 'gender', value: EGender.MALE, text: 'Masculino' },
     { attr: 'gender', value: EGender.FEMALE, text: 'Femenino' },
@@ -66,6 +73,20 @@ export class Eployees implements AfterViewInit {
     { attr: 'isOperational', value: false, text: 'Empleado no operativo' },
   ];
 
+  addHistory(employeeId: string) {
+    const dialog = this.addEmployeeDialog.open(CreateEmployeeHistoryDialogComponent, {
+      panelClass: 'full-screen-dialog',
+      data: { employeeId },
+      disableClose: true
+    });
+
+    dialog.afterClosed().subscribe((result: EmployeeHistory | undefined) => {
+      if (result) {
+        this.employeeHistoryService.saveHistory(result).subscribe();
+      }
+    });
+  }
+
   employees = computed(() => this.employeeService.getEmployeesSignal()());
   displayedColumns: string[] = ['employeeID', 'documentNumber', 'name', 'isOperational', 'sector', 'city', 'actions'];
   dataSource = new MatTableDataSource<Employee>([]);
@@ -73,7 +94,12 @@ export class Eployees implements AfterViewInit {
   searchBy = signal<keyof Employee>('name');
   filters = signal<keyof Employee | null>(null);
 
-  constructor(private employeeService: EmployeeService) {
+  constructor(
+    private employeeService: EmployeeService,
+    private viewsSvc: ViewsService,
+    private employeeHistoryService: EmployeeHistoryService,
+    private router: Router
+  ) {
 
     this.searchFormControl.valueChanges.subscribe((value) => {
       if (value?.length === 0) {
@@ -84,10 +110,11 @@ export class Eployees implements AfterViewInit {
         this.search();
       }
     });
+
+    this.viewsSvc.openSidenav$.subscribe(() => {
+      this.sideNav.toggle();
+    });
   }
-
-
-
 
   clearForms() {
     this.searchFormControl.reset();
@@ -105,12 +132,14 @@ export class Eployees implements AfterViewInit {
     }
   }
 
+  openEmployee(employee: Employee) {
+    this.router.navigate(['/main', "app-pages", 'eployees', employee.id]);
+  }
 
   search() {
     const searchValue = this.searchFormControl.value;
     if (searchValue) {
       const employees = this.employees().filter((employee: Employee) => {
-
         let value = employee[this.searchBy()] as string;
         const searchValueLower = searchValue.toLowerCase();
         value = value.toLowerCase();

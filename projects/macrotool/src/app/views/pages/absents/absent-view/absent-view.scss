@@ -1,0 +1,69 @@
+.absent-view {
+    width: 100%;
+    height: calc(100% - 64px);
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    box-sizing: border-box;
+
+    .absent-text {
+        color: gray;
+    }
+
+    .employee-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    button {
+        width: fit-content;
+    }
+
+    .content-item {
+        font-size: 1rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    .file-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .title-item {
+        font-size: 1rem;
+        font-weight: bold;
+        margin: 0;
+        color: gray;
+        text-transform: uppercase;
+    }
+
+    .chip {
+        border-radius: 50px;
+        width: fit-content;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #333;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #FF5500;
+
+        &.justified {
+            color: #30a775;
+        }
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .absent-view {
+        padding: 40px;
+    }
+}

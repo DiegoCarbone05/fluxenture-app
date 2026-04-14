@@ -1,25 +1,39 @@
-.status-chip-container{
+.status-chip-container {
     width: fit-content;
     padding: 0 10px;
     border-radius: 30px;
     display: flex;
     align-items: center;
-    font-weight: bold;
+    font-weight: 500;
     color: white;
-    justify-content: center;
     text-transform: uppercase;
-    
-    &.success{
+    overflow: hidden;
+
+    span {
+        // max-width: 100;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &.success {
         background-color: #D4EDBC;
         color: #11735D;
     }
-    &.error{
+
+    &.error {
         background-color: #FFCFC9;
         color: #B10202;
     }
-    &.no-status-pending{
+
+    &.warning {
+        background-color: #ffed89;
+        color: #8b7200;
+    }
+
+    &.no-status-pending {
         background-color: #F0F0F0;
         color: #808080;
     }
-    
+
 }

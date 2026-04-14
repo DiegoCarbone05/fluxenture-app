@@ -1,25 +1,83 @@
-.add-pdf-container{
+.add-pdf-container {
+    width: 100vw;
+    height: 100vh;
     display: flex;
-    padding: 20px;
     flex-direction: column;
     gap: 20px;
     background-color: var(--mat-sys-surface-container-high);
-    border-radius: 10px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
     max-width: 600px;
+    align-items: center;
 
-    form, mat-form-field{
+    form,
+    mat-form-field {
         width: 100%;
 
     }
-    .pdf-path-label{
+
+    .actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 0 20px;
+        box-sizing: border-box;
+        margin: auto;
+        margin-bottom: 20px;
+
+        button {
+            width: 100%;
+        }
+
+    }
+
+    .upload-pdf-btn {
+        width: 90%;
+
+    }
+
+    form {
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .pdf-path-label {
         width: 90%;
     }
-    .pdf-path-container{
+
+    .pdf-path-container {
         display: flex;
         flex-direction: row;
         gap: 10px;
         align-items: center;
         width: 100%;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+
+        h1 {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        button {
+            cursor: pointer;
+        }
+    }
+}
+
+@media (min-width: 768px) {
+    .add-pdf-container {
+        max-width: 600px;
+        height: fit-content;
     }
 }

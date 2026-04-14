@@ -1,25 +1,41 @@
-.absent-calendar {
-    display: grid;
-    grid-template-columns: 3fr auto;
-    width: 100%;
-    height: calc(100% - 64px);
-    background: rgb(255, 255, 255);
-    overflow: hidden;
+::ng-deep {
+
+    mat-tab-group {
+        height: calc(100% - 64px);
+        display: grid;
+        grid-template-rows: auto 1fr;
+        overflow: auto;
+
+        mat-tab-header {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-weight: 700;
+            background-color: white;
+            border-bottom: 1px solid #e4e4e4;
+            padding-left: 50px;
+
+        }
+
+        .mat-mdc-tab-body-wrapper {
+            height: 100%;
+        }
+    }
+
 }
 
-.calendar-container {
+.absent-calendar {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 1px);
     display: grid;
     grid-template-rows: auto 1fr;
+    overflow: auto;
     border-top: 1px solid #e4e4e4;
-    border-left: 1px solid #e4e4e4;
 
     .days {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
         width: 100%;
         height: 100%;
+
 
         .day-of-week {
             display: flex;
@@ -29,8 +45,6 @@
             height: 50px;
         }
     }
-
-
 
     .calendar {
         height: 100%;
@@ -48,12 +62,15 @@
             .day {
                 border-right: 1px solid #e4e4e4;
                 border-bottom: 1px solid #e4e4e4;
-                height: 100%;
+                height: calc(100% - 1px);
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 min-width: 0;
                 overflow: hidden;
+                transition: all 1s cubic-bezier(.02, .61, .17, 1.01);
+                outline: 3px solid transparent;
+                border-radius: 8px;
 
                 span {
                     margin-top: 10px;
@@ -79,7 +96,7 @@
                     overflow: hidden;
                     white-space: nowrap;
                     cursor: pointer;
-                    transition: all 0.3s ease-in-out;
+                    transition: all 1s ease-in-out;
 
                     &.highlight {
                         background-color: var(--primary) !important;
@@ -163,12 +180,84 @@
                     }
                 }
 
+
+                &:nth-child(7n+1) {
+                    background-color: #ffffff;
+                }
+
+                &:nth-child(7n) {
+                    background-color: #ffffff;
+                    border-right: none;
+                }
+
+                &:hover {
+                    background-color: white;
+                    transition: all 0.3s cubic-bezier(.02, .61, .17, 1.01);
+                    outline: 3px solid var(--primary);
+                    transform: translateY(-5px);
+                    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.233);
+
+                }
             }
 
 
         }
     }
+}
 
+.absent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 100px;
+    padding-top: 10px;
+    touch-action: pan-y;
+
+    .absent-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e4e4e4;
+        padding: 8px 16px;
+        touch-action: pan-y;
+
+        // &:hover {
+        //     background-color: #f8f8f8;
+        // }
+
+        .actions {
+            display: flex;
+            gap: 2px;
+        }
+
+        .absent {
+            width: 100%;
+            cursor: pointer;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            touch-action: pan-y;
+
+            .employee {
+                margin-top: 10px;
+                font-weight: 700;
+                font-size: 16px;
+            }
+
+            .date {
+                font-size: 12px;
+                color: #666;
+            }
+
+
+
+        }
+
+        &:hover {
+            background-color: #f0f0f0;
+        }
+    }
 
 }
 
@@ -184,15 +273,13 @@
 }
 
 @media screen and (min-width: 768px) {
-    .calendar-container {
+    .absent-calendar {
         .calendar {
 
             .week {
 
                 .day {
                     gap: 5px;
-
-                    span {}
 
                     .absent {
                         width: 90%;
@@ -205,6 +292,30 @@
                 }
 
 
+            }
+        }
+    }
+
+    .absent-list {
+        padding: 10px 50px;
+
+
+        .absent {
+            padding: 10px;
+
+
+            .employee {
+                font-weight: 700;
+                font-size: 20px;
+            }
+
+            .date {
+                font-size: 16px;
+                color: #666;
+            }
+
+            .chip {
+                margin-bottom: 10px;
             }
         }
     }

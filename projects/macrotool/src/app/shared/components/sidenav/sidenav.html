@@ -1,32 +1,67 @@
+<div class="list">
+    <img height="32px" src="assets/pictures/fluxenture_logo_dark.svg" alt="logo" class="logo">
+    <div class="list-item-content" routerLinkActive="selected" routerLink="/main/app-pages/tnt"
+        (click)="closeSidenav()">
+        <mat-icon>track_changes</mat-icon>
+        <span>Track And Trace</span>
+        <div class="pip-badge" routerLinkActive="active"></div>
+    </div>
+    <div class="list-item-content" routerLinkActive="selected" routerLink="/main/app-pages/eployees"
+        (click)="closeSidenav()">
+        <mat-icon>people</mat-icon>
+        <span>Empleados</span>
+        <div routerLinkActive="active"></div>
+    </div>
+    <div class="list-item-content" routerLinkActive="selected" routerLink="/main/app-pages/absents"
+        (click)="closeSidenav()">
+        <mat-icon>event_busy</mat-icon>
+        <span>Ausencias</span>
+        <div routerLinkActive="active"></div>
+    </div>
+    <div class="list-item-content" routerLinkActive="selected" routerLink="/main/app-pages/docs"
+        (click)="closeSidenav()">
+        <mat-icon>description</mat-icon>
+        <span>Documentos</span>
+        <div routerLinkActive="active"></div>
+    </div>
+    <div class="list-item-content" routerLinkActive="selected" routerLink="/main/app-pages/sgi"
+        (click)="closeSidenav()">
+        <mat-icon>falling</mat-icon>
+        <span>SGI</span>
+        <div routerLinkActive="active"></div>
+    </div>
+    <!-- 
 <mat-list role="list">
-    <img height="32px" src="assets/pictures/fluxenture_logo.svg" alt="logo" class="logo">
 
-    <mat-list-item role="listitem" routerLink="/main/app-pages/tnt">
-        <div class="list-item-content">
-            <mat-icon>track_changes</mat-icon>
-            <span>Track And Trace</span>
-            <div class="pip-badge" routerLinkActive="active"></div>
-        </div>
+    <mat-list-item role="listitem" routerLink="/main/app-pages/tnt" (click)="closeSidenav()">
+
     </mat-list-item>
-    <mat-list-item role="listitem" routerLink="/main/app-pages/eployees">
-        <div class="list-item-content">
+    <mat-list-item role="listitem" routerLink="/main/app-pages/eployees" (click)="closeSidenav()">
+        <div class="list-item-content" routerLinkActive="selected">
             <mat-icon>people</mat-icon>
             <span>Empleados</span>
             <div routerLinkActive="active"></div>
         </div>
     </mat-list-item>
-    <mat-list-item role="listitem" routerLink="/main/app-pages/absents">
-        <div class="list-item-content">
+    <mat-list-item role="listitem" routerLink="/main/app-pages/absents" (click)="closeSidenav()">
+        <div class="list-item-content" routerLinkActive="selected">
             <mat-icon>event_busy</mat-icon>
             <span>Ausencias</span>
             <div routerLinkActive="active"></div>
         </div>
     </mat-list-item>
-    <mat-list-item role="listitem" routerLink="/main/app-pages/docs">
-        <div class="list-item-content">
+    <mat-list-item role="listitem" routerLink="/main/app-pages/docs" (click)="closeSidenav()">
+        <div class="list-item-content" routerLinkActive="selected">
             <mat-icon>description</mat-icon>
             <span>Documentos</span>
             <div routerLinkActive="active"></div>
         </div>
     </mat-list-item>
-</mat-list>
+    <mat-list-item role="listitem" routerLink="/main/app-pages/sgi" (click)="closeSidenav()">
+        <div class="list-item-content" routerLinkActive="selected">
+            <mat-icon>falling</mat-icon>
+            <span>SGI</span>
+            <div routerLinkActive="active"></div>
+        </div>
+    </mat-list-item>
+</mat-list> -->

@@ -1,108 +1,102 @@
-<mat-drawer-container class="example-container">
-    <mat-drawer mode="side" #sideNav opened>
-        <flux-navbar></flux-navbar>
-    </mat-drawer>
-    <mat-drawer-content class="app-content">
-        <flux-toolbar title="Empleados">
-            <button matButton color="primary" (click)="openAddEmployeeDialog()"> <mat-icon>add</mat-icon>
-                <strong>AGREGAR</strong></button>
-        </flux-toolbar>
-        <div class="search-container">
-            <div class="search-content" [class.finded]="dataSource.data.length > 0">
-                <p class="search-title" [class.finded]="dataSource.data.length > 0">Buscar empleado</p>
-                <p class="search-description" [class.finded]="dataSource.data.length > 0">Ingrse algun dato para buscar
-                    un empleado.</p>
-                <div class="search-input-container">
-                    <input type="text" placeholder="Buscar" [formControl]="searchFormControl">
-                    <button matIconButton (click)="search()">
-                        <mat-icon>search</mat-icon>
-                    </button>
-                </div>
-                <div class="filter-container">
-                    <mat-menu #filterByMenu="matMenu">
-                        <button mat-menu-item *ngFor="let option of findByOptions" (click)="searchBy.set(option.attr)">
-                            <span>{{ option.text }}</span>
-                        </button>
-                    </mat-menu>
-                    <button mat-button [matMenuTriggerFor]="filterByMenu">
-                        <mat-icon>search</mat-icon>
-                        <span>Buscar por: <strong>{{searchBy() | titlecase}}</strong></span>
-                    </button>
-
-                    <mat-menu #activateFiltersMenu="matMenu">
-                        <button mat-menu-item (click)="filters.set(null)">
-                            <span>Ninguno</span>
-                        </button>
-                        <button mat-menu-item *ngFor="let option of filterByOptions" (click)="filters.set(option.attr)">
-                            <span>{{ option.text }}</span>
-                        </button>
-                    </mat-menu>
-                    <button mat-button [matMenuTriggerFor]="activateFiltersMenu">
-                        <mat-icon>{{filters() ? 'filter_list' : 'filter_list_off'}}</mat-icon>
-                        <span>{{filters() ? filters() : 'FIltros'}}</span>
-                    </button>
-                </div>
-
-                @if (dataSource.data.length > 0) {
-                <div class="table-container">
-                    <table mat-table [dataSource]="dataSource" class="tabla-custom-hover">
-                        <ng-container matColumnDef="employeeID">
-                            <th mat-header-cell *matHeaderCellDef>ID</th>
-                            <td mat-cell *matCellDef="let element">{{ element.employeeID }}</td>
-                        </ng-container>
-                        <ng-container matColumnDef="documentNumber">
-                            <th mat-header-cell *matHeaderCellDef>Documento</th>
-                            <td mat-cell *matCellDef="let element">{{ element.documentNumber}}</td>
-                        </ng-container>
-                        <ng-container matColumnDef="name">
-                            <th mat-header-cell *matHeaderCellDef>Nombre</th>
-                            <td mat-cell *matCellDef="let element"><strong>{{ element.name | uppercase }}</strong></td>
-
-                        </ng-container>
-                        <ng-container matColumnDef="isOperational">
-                            <th mat-header-cell *matHeaderCellDef>Operativo</th>
-                            <td mat-cell *matCellDef="let element">
-
-                                @if (element.isOperational) {
-                                <div class="status-sign active">
-                                    <mat-icon>check</mat-icon>
-                                    <span>Operativo</span>
-                                </div>
-                                } @else {
-                                <div class="status-sign not-active">
-                                    <mat-icon>close</mat-icon>
-                                    <span>Inactivo</span>
-                                </div>
-                                }
-
-                            </td>
-                        </ng-container>
-                        <ng-container matColumnDef="sector">
-                            <th mat-header-cell *matHeaderCellDef>Sector</th>
-                            <td mat-cell *matCellDef="let element">{{ element.sector | uppercase }}</td>
-                        </ng-container>
-                        <ng-container matColumnDef="city">
-                            <th mat-header-cell *matHeaderCellDef>Ciudad</th>
-                            <td mat-cell *matCellDef="let element">{{ element.city | titlecase }}</td>
-                        </ng-container>
-                        <ng-container matColumnDef="actions">
-                            <th mat-header-cell *matHeaderCellDef></th>
-                            <td mat-cell *matCellDef="let element">
-                                <button mat-icon-button (click)="openAddEmployeeDialog(element)" aria-label="Editar">
-                                    <mat-icon>edit</mat-icon>
-                                </button>
-                            </td>
-                        </ng-container>
-
-                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                    </table>
-                    <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons
-                        aria-label="Select page of employees">
-                    </mat-paginator>
-                </div>
-                }
-            </div>
+<flux-toolbar title="Empleados">
+</flux-toolbar>
+<div class="search-container">
+    <div class="search-content" [class.finded]="dataSource.data.length > 0">
+        <p class="search-title" [class.finded]="dataSource.data.length > 0">Buscar empleado</p>
+        <p class="search-description" [class.finded]="dataSource.data.length > 0">Ingrse algun dato para buscar
+            un empleado.</p>
+        <div class="search-input-container">
+            <input type="text" placeholder="Buscar" [formControl]="searchFormControl">
         </div>
-    </mat-drawer-content>
-</mat-drawer-container>
+        <div class="filter-container">
+            <mat-menu #filterByMenu="matMenu">
+                <button mat-menu-item *ngFor="let option of findByOptions" (click)="searchBy.set(option.attr)">
+                    <span>{{ option.text }}</span>
+                </button>
+            </mat-menu>
+            <button mat-button [matMenuTriggerFor]="filterByMenu">
+                <mat-icon>search</mat-icon>
+                <span>Buscar por: <strong>{{searchBy() | titlecase}}</strong></span>
+            </button>
+
+            <mat-menu #activateFiltersMenu="matMenu">
+                <button mat-menu-item (click)="filters.set(null)">
+                    <span>Ninguno</span>
+                </button>
+                <button mat-menu-item *ngFor="let option of filterByOptions" (click)="filters.set(option.attr)">
+                    <span>{{ option.text }}</span>
+                </button>
+            </mat-menu>
+            <button mat-button [matMenuTriggerFor]="activateFiltersMenu">
+                <mat-icon>{{filters() ? 'filter_list' : 'filter_list_off'}}</mat-icon>
+                <span>{{filters() ? filters() : 'FIltros'}}</span>
+            </button>
+        </div>
+
+        @if (dataSource.data.length > 0) {
+        <div class="table-container">
+            <table mat-table [dataSource]="dataSource" class="tabla-custom-hover">
+                <ng-container matColumnDef="employeeID">
+                    <th mat-header-cell *matHeaderCellDef>ID</th>
+                    <td mat-cell *matCellDef="let element">{{ element.employeeID }}</td>
+                </ng-container>
+                <ng-container matColumnDef="documentNumber">
+                    <th mat-header-cell *matHeaderCellDef>Documento</th>
+                    <td mat-cell *matCellDef="let element">{{ element.documentNumber}}</td>
+                </ng-container>
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                    <td mat-cell *matCellDef="let element"><strong>{{ element.name | uppercase }}</strong></td>
+
+                </ng-container>
+                <ng-container matColumnDef="isOperational">
+                    <th mat-header-cell *matHeaderCellDef>Operativo</th>
+                    <td mat-cell *matCellDef="let element">
+
+                        @if (element.isOperational) {
+                        <div class="status-sign active">
+                            <mat-icon>check</mat-icon>
+                            <span>Operativo</span>
+                        </div>
+                        } @else {
+                        <div class="status-sign not-active">
+                            <mat-icon>close</mat-icon>
+                            <span>Inactivo</span>
+                        </div>
+                        }
+
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="sector">
+                    <th mat-header-cell *matHeaderCellDef>Sector</th>
+                    <td mat-cell *matCellDef="let element">{{ element.sector | uppercase }}</td>
+                </ng-container>
+                <ng-container matColumnDef="city">
+                    <th mat-header-cell *matHeaderCellDef>Ciudad</th>
+                    <td mat-cell *matCellDef="let element">{{ element.city | titlecase }}</td>
+                </ng-container>
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-icon-button (click)="openAddEmployeeDialog(element)" aria-label="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="addHistory(element.id)" aria-label="Agregar historial">
+                            <mat-icon>history</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="openEmployee(row)"></tr>
+            </table>
+            <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Select page of employees">
+            </mat-paginator>
+        </div>
+        }
+    </div>
+</div>
+
+<button matFab color="primary" class="add-button" (click)="openAddEmployeeDialog()">
+    <mat-icon>add</mat-icon>
+</button>

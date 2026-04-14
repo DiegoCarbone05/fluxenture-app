@@ -1,64 +1,87 @@
-<mat-drawer-container class="example-container">
-    <mat-drawer mode="side" #sideNav opened>
-        <flux-navbar></flux-navbar>
-    </mat-drawer>
-    <mat-drawer-content class="app-content">
-        <flux-toolbar title="Track And Trace">
-            <button matButton="filled" color="primary" (click)="loadPDF()"> <mat-icon>add</mat-icon> <strong>AGREGAR
-                    CD</strong></button>
-        </flux-toolbar>
-        <div class="table-container">
-            <table mat-table [dataSource]="dataSource" matSort matSortActive="emission_date" matSortDirection="desc" class="tabla-custom-hover">
-                <ng-container matColumnDef="follow_number">
-                    <th mat-header-cell *matHeaderCellDef>Numero de seguimiento</th>
-                    <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">{{ element.trackingNumber }}
-                    </td>
-                </ng-container>
+<flux-toolbar title="Track & Trace"></flux-toolbar>
+<div class="table-container">
+    <table *ngIf="!isMobile()" mat-table [dataSource]="dataSource" matSort matSortActive="emission_date"
+        matSortDirection="desc" class="tabla-custom-hover">
+        <ng-container matColumnDef="follow_number">
+            <th mat-header-cell *matHeaderCellDef>Numero de seguimiento</th>
+            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
+                <div class="td-content">
+                    {{ element.trackingNumber }}
+                </div>
+            </td>
+        </ng-container>
 
-                <ng-container matColumnDef="name">
-                    <th mat-header-cell *matHeaderCellDef>Name</th>
-                    <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)"><strong>{{
-                            returnEmployeeName(element.employeeId) }}</strong>
-                    </td>
-                </ng-container>
-                <ng-container matColumnDef="emission_date">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de emisión</th>
-                    <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">{{ element.emissionDate |
-                        date: 'dd/MM/yy' }}
-                    </td>
-                </ng-container>
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
+                <div class="td-content employee-name">
+                    {{returnEmployeeName(element.employeeId) }}
+                </div>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="emission_date">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de emisión</th>
+            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
+                <div class="td-content">
+                    {{ element.emissionDate | date: 'dd/MM/yy' }}
+                </div>
+            </td>
+        </ng-container>
 
 
-                <ng-container matColumnDef="cd_path">
-                    <th mat-header-cell *matHeaderCellDef>Carta de documento</th>
-                    <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">{{element.cdPath}}</td>
-                </ng-container>
+        <ng-container matColumnDef="cd_path">
+            <th mat-header-cell *matHeaderCellDef>Carta de documento</th>
+            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
+                <div class="td-content">
+                    {{element.cdPath}}
+                </div>
+            </td>
+        </ng-container>
 
-                <ng-container matColumnDef="obs">
-                    <th mat-header-cell *matHeaderCellDef>Observacion</th>
-                    <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
-                        {{ element.obs }}
-                    </td>
-                </ng-container>
+        <ng-container matColumnDef="obs">
+            <th mat-header-cell *matHeaderCellDef>Observacion</th>
+            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
+                <div class="td-content">
+                    {{ element.obs }}
+                </div>
+            </td>
+        </ng-container>
 
-                <ng-container matColumnDef="last_status">
-                    <th mat-header-cell *matHeaderCellDef>Progreso</th>
-                    <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
-                        <app-cd-status-chip [status]="element.tnt | tntStatusPipe | async"></app-cd-status-chip>
-                    </td>
-                </ng-container>
+        <ng-container matColumnDef="last_status">
+            <th mat-header-cell *matHeaderCellDef>Progreso</th>
+            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
+                <app-cd-status-chip [status]="element.tnt | tntStatusPipe | async"></app-cd-status-chip>
+            </td>
+        </ng-container>
 
-                <ng-container matColumnDef="actions">
-                    <th mat-header-cell *matHeaderCellDef>Acciones</th>
-                    <td mat-cell *matCellDef="let element">
-                        <button matButton="text" color="primary" (click)="editCd(element)">Modificar</button>
-                        <button matButton="text" color="warn" (click)="deleteCd(element)">Eliminar</button>
-                    </td>
-                </ng-container>
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr [class.finalized]="row.trackingCompleted" mat-row *matRowDef="let row; columns: displayedColumns">
-                </tr>
-            </table>
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let element">
+                <button matIconButton color="primary" (click)="editCd(element)"><mat-icon>edit</mat-icon></button>
+                <button matIconButton color="warn" (click)="deleteCd(element)"><mat-icon>delete</mat-icon></button>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr [class.finalized]="row.trackingCompleted" mat-row *matRowDef="let row; columns: displayedColumns">
+        </tr>
+    </table>
+
+    <div *ngIf="isMobile()" class="mobile-list">
+        @for (item of sortedCds(); track $index) {
+        <div class="mobile-item" (click)="openCdsViewer(item)">
+            <div class="mobile-item-header">
+                <span class="mobile-item-name">{{returnEmployeeName(item.employeeId) }}</span>
+                <app-cd-status-chip [status]="item.tnt | tntStatusPipe | async"></app-cd-status-chip>
+            </div>
+            <div class="mobile-item-details">
+                <span class="mobile-item-date">{{ item.emissionDate | date: 'dd/MM/yy' }}</span>
+                <span class="mobile-item-tracking">{{ item.trackingNumber }}</span>
+            </div>
         </div>
-    </mat-drawer-content>
-</mat-drawer-container>
+        }
+    </div>
+</div>
+
+<button matFab color="primary" class="add-button" (click)="loadPDF()">
+    <mat-icon>add</mat-icon>
+</button>

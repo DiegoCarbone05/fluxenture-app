@@ -1,22 +1,35 @@
 .add-employee-container {
-    width: 100%;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding: 20px;
     background-color: var(--mat-sys-surface-container-high);
-    max-height: 80vh;
     box-sizing: border-box;
+    border-radius: 0;
+    max-width: 940px;
 
     form,
     mat-form-field {
         width: 100%;
     }
 
+    mat-form-field {
+        max-width: 600px;
+    }
+
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 0 20px;
+        padding-right: 10px;
+        background-color: var(--primary);
+        color: white;
+
+        h1 {
+            font-size: 20px;
+        }
     }
 
     mat-checkbox {
@@ -48,7 +61,13 @@
         justify-content: flex-end;
         gap: 12px;
         padding: 0 25px;
-        margin-bottom: 25px ;
+        margin-bottom: 25px;
         box-sizing: border-box;
+    }
+}
+
+@media (min-width: 940px) {
+    .add-employee-container {
+        height: fit-content;
     }
 }

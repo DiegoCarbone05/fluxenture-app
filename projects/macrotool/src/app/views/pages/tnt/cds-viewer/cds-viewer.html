@@ -1,4 +1,4 @@
-<flux-toolbar [backButton]="true" title="Carta de documento de: {{ employee()?.name }}" (backClick)="goBack()">
+<flux-toolbar [backButton]="true" [menuButton]="false" (backClick)="goBack()">
   <button matButton color="primary" (click)="downloadFile()"> Descargar PDF</button>
   <button matButton="filled" color="primary" (click)="exportPDF()"> <strong>EXPORTAR</strong></button>
 </flux-toolbar>

@@ -6,7 +6,8 @@
         </button>
     </div>
     <form [formGroup]="form">
-        <mat-stepper #stepper="matStepper" [linear]="isEditMode ? false : true">
+        <mat-stepper #stepper="matStepper" [orientation]="isMobile() ? 'vertical' : 'horizontal'"
+            [linear]="isEditMode ? false : true">
 
             <!-- Step 1: Identification -->
             <mat-step [stepControl]="identificationForm" label="Identificación">
@@ -75,7 +76,7 @@
                     </mat-form-field>
                     <mat-form-field appearance="outline">
                         <mat-label>Sector</mat-label>
-                        <mat-select formControlName="sector" [compareWith]="compareSector">
+                        <mat-select formControlName="sector">
                             @for (opt of sectorOptions; track opt.value) {
                             <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
                             }
@@ -154,7 +155,8 @@
             </mat-step>
         </mat-stepper>
         <div class="actions-edit" *ngIf="isEditMode">
-            <button mat-flat-button color="primary" (click)="saveEmployee()" [disabled]="form.invalid">Guardar cambios</button>
+            <button mat-flat-button color="primary" (click)="saveEmployee()" [disabled]="form.invalid">Guardar
+                cambios</button>
         </div>
     </form>
 

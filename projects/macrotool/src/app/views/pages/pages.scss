@@ -1,0 +1,30 @@
+mat-drawer {
+    width: 100% !important;
+    max-width: 300px !important;
+    min-width: 200px !important;
+    border: none !important;
+    background-color: #2E2F41;
+    color: white;
+
+
+    mat-list-item {
+        &:hover {
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+    }
+}
+
+mat-drawer-container {
+    height: 100%;
+}
+
+@media (min-width: 940px) {
+    mat-drawer {
+        width: 22vw !important;
+
+        max-width: 300px !important;
+        min-width: 200px !important;
+        border: none !important;
+    }
+}

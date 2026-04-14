@@ -1,0 +1,45 @@
+<h2 mat-dialog-title>Nuevo cambio en empleado</h2>
+<mat-dialog-content [formGroup]="historyForm">
+  <div class="form-grid">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tipo de Evento</mat-label>
+      <mat-select formControlName="type" required>
+        <mat-option *ngFor="let type of eventTypes" [value]="type.value">{{type.label}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Descripción</mat-label>
+      <textarea matInput formControlName="description" rows="3"></textarea>
+    </mat-form-field>
+  </div>
+
+  @if (historyForm.get('docId')?.value) {
+  <div class="flux-dox-loaded">
+    <div class="text-container">
+      <p class="title">Archivo cargado</p>
+    </div>
+
+    <div class="actions">
+      <button matIconButton>
+        <mat-icon>visibility</mat-icon>
+      </button>
+      <button matIconButton style="background-color: #01964e;" (click)="deleteFile()">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+  }@else {
+
+  <button mat-flat-button color="primary" (click)="addDocument()">
+    <mat-icon>attach_file</mat-icon>
+    Agregar documento
+  </button>
+
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="primary" [disabled]="historyForm.invalid" (click)="save()">Guardar Registro</button>
+</mat-dialog-actions>

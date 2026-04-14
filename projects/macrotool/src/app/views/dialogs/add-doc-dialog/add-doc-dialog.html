@@ -1,108 +1,140 @@
-@switch (uploadStatus()) {
-@case (UploadStatus.UPLOADING) {
-<div class="loading-screen">
-  <mat-spinner></mat-spinner>
-  <span>Subiendo documento...</span>
-</div>
-}
-@case (UploadStatus.ERROR) {
-<div class="error-screen">
-  <mat-icon class="error-icon">error</mat-icon>
-  <span>Error al subir el documento</span>
-  <span>{{ errorMessage() }}</span>
-</div>
-}
-@case (UploadStatus.SUCCESS) {
-<div class="success-screen">
-  <mat-icon class="success-icon">check_circle</mat-icon>
-  <span>Documento subido exitosamente</span>
-</div>
-}
-@default {
-<h2 mat-dialog-title>Agregar Nuevo Documento</h2>
-
-<form [formGroup]="form" (ngSubmit)="onSave()">
-  <mat-dialog-content class="mat-typography">
-    <div class="form-container">
-
-      <!-- Input con Autocomplete para Empleados -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Buscar Empleado (Nombre o Legajo)</mat-label>
-        <input type="text" placeholder="Escriba para buscar..." matInput formControlName="employee"
-          [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn"
-          (optionSelected)="onEmployeeSelected($event)">
-          @for (emp of filteredEmployees | async; track emp) {
-          <mat-option [value]="emp">
-            {{ emp.name }} <small>({{ emp.employeeID }})</small>
-          </mat-option>
-          }
-        </mat-autocomplete>
-        <mat-error *ngIf="form.get('employee')?.hasError('required')">
-          Debe seleccionar un empleado de la lista
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Tipo de Documento</mat-label>
-        <mat-select formControlName="type">
-          @for (type of docTypes; track type) {
-          <mat-option [value]="type">
-            {{ type }}
-          </mat-option>
-          }
-        </mat-select>
-        <mat-error *ngIf="form.get('type')?.hasError('required')">
-          Debe seleccionar el tipo de documento
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Descripción</mat-label>
-        <textarea matInput formControlName="description" placeholder="Escriba una breve descripción..."
-          rows="3"></textarea>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Fecha de emisión</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="date">
-        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-        <mat-error *ngIf="form.get('date')?.hasError('required')">
-          Debe seleccionar la fecha de emisión
-        </mat-error>
-      </mat-form-field>
-
-      <div class="file-upload-section">
-        <label class="file-label">Archivo (PDF, JPG, PNG):</label>
-        <div class="file-input-wrapper">
-          <button type="button" mat-stroked-button color="accent" (click)="fileInput.click()">
-            <mat-icon>attach_file</mat-icon>
-            Seleccionar Archivo
-          </button>
-          <span class="file-name" *ngIf="form.get('file')?.value">
-            {{ form.get('file')?.value?.name }}
-          </span>
-          <input #fileInput type="file" (change)="onFileSelected($event)"
-            accept="application/pdf, image/jpeg, image/png, image/jpg" hidden>
-        </div>
-        <mat-error class="custom-error" *ngIf="form.get('file')?.invalid && form.get('file')?.touched">
-          El archivo es obligatorio y debe ser PDF, JPG o PNG
-        </mat-error>
+<div class="container">
+  @switch (uploadStatus()) {
+  @case (UploadStatus.ERROR) {
+  <div class="lienzo">
+    <div class="bubble err"></div>
+    <div class="content">
+      <div class="icon-container err">
+        <mat-icon class="error-icon">cancel</mat-icon>
       </div>
+      <span>Error al subir el documento</span>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  </div>
+  }
+  @case (UploadStatus.SUCCESS) {
+  <div class="lienzo">
+    <div class="bubble success"></div>
+    <div class="content">
+      <div class="icon-container success">
+        <mat-icon class="success-icon">check_circle</mat-icon>
+      </div>
+      <span>Documento subido exitosamente</span>
+    </div>
+  </div>
+  }}
 
+
+
+  <div class="header">
+    <div class="wrap">
+      <h2>Agregar Nuevo Documento</h2>
+      <span>Archivos soportados: PDF, JPG o PNG, DOCX</span>
     </div>
 
-
-  </mat-dialog-content>
-
-  <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-      <mat-icon>cloud_upload</mat-icon>
-      Subir Documento
+    <button mat-icon-button (click)="onCancel()">
+      <mat-icon>close</mat-icon>
     </button>
-  </mat-dialog-actions>
-</form>
-}
-}
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSave()">
+    <mat-dialog-content class="mat-typography">
+      <div class="form-container">
+
+        <!-- Input con Autocomplete para Empleados -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Buscar Empleado (Nombre o Legajo)</mat-label>
+          <input type="text" placeholder="Escriba para buscar..." matInput formControlName="employee"
+            [matAutocomplete]="auto">
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn"
+            (optionSelected)="onEmployeeSelected($event)">
+            @for (emp of filteredEmployees | async; track emp) {
+            <mat-option [value]="emp">
+              {{ emp.name }} <small>({{ emp.employeeID }})</small>
+            </mat-option>
+            }
+          </mat-autocomplete>
+          <mat-error *ngIf="form.get('employee')?.hasError('required')">
+            Debe seleccionar un empleado de la lista
+          </mat-error>
+        </mat-form-field>
+
+        <div class="row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tipo de Documento</mat-label>
+            <mat-select formControlName="type">
+              @for (type of docTypes; track type) {
+              <mat-option [value]="type.value">
+                {{ type.label }}
+              </mat-option>
+              }
+            </mat-select>
+            <mat-error *ngIf="form.get('type')?.hasError('required')">
+              Debe seleccionar el tipo de documento
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha de emisión</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="form.get('date')?.hasError('required')">
+              Debe seleccionar la fecha de emisión
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Descripción</mat-label>
+          <input matInput formControlName="description" placeholder="Escriba una breve descripción..." rows="3">
+        </mat-form-field>
+
+
+
+        <div class="file-upload-section">
+          @if ((form.value.file == null) && (currentFileID() == '')) {
+          <!-- Solo se muestra el input si no hay archivo -->
+          <div class="file-input-wrapper" appDragDropFile (click)="fileInput.click()"
+            (fileDropped)="onFileDropped($event)">
+            <mat-icon>upload_file</mat-icon>
+            <label for="fileInput">Arrastra archivos aquí o <strong>haz clic para subir</strong></label>
+            <small>También puedes pegar (Ctrl+V) una imagen o archivo</small>
+            <input #fileInput type="file" (change)="onFileSelected($event)"
+              accept="application/pdf, image/jpeg, image/png, image/jpg, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              hidden>
+          </div>
+          <mat-error class="custom-error" *ngIf="form.get('file')?.invalid && form.get('file')?.touched">
+            El archivo es obligatorio y debe ser PDF, JPG o PNG, DOCX
+          </mat-error>
+          }@else {
+          <div class="flux-dox-loaded">
+            <div class="text-container">
+              <p class="title">Archivo cargado</p>
+              <small class="desc">{{fluxDocUploadMsg()}}</small>
+            </div>
+
+            <div class="actions">
+              <button matIconButton>
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button matIconButton style="background-color: #01964e;" (click)="onDeleteFile()">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button color="primary" type="submit" class="dialog-btn submit-btn" [disabled]="form.invalid">
+        <mat-icon>cloud_upload</mat-icon>
+        Subir Documento
+        <div class="progress-bar" [style.width.%]="progress()"></div>
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

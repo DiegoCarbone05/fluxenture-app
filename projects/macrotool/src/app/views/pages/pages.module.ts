@@ -26,6 +26,9 @@ import { Absents } from './absents/absents';
 import { Docs } from './docs/docs';
 import { AddDocDialog } from '../dialogs/add-doc-dialog/add-doc-dialog';
 import { AddAbsentDialog } from '../dialogs/add-absent-dialog/add-absent-dialog';
+import { Sgi } from './sgi/sgi';
+import { AbsentView } from './absents/absent-view/absent-view';
+import { EmpView } from './eployees/emp-view/emp-view';
 
 @NgModule({
   declarations: [
@@ -37,6 +40,9 @@ import { AddAbsentDialog } from '../dialogs/add-absent-dialog/add-absent-dialog'
     Docs,
     AddDocDialog,
     AddAbsentDialog,
+    Sgi,
+    AbsentView,
+    EmpView,
   ],
   imports: [
     CommonModule,

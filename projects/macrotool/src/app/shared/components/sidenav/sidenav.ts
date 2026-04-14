@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { ViewsService } from '../../../views/views.service';
 
 @Component({
   selector: 'flux-navbar',
@@ -8,4 +9,12 @@ import { Component } from '@angular/core';
 })
 export class Sidenav {
 
+  private viewsSvc = inject(ViewsService);
+  isMobile = computed(() => this.viewsSvc.getIsMobile());
+
+  closeSidenav() {
+    if (this.isMobile()) {
+      this.viewsSvc.toggleSidenav();
+    }
+  }
 }

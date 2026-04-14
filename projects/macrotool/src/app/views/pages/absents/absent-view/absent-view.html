@@ -1,0 +1,43 @@
+<flux-toolbar title="Ausencia" [menuButton]="false" [backButton]="true">
+</flux-toolbar>
+<div class="absent-view">
+    <div class="chip" [class.justified]="absent()?.justified">
+        <mat-icon>{{absent()?.justified ? 'check_circle' : 'cancel'}}</mat-icon>
+        <span>{{absent()?.justified ? 'Ausencia Justificada' : 'Ausencia No Justificada'}}</span>
+    </div>
+    <p class="employee-name">{{employee()?.name}}</p>
+    <br>
+
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span class="title-item">tipo de ausencia: </span>
+        <div class="absent-type-chip" [class]="'chip-' + absent()?.type">
+            {{absent()?.type | abstentType}}
+        </div>
+
+    </div>
+    <br>
+    <p class="title-item">ARCHIVO</p>
+    <div class="file-buttons">
+        <button mat-button (click)="openFile(absent()?.documentId)">
+            Abrir archivo
+            <mat-icon>file_open</mat-icon>
+        </button>
+        <button mat-flat-button color="primary" (click)="downloadFile(absent()?.documentId)">
+            Descargar archivo
+            <mat-icon>file_download</mat-icon>
+        </button>
+    </div>
+
+    <br>
+    <p class="title-item">periodo de ausencia</p>
+    <p class="content-item">De <b>{{absent()?.originalStartDate | date:"dd/MM/yyyy"}}</b> a
+        <b>{{absent()?.originalEndDate | date:"dd/MM/yyyy"}}</b>
+    </p>
+    <br>
+    <p class="title-item">dias ausente</p>
+    <p class="content-item">{{absent()?.impactDaysInMonth}}</p>
+    <br>
+    <p class="title-item">OBSERVACIONES</p>
+    <p class="content-item">{{absent()?.observations || 'Sin observaciones'}}</p>
+</div>

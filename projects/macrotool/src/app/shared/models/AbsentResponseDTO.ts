@@ -7,4 +7,5 @@ export interface AbsentResponseDTO {
     originalStartDate: string;
     originalEndDate: string;
     impactDaysInMonth: number;
+    observations: string;
 }

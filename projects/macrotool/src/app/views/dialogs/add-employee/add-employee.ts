@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Employee, EGender, ECivilStatus, ESector } from '../../../shared/models/Employee';
+import { ViewsService } from '../../views.service';
 
 export interface AddEmployeeDialogData {
   employee?: Employee;
@@ -20,6 +21,11 @@ export class AddEmployee implements OnInit {
   /** Employee to edit, or undefined for create mode */
   readonly employee: Employee | undefined = this.dialogData?.employee;
   readonly isEditMode = !!this.employee;
+  isMobile = computed(() => this.viewSvc.getIsMobile());
+
+  constructor(private viewSvc: ViewsService) {
+
+  }
 
   readonly genderOptions: { value: EGender; label: string }[] = [
     { value: EGender.MALE, label: 'Masculino' },
@@ -76,28 +82,6 @@ export class AddEmployee implements OnInit {
     contact: this.contactForm,
   });
 
-  /** Normalizes sector from API (number, string number, or enum key) to ESector */
-  private normalizeSector(value: unknown): ESector {
-    if (typeof value === 'number' && !isNaN(value) && value >= 0 && value <= 2) {
-      return value as ESector;
-    }
-    if (typeof value === 'string') {
-      const num = parseInt(value, 10);
-      if (!isNaN(num) && num >= 0 && num <= 2) return num as ESector;
-      const keyMap: Record<string, ESector> = {
-        DESMALEZADO: ESector.DESMALEZADO,
-        CLEANING_OPERATOR: ESector.CLEANING_OPERATOR,
-        ADMINISTRATION: ESector.ADMINISTRATION,
-      };
-      if (value in keyMap) return keyMap[value];
-    }
-    return ESector.ADMINISTRATION;
-  }
-
-  /** Compares sector values (handles number from DB vs enum number) */
-  compareSector = (a: unknown, b: unknown): boolean =>
-    this.normalizeSector(a) === this.normalizeSector(b);
-
   ngOnInit(): void {
     if (this.employee) {
       this.patchFormWithEmployee(this.employee);
@@ -118,7 +102,7 @@ export class AddEmployee implements OnInit {
     });
     this.workForm.patchValue({
       employeeID: emp.employeeID,
-      sector: this.normalizeSector(emp.sector),
+      sector: emp.sector,
       isOperational: emp.isOperational,
       entryDate: emp.entryDate ?? '',
       leaveDate: emp.leaveDate ?? '',

@@ -1,79 +1,88 @@
-<mat-drawer-container class="example-container">
-    <mat-drawer mode="side" #sideNav opened>
-        <flux-navbar title="Documentos"></flux-navbar>
-    </mat-drawer>
-    <mat-drawer-content class="app-content">
-        <flux-toolbar title="Documentos">
-            <button matButton="filled" color="primary" (click)="openDialog()">
-                <mat-icon>add</mat-icon>
-                Nuevo Documento
-            </button>
-        </flux-toolbar>
+<flux-toolbar title="Documentos" subTitle="{{ months[ currentDate().month - 1]}} - {{currentDate().year}}">
+    <button matIconButton (click)="openDatePickerDialog()">
+        <mat-icon>calendar_today</mat-icon>
+    </button>
+</flux-toolbar>
 
-        <div class="table-container">
+<div class="table-container">
 
-            <!-- Loading -->
-            @if (isLoading()) {
-            <div class="loading-wrapper">
-                <mat-spinner diameter="40"></mat-spinner>
-            </div>
-            } @else {
+    <!-- Loading -->
+    @if (isLoading()) {
+    <div class="loading-wrapper">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+    } @else {
 
-            <!-- Tabla -->
-            <mat-table [dataSource]="dataSource" matSort matSortActive="uploadDate" matSortDirection="desc" class="docs-table mat-elevation-z2">
+    <!-- Tabla -->
+    <mat-table [dataSource]="dataSource" matSort matSortActive="uploadDate" matSortDirection="desc"
+        class="docs-table mat-elevation-z2">
 
-                <!-- Empleado -->
-                <ng-container matColumnDef="employee">
-                    <mat-header-cell *matHeaderCellDef> Empleado </mat-header-cell>
-                    <mat-cell *matCellDef="let doc">
-                        {{ getEmployeeName(doc.employeeId) }}
-                    </mat-cell>
-                </ng-container>
+        <!-- Empleado -->
+        <ng-container matColumnDef="employee">
+            <mat-header-cell *matHeaderCellDef> Empleado </mat-header-cell>
+            <mat-cell *matCellDef="let doc">
+                {{ getEmployeeName(doc.employeeId) }}
+            </mat-cell>
+        </ng-container>
 
-                <!-- Tipo -->
-                <ng-container matColumnDef="type">
-                    <mat-header-cell *matHeaderCellDef> Tipo </mat-header-cell>
-                    <mat-cell *matCellDef="let doc">
-                        <span class="type-chip">{{ doc.type }}</span>
-                    </mat-cell>
-                </ng-container>
+        <!-- Tipo -->
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef> Tipo </mat-header-cell>
+            <mat-cell *matCellDef="let doc">
+                <span class="type-chip">{{ doc.type | docType }}</span>
+            </mat-cell>
+        </ng-container>
 
-                <!-- Fecha -->
-                <ng-container matColumnDef="uploadDate">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Fecha de Subida </mat-header-cell>
-                    <mat-cell *matCellDef="let doc"> {{ formatDate(doc.uploadDate) }} </mat-cell>
-                </ng-container>
+        <!-- Fecha -->
+        <ng-container matColumnDef="uploadDate">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Fecha de Subida </mat-header-cell>
+            <mat-cell *matCellDef="let doc"> {{ formatDate(doc.uploadDate) }} </mat-cell>
+        </ng-container>
 
-                <!-- Descripción -->
-                <ng-container matColumnDef="description">
-                    <mat-header-cell *matHeaderCellDef> Descripción </mat-header-cell>
-                    <mat-cell *matCellDef="let doc"> {{ doc.description || '-' }} </mat-cell>
-                </ng-container>
+        <!-- Descripción -->
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef> Descripción </mat-header-cell>
+            <mat-cell *matCellDef="let doc"> {{ doc.description || '-' }} </mat-cell>
+        </ng-container>
 
-                <!-- Acciones -->
-                <ng-container matColumnDef="actions">
-                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
-                    <mat-cell *matCellDef="let doc" class="actions-cell">
-                        <button mat-icon-button color="warn" (click)="deleteDoc(doc)" matTooltip="Eliminar">
-                            <mat-icon>delete</mat-icon>
-                        </button>
-                    </mat-cell>
-                </ng-container>
+        <!-- Usuario -->
+        <ng-container matColumnDef="user">
+            <mat-header-cell *matHeaderCellDef> Usuario </mat-header-cell>
+            <mat-cell *matCellDef="let doc"> {{ doc.user || '-' }} </mat-cell>
+        </ng-container>
 
-                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        <!-- Acciones -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let doc" class="actions-cell">
+                <button mat-icon-button color="primary" (click)="editDoc(doc.id)" matTooltip="Editar">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="primary" (click)="openFile(doc.driveFileId)" matTooltip="Ver">
+                    <mat-icon>visibility</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteDoc(doc)" matTooltip="Eliminar">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </mat-cell>
+        </ng-container>
 
-                <!-- Sin datos -->
-                <tr class="mat-row no-data-row" *matNoDataRow>
-                    <td class="mat-cell" [attr.colspan]="displayedColumns.length">
-                        <span>No hay documentos registrados</span>
-                    </td>
-                </tr>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
 
-            </mat-table>
+        <!-- Sin datos -->
+        <tr class="mat-row no-data-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                <span>No hay documentos registrados este mes.</span>
+            </td>
+        </tr>
 
-            }
-        </div>
+    </mat-table>
 
-    </mat-drawer-content>
-</mat-drawer-container>
+    }
+</div>
+
+
+<button matFab color="primary" class="add-button" (click)="openDialog()">
+    <mat-icon>add</mat-icon>
+</button>

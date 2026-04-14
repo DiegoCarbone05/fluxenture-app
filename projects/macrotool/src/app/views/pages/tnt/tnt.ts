@@ -11,6 +11,9 @@ import { EmployeeService } from '../../../core/services/employees/employee.servi
 import { Prompt } from '../../dialogs/prompt/prompt';
 import { StorageService } from '../../../core/services/storage/storage.service';
 import { AppService } from '../../../core/services/app.service';
+import { MatSidenav } from '@angular/material/sidenav';
+import { ViewsService } from '../../views.service';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-tnt',
@@ -23,13 +26,15 @@ export class Tnt implements AfterViewInit {
 
   displayedColumns: string[] = ['name', 'follow_number', 'emission_date', 'obs', 'last_status', 'actions'];
   dataSource = new MatTableDataSource<Cd>([]);
-
+  isMobile = computed(() => this.viewsSvc.getIsMobile());
   isElectron = computed(() => this.appService.isElectron());
   cdsSignal = computed(() => this.cdService.getCdsSignal());
+  sortedCds = computed(() => [...this.cdsSignal()].sort((a, b) =>
+    new Date(b.emissionDate).getTime() - new Date(a.emissionDate).getTime()
+  ));
 
   /** Cached status for each tracking number to avoid repeated API calls in template */
   private statusMap = signal<Map<string, string>>(new Map());
-
   readonly addPdfDialog = inject(MatDialog);
   readonly promptDialog = inject(MatDialog);
 
@@ -50,7 +55,9 @@ export class Tnt implements AfterViewInit {
     private cdService: CdService,
     private employeeService: EmployeeService,
     private storageService: StorageService,
-    private appService: AppService
+    private appService: AppService,
+    private viewsSvc: ViewsService,
+    breakpointObserver: BreakpointObserver
   ) {
 
     effect(() => {
@@ -59,6 +66,20 @@ export class Tnt implements AfterViewInit {
         new Date(b.emissionDate).getTime() - new Date(a.emissionDate).getTime()
       );
     });
+
+
+    breakpointObserver.observe([Breakpoints.Handset, Breakpoints.Tablet])
+      .subscribe(result => {
+        if (result.matches) {
+          // En móvil solo mostramos lo esencial
+
+          this.displayedColumns = ['name', 'follow_number', 'last_status', 'actions'];
+        } else {
+          // En escritorio mostramos todo
+          this.displayedColumns = ['name', 'follow_number', 'emission_date', 'obs', 'last_status', 'actions'];
+        }
+      });
+
   }
 
 
@@ -110,13 +131,16 @@ export class Tnt implements AfterViewInit {
 
   async loadPDF() {
     this.addPdfDialog.open(AddPdf, {
-      disableClose: true
+      disableClose: true,
+      panelClass: 'custom-flex-dialog'
     });
   }
 
   editCd(cd: Cd) {
     this.addPdfDialog.open(AddPdf, {
-      data: cd
+      data: cd,
+      panelClass: 'custom-flex-dialog'
+
     });
   }
 

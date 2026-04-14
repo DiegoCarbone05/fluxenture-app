@@ -1,22 +1,35 @@
-<mat-toolbar class="toolbar-custom">
+<mat-toolbar class="toolbar-custom" [style.background-color]="bgColor"
+    [style.color]="theme === 'dark' ? 'white' : 'black'">
     <div class="toolbar-content">
-        <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon" *ngIf="menuButton"
-            (click)="clickMenu()">
+        @if (isMobile()) {
+        <button mat-icon-button class="example-icon" *ngIf="menuButton" (click)="clickMenu()">
             <mat-icon>menu</mat-icon>
         </button>
-        <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon" *ngIf="backButton"
-            (click)="clickBack()">
+        }
+        <button mat-icon-button class="example-icon" *ngIf="backButton" (click)="clickBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <span>{{title}}</span>
+        <div class="title-container">
+            <span class="title">{{title}}</span>
+            @if (subTitle) {
+            <span class="sub-title">{{subTitle}}</span>
+            }
+        </div>
     </div>
     <div class="wrapper-content">
         <ng-content></ng-content>
 
-        <button mat-button [matMenuTriggerFor]="menu">
+        @if (!isMobile()) {
+        <button mat-button [matMenuTriggerFor]="menu" class="user-button"
+            [style.color]="theme === 'dark' ? 'white' : 'black'">
             <mat-icon>account_circle</mat-icon>
             <span>Hola, <strong> {{user()?.username}}</strong></span>
         </button>
+        }@else {
+        <button mat-icon-button [matMenuTriggerFor]="menu" class="user-button">
+            <mat-icon>account_circle</mat-icon>
+        </button>
+        }
         <mat-menu #menu="matMenu">
             <button mat-menu-item (click)="logout()">
                 <mat-icon>logout</mat-icon>

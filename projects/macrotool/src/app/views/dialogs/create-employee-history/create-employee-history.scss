@@ -1,0 +1,87 @@
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 10px;
+  width: 500px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.details-section {
+  margin-top: 24px;
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #666;
+    }
+  }
+}
+
+
+.flux-dox-loaded {
+  width: 100%;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  background-color: #00A751;
+  border-radius: 4px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+
+  .text-container {
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .desc {
+      margin: 0;
+      font-size: 12px;
+    }
+
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+
+    }
+  }
+
+
+}
+
+.detail-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+
+  mat-form-field {
+    flex: 1;
+  }
+}

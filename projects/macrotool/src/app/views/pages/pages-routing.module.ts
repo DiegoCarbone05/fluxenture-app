@@ -6,6 +6,9 @@ import { Eployees } from './eployees/eployees';
 import { Pages } from './pages';
 import { Absents } from './absents/absents';
 import { Docs } from './docs/docs';
+import { Sgi } from './sgi/sgi';
+import { AbsentView } from './absents/absent-view/absent-view';
+import { EmpView } from './eployees/emp-view/emp-view';
 
 const routes: Routes = [
   {
@@ -25,12 +28,24 @@ const routes: Routes = [
         component: Eployees
       },
       {
+        path: 'eployees/:id',
+        component: EmpView
+      },
+      {
         path: 'absents',
         component: Absents
       },
       {
+        path: 'absents/:id',
+        component: AbsentView
+      },
+      {
         path: 'docs',
         component: Docs
+      },
+      {
+        path: 'sgi',
+        component: Sgi
       }
     ]
   },

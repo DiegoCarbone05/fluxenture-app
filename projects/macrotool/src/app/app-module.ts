@@ -10,6 +10,8 @@ import { AddPdf } from './views/dialogs/add-pdf/add-pdf';
 import { Prompt } from './views/dialogs/prompt/prompt';
 import { SharedModule } from './shared/shared.module';
 import { AddEmployee } from './views/dialogs/add-employee/add-employee';
+import { DatepickerDialog } from './views/dialogs/datepicker-dialog/datepicker-dialog';
+import { CreateEmployeeHistoryDialogComponent } from './views/dialogs/create-employee-history/create-employee-history';
 
 @NgModule({
   declarations: [
@@ -17,6 +19,8 @@ import { AddEmployee } from './views/dialogs/add-employee/add-employee';
     AddPdf,
     Prompt,
     AddEmployee,
+    DatepickerDialog,
+    CreateEmployeeHistoryDialogComponent
   ],
   imports: [
     BrowserModule,

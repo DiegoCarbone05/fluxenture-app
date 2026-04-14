@@ -37,6 +37,10 @@ export class AbsentService extends BaseApiService<Absent> {
     );
   }
 
+  getAbsentById(id: string) {
+    return this.absentResponseDTO().find(absent => absent.id === id);
+  }
+
   getAbsentsByEmployee(employeeId: string) {
     return this.http.get<AbsentResponseDTO[]>(`${this.endpoint}/employee/${employeeId}`).pipe(
       tap(absents => this.absentResponseDTO.set(absents))
