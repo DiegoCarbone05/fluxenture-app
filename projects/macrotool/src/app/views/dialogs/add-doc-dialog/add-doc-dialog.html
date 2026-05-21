@@ -50,7 +50,7 @@
             (optionSelected)="onEmployeeSelected($event)">
             @for (emp of filteredEmployees | async; track emp) {
             <mat-option [value]="emp">
-              {{ emp.name }} <small>({{ emp.employeeID }})</small>
+              {{ emp.name }} <small>({{ emp.employeeId }})</small>
             </mat-option>
             }
           </mat-autocomplete>
@@ -74,7 +74,7 @@
             </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Fecha de emisión</mat-label>
+            <mat-label>Fecha</mat-label>
             <input matInput [matDatepicker]="picker" formControlName="date">
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
@@ -98,8 +98,17 @@
           <div class="file-input-wrapper" appDragDropFile (click)="fileInput.click()"
             (fileDropped)="onFileDropped($event)">
             <mat-icon>upload_file</mat-icon>
-            <label for="fileInput">Arrastra archivos aquí o <strong>haz clic para subir</strong></label>
-            <small>También puedes pegar (Ctrl+V) una imagen o archivo</small>
+
+            <div class="text-container-mobile">
+              <label for="fileInput">Subir Documento</label>
+              <small>Archivos soportados: PDF, JPG o PNG, DOCX</small>
+            </div>
+
+            <div class="text-container-desktop">
+              <label for="fileInput">Arrastra archivos aquí o <strong>haz clic para subir</strong></label>
+              <small>También puedes pegar (Ctrl+V) una imagen o archivo</small>
+            </div>
+
             <input #fileInput type="file" (change)="onFileSelected($event)"
               accept="application/pdf, image/jpeg, image/png, image/jpg, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               hidden>

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Cd } from '../../../shared/models/Cd.model';
-import { BaseApiService } from '../base-api.service';
-import { Doc, EDocType } from '../../../shared/models/Doc';
+import { Cd } from '../../../../shared/models/Cd.model';
+import { BaseApiService } from '../../base-api.service';
+import { Doc, EDocType } from '../../../../shared/models/Doc';
 import { EmployeeService } from '../employees/employee.service';
-import { Employee } from '../../../shared/models/Employee';
+import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -25,10 +25,10 @@ export class StorageService extends BaseApiService<string> {
   /**
    * Funcion hecha solo para subir Docs y que sean enviados a LPO
    */
-  uploadDoc(file: File, employee: Employee, docType: EDocType) {
+  uploadDoc(file: File, employee: EmployeeDTO, docType: EDocType) {
     const formData = new FormData();
 
-    const folderPath = `lpo/[${employee?.employeeID}] ${employee?.name}`
+    const folderPath = `lpo/[${employee.employeeId}] ${employee.name}`
 
     formData.append('file', file, file.name);
     formData.append('folderPath', folderPath);

@@ -3,11 +3,12 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 0;
     background-color: var(--mat-sys-surface-container-high);
     box-sizing: border-box;
     border-radius: 0;
     max-width: 940px;
+    overflow: hidden;
 
     form,
     mat-form-field {
@@ -18,14 +19,27 @@
         max-width: 600px;
     }
 
+    mat-dialog-content {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0; // Crucial para que flex y overflow funcionen juntos
+        display: flex;
+        flex-direction: column;
+        padding: 0 20px !important;
+
+        form {
+            width: 100%;
+        }
+    }
+
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 0 20px;
         padding-right: 10px;
-        background-color: var(--primary);
-        color: white;
+        background-color: white;
+        color: rgb(27, 27, 27);
 
         h1 {
             font-size: 20px;
@@ -64,10 +78,55 @@
         margin-bottom: 25px;
         box-sizing: border-box;
     }
+
+    .footer-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        padding: 21px 12px;
+        box-sizing: border-box;
+
+        button {
+            background-color: var(--primary);
+            height: 46px;
+            width: 100%;
+            border-radius: 4px !important;
+            color: white;
+            position: relative;
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            border: none;
+            cursor: pointer;
+
+            &:hover {
+                background-color: var(--primary-hover);
+            }
+        }
+    }
 }
 
 @media (min-width: 940px) {
     .add-employee-container {
-        height: fit-content;
+        height: auto;
+        max-height: 90vh;
+        border-radius: 12px;
+
+        mat-dialog-content {
+            max-height: 70vh;
+        }
+
+        .footer-actions {
+            width: 100%;
+            justify-content: left;
+            padding-top: 0;
+            padding-bottom: 34px;
+
+            button {
+                width: 200px;
+                margin-left: 35px;
+            }
+        }
     }
 }

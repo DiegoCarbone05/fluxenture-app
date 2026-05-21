@@ -1,75 +1,131 @@
-<flux-toolbar title="Ausencias" subTitle="{{ months[ currentDate().month - 1]}} - {{currentDate().year}}">
-
-    <button matIconButton (click)="openDatePickerDialog()">
-        <mat-icon>calendar_today</mat-icon>
-    </button>
-
+<flux-toolbar
+  title="Ausencias"
+  class="glass-tab"
+  subTitle="{{ months[currentDate().month - 1] }} - {{ currentDate().year }}"
+>
+  <button matIconButton (click)="openDatePickerDialog()">
+    <mat-icon>calendar_today</mat-icon>
+  </button>
 </flux-toolbar>
 
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-    <mat-tab label="AUSENCIAS">
-        <div class="absent-list">
-            @for (item of absentOfMonth(); track $index) {
-            <div class="absent-container" (click)="openAbsent(item.id)">
-                <div class="absent">
-                    <div class="absent-type-chip" [class]="'chip-' + item.type">
-                        {{item.type | abstentType}}
-                    </div>
-                    <span class="employee">{{getEmployeeName(item.employeeId)}}</span>
-                    <span class="date">{{item.originalStartDate}} - {{item.originalEndDate}}</span>
-                </div>
-                <div class="actions">
-                    <button mat-icon-button color="primary" (click)="openFile(item.documentId, $event)">
-                        <mat-icon>visibility</mat-icon>
-                    </button>
-                    <button mat-icon-button color="primary" (click)="onEditAbsent(item, $event)">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button color="warn" (click)="onDeleteAbsent(item.id, $event)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </div>
+  <mat-tab label="AUSENCIAS">
+    <div class="absent-list">
+      @for (item of absentOfMonth(); track $index) {
+        <div class="absent-container" (click)="openAbsent(item.id)">
+          <div class="absent">
+            <div class="absent-type-chip" [class]="'chip-' + item.type">
+              {{ item.type | abstentType }}
             </div>
-            }
+            <span class="employee">{{ getEmployeeName(item.employeeId) }}</span>
+            <span class="date"
+              >{{ item.originalStartDate }} - {{ item.originalEndDate }}</span
+            >
+          </div>
+          <div class="actions">
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="openFile(item.documentId, $event)"
+            >
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="onEditAbsent(item, $event)"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="onDeleteAbsent(item.id, $event)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </div>
-    </mat-tab>
-    <mat-tab label="CALENDARIO">
-        <div class="absent-calendar">
-            <div class="days">
-                <div class="day-of-week">Dom</div>
-                <div class="day-of-week">Lun</div>
-                <div class="day-of-week">Mar</div>
-                <div class="day-of-week">Mie</div>
-                <div class="day-of-week">Jue</div>
-                <div class="day-of-week">Vie</div>
-                <div class="day-of-week">Sab</div>
+      }
+    </div>
+  </mat-tab>
+  <mat-tab label="CALENDARIO">
+    <div class="absent-calendar">
+      <div class="days">
+        <div class="day-of-week">Dom</div>
+        <div class="day-of-week">Lun</div>
+        <div class="day-of-week">Mar</div>
+        <div class="day-of-week">Mie</div>
+        <div class="day-of-week">Jue</div>
+        <div class="day-of-week">Vie</div>
+        <div class="day-of-week">Sab</div>
+      </div>
+      <div class="calendar">
+        <div class="week">
+          @for (day of daysOfMonth(); track $index) {
+            <div class="day">
+              <span>{{ day.day }}</span>
+              @if (day.hasAbsence) {
+                @for (item of day.absences; track $index) {
+                  <div
+                    (dblclick)="openAbsent(item.id)"
+                    (mouseover)="onAbsentClick(item.id)"
+                    (mouseleave)="onAbsentLeave(item.id)"
+                    [attr.absent-id]="item.id"
+                    class="absent"
+                    [class]="'absent-' + item.type"
+                  >
+                    {{ getEmployeeName(item.employeeId) }}
+                  </div>
+                }
+              }
             </div>
-            <div class="calendar">
-                <div class="week">
-                    @for (day of daysOfMonth(); track $index) {
-                    <div class="day">
-                        <span>{{ day.day }}</span>
-                        @if (day.hasAbsence) {
-                        @for (item of day.absences; track $index) {
-                        <div (dblclick)="openAbsent(item.id)" (mouseover)="onAbsentClick(item.id)"
-                            (mouseleave)="onAbsentLeave(item.id)" [attr.absent-id]="item.id" class="absent"
-                            [class]="'absent-' + item.type">
-                            {{getEmployeeName(item.employeeId)}}
-                        </div>
-                        }
-                        }
-                    </div>
-
-                    }
-                </div>
-
-            </div>
+          }
         </div>
-    </mat-tab>
+      </div>
+    </div>
+  </mat-tab>
 
-    <!-- <mat-tab label="Third"> Content 3 </mat-tab> -->
+  <mat-tab label="ESTADISTICAS">
+    <div class="stats-container">
+      @if (employeeStats().length === 0) {
+        <div class="stats-empty">
+          <mat-icon>check_circle</mat-icon>
+          <span
+            >Sin ausencias en {{ months[currentDate().month - 1] }}
+            {{ currentDate().year }}</span
+          >
+        </div>
+      } @else {
+        <div class="stats-list">
+          @for (row of employeeStats(); track row.employeeId) {
+            <div class="stat-row">
+              <span class="stat-name"
+                ><strong> {{ getEmployeeId(row.employeeId) }} </strong> -
+                {{ getEmployeeName(row.employeeId) }}</span
+              >
+              <div class="stat-tags">
+                @for (tag of getStatTags(row); track tag.label) {
+                  <span class="stat-tag" [class]="tag.class">
+                    {{ tag.label }}: <strong>{{ tag.value }}</strong>
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </mat-tab>
+
+  <!-- <mat-tab label="Third"> Content 3 </mat-tab> -->
 </mat-tab-group>
 
-<button matFab color="primary" class="add-button" (click)="openAddAbsentDialog()">
-    <mat-icon>add</mat-icon>
+<button
+  matFab
+  color="primary"
+  class="add-button"
+  (click)="openAddAbsentDialog()"
+>
+  <mat-icon>add</mat-icon>
 </button>

@@ -1,3 +1,5 @@
+import { AuditMetadata } from "./AuditMetadata";
+
 export class EmployeeHistory {
     id: string | undefined;
     date: Date = new Date();
@@ -6,6 +8,7 @@ export class EmployeeHistory {
     employeeId: string;
     description?: string;
     docId?: string;
+    audit?: AuditMetadata;
 
     constructor(employeeName: string, employeeId: string, type: EEmployeeHistoryType, description?: string, docId?: string) {
         this.employeeName = employeeName;

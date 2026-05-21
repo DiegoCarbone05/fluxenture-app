@@ -1,3 +1,5 @@
+import { AuditMetadata } from "./AuditMetadata";
+
 export class Doc {
     id?: string;
     employeeId: string;
@@ -6,6 +8,7 @@ export class Doc {
     uploadDate: Date;
     description?: string;
     user?: string;
+    audit?: AuditMetadata;
 
     constructor(employeeId: string, type: EDocType, driveFileId: string, uploadDate: Date, id?: string, description?: string, user?: string) {
         this.id = id;

@@ -3,14 +3,13 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { map, Observable, startWith } from 'rxjs';
-import { EmployeeService } from '../../../core/services/employees/employee.service';
-import { Employee } from '../../../shared/models/Employee';
+import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { Doc, EDocType } from '../../../shared/models/Doc';
-import { StorageService } from '../../../core/services/storage/storage.service';
-import { DocsService } from '../../../core/services/docs/docs.service';
-import { AuthService } from '../../../core/services/auth/auth.service';
+import { StorageService } from '../../../core/services/api/storage/storage.service';
+import { DocsService } from '../../../core/services/api/docs/docs.service';
+import { AuthService } from '../../../core/services/api/auth/auth.service';
 import { DOC_TYPES } from '../../../shared/constants/typesValues.constant';
-import { Router } from '@angular/router';
+import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
 
 export enum UploadStatus {
   IDLE,
@@ -53,8 +52,8 @@ export class AddDocDialog implements OnInit, AfterViewInit {
   });
 
   docTypes = DOC_TYPES;
-  filteredEmployees!: Observable<Employee[]>;
-  employeeSelected!: Employee;
+  filteredEmployees!: Observable<EmployeeDTO[]>;
+  employeeSelected!: EmployeeDTO;
 
   constructor(
     private employeeService: EmployeeService,
@@ -71,12 +70,12 @@ export class AddDocDialog implements OnInit, AfterViewInit {
     this.filteredEmployees = (this.form.get('employee')?.valueChanges as Observable<string>).pipe(
       startWith(''),
       map((value) => {
-        const employees = this.employeeService.getEmployees();
+        const employees = this.employeeService.getEmployeesSignal()();
         if (!value || value === '') return employees;
         const search = value.toString().toLowerCase();
         return employees.filter(emp =>
           emp.name.toLowerCase().includes(search) ||
-          emp.employeeID.toString().includes(search)
+          String(emp.employeeId).toLowerCase().includes(search)
         );
       })
     );
@@ -175,19 +174,19 @@ export class AddDocDialog implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
   }
 
-  displayFn = (empOrStr: Employee | string | null): string => {
+  displayFn = (empOrStr: EmployeeDTO | string | null): string => {
     if (!empOrStr) return '';
     if (typeof empOrStr === 'object' && 'name' in empOrStr) return empOrStr.name;
-    const employees = this.employeeService.getEmployees();
-    const found = employees.find(e => e.id === empOrStr || String(e.employeeID) === String(empOrStr));
+    const employees = this.employeeService.getEmployeesSignal()();
+    const found = employees.find(e => e.id === empOrStr || String(e.employeeId) === String(empOrStr));
     return found ? found.name : '';
   };
 
   onEmployeeSelected(event: any): void {
-    const emp = event.option.value as Employee;
+    const emp = event.option.value as EmployeeDTO;
     this.employeeSelected = emp;
     this.form.patchValue({
-      employeeId: emp.id ?? '',
+      employeeId: String(emp.employeeId ?? ''),
       employee: emp as any
     });
   }
@@ -267,7 +266,7 @@ export class AddDocDialog implements OnInit, AfterViewInit {
 
       // Fallback en caso de que employeeSelected no se haya seteado (por carga externa o error en el flujo)
       if (!this.employeeSelected && employee && typeof employee === 'object') {
-        this.employeeSelected = employee as Employee;
+        this.employeeSelected = employee as EmployeeDTO;
       }
 
       if (!employeeId || !type || !file || !date || !this.employeeSelected) {
@@ -283,8 +282,10 @@ export class AddDocDialog implements OnInit, AfterViewInit {
           //CREA EL OBJETO DOC
           console.log("CREA EL OBJETO DOC, " + this.employeeSelected);
 
+          const employeeObject = employee as unknown as EmployeeDTO;
+
           const payload = new Doc(
-            employeeId,
+            employeeObject.id,
             type as EDocType,
             fileId.response,
             date as Date,
@@ -296,8 +297,6 @@ export class AddDocDialog implements OnInit, AfterViewInit {
           //GUARDA EL DOC EN LA DB
           console.log("GUARDA EN LA DB");
           this.docService.saveDoc(payload).subscribe({
-
-
             next: (doc) => {
               this.uploadStatus.set(UploadStatus.SUCCESS);
 
@@ -319,6 +318,8 @@ export class AddDocDialog implements OnInit, AfterViewInit {
               }, 3000);
             }
           });
+
+
           this.completeProgress()
         },
         error: (err) => {

@@ -1,3 +1,4 @@
+import { AuditMetadata } from "./AuditMetadata";
 import { Tnt } from "./Tnt.model";
 
 export class Cd {
@@ -9,7 +10,7 @@ export class Cd {
     public tnt!: Tnt[];
     obs: string;
     trackingCompleted: boolean;
-
+    audit?: AuditMetadata;
 
     constructor(
         trackingNumber: number,

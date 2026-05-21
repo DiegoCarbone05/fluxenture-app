@@ -4,14 +4,15 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AddDocDialog } from '../../dialogs/add-doc-dialog/add-doc-dialog';
-import { DocsService } from '../../../core/services/docs/docs.service';
-import { EmployeeService } from '../../../core/services/employees/employee.service';
+import { DocsService } from '../../../core/services/api/docs/docs.service';
+import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { Doc } from '../../../shared/models/Doc';
-import { StorageService } from '../../../core/services/storage/storage.service';
+import { StorageService } from '../../../core/services/api/storage/storage.service';
 import { Prompt } from '../../dialogs/prompt/prompt';
 import { DatepickerDialog } from '../../dialogs/datepicker-dialog/datepicker-dialog';
 import { MONTHS, YEARS } from '../../../shared/constants/general-constant';
 import { AppService } from '../../../core/services/app.service';
+import { UtilsService } from '../../../core/services/utils.service';
 
 @Component({
   selector: 'app-docs',
@@ -48,7 +49,8 @@ export class Docs implements OnInit {
     private employeeService: EmployeeService,
     private snackBar: MatSnackBar,
     private storageSvc: StorageService,
-    private appSvc: AppService
+    private appSvc: AppService,
+    private utilsSvc: UtilsService
   ) {
   }
 
@@ -108,23 +110,7 @@ export class Docs implements OnInit {
   }
 
   openFile(docId: string) {
-    if (docId == "") return;
-
-    const link = document.createElement('a');
-
-    this.docsService.getDoc(docId).subscribe({
-      next: (doc) => {
-        link.href = 'https://drive.google.com/file/d/' + doc.driveFileId + '/view';
-        link.target = '_blank';
-        link.click();
-      },
-      error: (err) => {
-        console.error('Error cargando doc', err);
-        link.href = 'https://drive.google.com/file/d/' + docId + '/view';
-        link.target = '_blank';
-        link.click();
-      }
-    });
+    this.utilsSvc.openFile(docId);
   }
 
   /**

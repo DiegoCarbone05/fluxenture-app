@@ -1,7 +1,9 @@
 import { Component, computed, ViewChild } from '@angular/core';
-import { AuthService } from '../../core/services/auth/auth.service';
+import { AuthService } from '../../core/services/api/auth/auth.service';
 import { ViewsService } from '../views.service';
 import { MatSidenav } from '@angular/material/sidenav';
+import { ChildrenOutletContexts } from '@angular/router';
+import { slideInAnimation } from '../../shared/constants/slideAnimaton';
 
 
 
@@ -9,7 +11,8 @@ import { MatSidenav } from '@angular/material/sidenav';
   selector: 'app-pages',
   standalone: false,
   templateUrl: './pages.html',
-  styleUrl: './pages.scss'
+  styleUrl: './pages.scss',
+  animations: [slideInAnimation]
 })
 export class Pages {
   isMobile = computed(() => this.viewsSvc.getIsMobile());
@@ -17,12 +20,17 @@ export class Pages {
 
   constructor(
     private authService: AuthService,
-    private viewsSvc: ViewsService
+    private viewsSvc: ViewsService,
+    private contexts: ChildrenOutletContexts
   ) {
     this.authService.saveUserInSignal();
     this.viewsSvc.openSidenav$.subscribe(() => {
       this.sideNav.toggle();
     });
+  }
+
+  getRouteAnimationData() {
+    return this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation'];
   }
 
 

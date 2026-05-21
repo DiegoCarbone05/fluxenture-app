@@ -1,10 +1,11 @@
 import { Component, signal } from '@angular/core';
-import { AbsentService } from '../../../../core/services/absents/absent.service';
+import { AbsentService } from '../../../../core/services/api/absents/absent.service';
 import { ActivatedRoute } from '@angular/router';
 import { AbsentResponseDTO } from '../../../../shared/models/AbsentResponseDTO';
-import { EmployeeService } from '../../../../core/services/employees/employee.service';
+import { EmployeeService } from '../../../../core/services/api/employees/employee.service';
 import { Employee } from '../../../../shared/models/Employee';
-import { StorageService } from '../../../../core/services/storage/storage.service';
+import { StorageService } from '../../../../core/services/api/storage/storage.service';
+import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
 
 @Component({
   selector: 'app-absent-view',
@@ -15,7 +16,7 @@ import { StorageService } from '../../../../core/services/storage/storage.servic
 export class AbsentView {
 
   absent = signal<AbsentResponseDTO | null>(null);
-  employee = signal<Employee | null>(null);
+  employee = signal<EmployeeDTO | null>(null);
 
   constructor(
     private absentService: AbsentService,

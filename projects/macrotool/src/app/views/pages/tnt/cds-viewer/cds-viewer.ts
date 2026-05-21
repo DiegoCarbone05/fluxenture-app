@@ -5,14 +5,15 @@ import { TrackAndTrace } from '../../../../shared/services/track-and-trace';
 import html2Canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { Tnt } from '../../../../shared/models/Tnt.model';
-import { CdService } from '../../../../core/services/cd-api/cd.service';
+import { CdService } from '../../../../core/services/api/cd-api/cd.service';
 import { Employee } from '../../../../shared/models/Employee';
-import { EmployeeService } from '../../../../core/services/employees/employee.service';
+import { EmployeeService } from '../../../../core/services/api/employees/employee.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { Prompt } from '../../../dialogs/prompt/prompt';
-import { StorageService } from '../../../../core/services/storage/storage.service';
+import { StorageService } from '../../../../core/services/api/storage/storage.service';
 import { AppService } from '../../../../core/services/app.service';
+import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
 
 @Component({
   selector: 'app-cds-viewer',
@@ -25,7 +26,7 @@ export class CdsViewer {
   @ViewChild('imprZone', { static: false }) imprZone!: ElementRef;
 
   cd = signal<Cd | null>(null);
-  employee = signal<Employee | null>(null)
+  employee = signal<EmployeeDTO | null>(null)
   isElectron = computed(() => this.appService.isElectron());
 
   readonly promptDialog = inject(MatDialog);

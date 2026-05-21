@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, computed, effect, inject, signal, ViewChild } from '@angular/core';
-import { EmployeeService } from '../../../core/services/employees/employee.service';
+import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { EGender, Employee, ESector } from '../../../shared/models/Employee';
@@ -8,10 +8,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddEmployee } from '../../dialogs/add-employee/add-employee';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ViewsService } from '../../views.service';
-import { CreateEmployeeHistoryDialogComponent } from '../../dialogs/create-employee-history/create-employee-history';
-import { EmployeeHistoryService } from '../../../core/services/employee-history/employee-history.service';
-import { EmployeeHistory } from '../../../shared/models/EmployeeHistory.model';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 
 @Component({
@@ -20,20 +18,64 @@ import { Router } from '@angular/router';
   templateUrl: './eployees.html',
   styleUrl: './eployees.scss'
 })
-export class Eployees implements AfterViewInit {
+export class Eployees {
 
   isMobile = computed(() => this.viewsSvc.getIsMobile());
   @ViewChild("sideNav") sideNav!: MatSidenav;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-
   searchFormControl = new FormControl<string>('');
-  readonly addPdfDialog = inject(MatDialog);
   readonly addEmployeeDialog = inject(MatDialog);
 
-  openAddEmployeeDialog(employee?: Employee) {
+  employees = computed(() => this.employeeService.getEmployeesSignal()());
+  findedEmployees = signal<Employee[]>([]);
+  formMsg = signal<string>('');
+  searchBy = signal<keyof Employee>('name');
+  filters = signal<keyof Employee | null>(null);
+
+  constructor(
+    private employeeService: EmployeeService,
+    private viewsSvc: ViewsService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+
+    this.route.queryParams.subscribe((params) => {
+      const searchValue = params['q']?.trim();
+      if (searchValue === "") {
+        this.searchFormControl.reset();
+        this.clearForms();
+        return;
+      }
+      this.searchFormControl.setValue(searchValue);
+      this.search();
+    });
+
+    this.searchFormControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe((value) => {
+      const term = value?.trim();
+      if (term) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { q: term },
+          queryParamsHandling: 'merge',
+          replaceUrl: true
+        });
+      } else {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { q: "" },
+          queryParamsHandling: 'merge',
+          replaceUrl: true
+        });
+      }
+    });
+    this.viewsSvc.openSidenav$.subscribe(() => {
+      this.sideNav.toggle();
+    });
+  }
+
+
+  openAddEmployeeDialog() {
     const dialog = this.addEmployeeDialog.open(AddEmployee, {
       panelClass: 'full-screen-dialog',
-      data: { employee },
       disableClose: true
     });
 
@@ -51,85 +93,10 @@ export class Eployees implements AfterViewInit {
     });
   }
 
-  findByOptions: { attr: keyof Employee; text: string }[] = [
-    { attr: 'name', text: 'Nombre empleado' },
-    { attr: 'documentNumber', text: 'Número de documento' },
-    { attr: 'city', text: 'Ciudad' },
-    { attr: 'employeeID', text: 'ID empleado' },
-    { attr: 'cuil', text: 'CUIL' },
-    { attr: 'phone', text: 'Teléfono' },
-    { attr: 'cellPhone', text: 'Celular' },
-    { attr: 'email', text: 'Email' },
-  ];
-
-  filterByOptions: { attr: keyof Employee; value: any; text: string }[] = [
-    { attr: 'gender', value: EGender.MALE, text: 'Masculino' },
-    { attr: 'gender', value: EGender.FEMALE, text: 'Femenino' },
-    { attr: 'gender', value: EGender.OTHER, text: 'Otro' },
-    { attr: 'sector', value: ESector.DESMALEZADO, text: 'Desmalezado' },
-    { attr: 'sector', value: ESector.CLEANING_OPERATOR, text: 'Limpieza' },
-    { attr: 'sector', value: ESector.ADMINISTRATION, text: 'Administración' },
-    { attr: 'isOperational', value: true, text: 'Empleado operativo' },
-    { attr: 'isOperational', value: false, text: 'Empleado no operativo' },
-  ];
-
-  addHistory(employeeId: string) {
-    const dialog = this.addEmployeeDialog.open(CreateEmployeeHistoryDialogComponent, {
-      panelClass: 'full-screen-dialog',
-      data: { employeeId },
-      disableClose: true
-    });
-
-    dialog.afterClosed().subscribe((result: EmployeeHistory | undefined) => {
-      if (result) {
-        this.employeeHistoryService.saveHistory(result).subscribe();
-      }
-    });
-  }
-
-  employees = computed(() => this.employeeService.getEmployeesSignal()());
-  displayedColumns: string[] = ['employeeID', 'documentNumber', 'name', 'isOperational', 'sector', 'city', 'actions'];
-  dataSource = new MatTableDataSource<Employee>([]);
-
-  searchBy = signal<keyof Employee>('name');
-  filters = signal<keyof Employee | null>(null);
-
-  constructor(
-    private employeeService: EmployeeService,
-    private viewsSvc: ViewsService,
-    private employeeHistoryService: EmployeeHistoryService,
-    private router: Router
-  ) {
-
-    this.searchFormControl.valueChanges.subscribe((value) => {
-      if (value?.length === 0) {
-        this.dataSource.data = [];
-        this.connectPaginator();
-        return;
-      } else if (value?.length && value.length > 2) {
-        this.search();
-      }
-    });
-
-    this.viewsSvc.openSidenav$.subscribe(() => {
-      this.sideNav.toggle();
-    });
-  }
 
   clearForms() {
     this.searchFormControl.reset();
-    this.dataSource.data = [];
-    this.connectPaginator();
-  }
-
-  ngAfterViewInit(): void {
-    this.connectPaginator();
-  }
-
-  private connectPaginator(): void {
-    if (this.paginator) {
-      this.dataSource.paginator = this.paginator;
-    }
+    this.findedEmployees.set([]);
   }
 
   openEmployee(employee: Employee) {
@@ -137,16 +104,16 @@ export class Eployees implements AfterViewInit {
   }
 
   search() {
-    const searchValue = this.searchFormControl.value;
+    const searchValue = this.route.snapshot.queryParams['q'] || this.searchFormControl.value?.trim();
+    this.searchFormControl.setValue(searchValue);
     if (searchValue) {
-      const employees = this.employees().filter((employee: Employee) => {
-        let value = employee[this.searchBy()] as string;
-        const searchValueLower = searchValue.toLowerCase();
-        value = value.toLowerCase();
-        return value.includes(searchValueLower)
+      this.formMsg.set('');
+      this.employeeService.searchEmployees(searchValue).subscribe((employees: Employee[]) => {
+        this.formMsg.set(employees?.length ? '' : 'No se encontraron empleados con la búsqueda');
+        this.findedEmployees.set(employees?.length ? employees : []);
       });
-      this.dataSource.data = employees?.length ? employees : [];
-      this.connectPaginator();
+    } else {
+      this.formMsg.set('Por favor, ingrese un valor para buscar');
     }
   }
 

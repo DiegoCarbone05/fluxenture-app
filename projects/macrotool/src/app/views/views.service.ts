@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Subject } from 'rxjs';
-import { DocsService } from '../core/services/docs/docs.service';
+import { DocsService } from '../core/services/api/docs/docs.service';
 import { Prompt } from './dialogs/prompt/prompt';
 import { MatDialog } from '@angular/material/dialog';
 

@@ -3,6 +3,8 @@
         <flux-navbar title="Track And Trace"></flux-navbar>
     </mat-drawer>
     <mat-drawer-content class="app-content">
-        <router-outlet></router-outlet>
+        <div class="route-container" [@routeAnimations]="getRouteAnimationData()">
+            <router-outlet></router-outlet>
+        </div>
     </mat-drawer-content>
 </mat-drawer-container>

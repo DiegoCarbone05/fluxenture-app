@@ -1,3 +1,5 @@
+import { AuditMetadata } from "./AuditMetadata";
+
 export class Employee {
     id?: string;
     cuil: number = 0;
@@ -25,6 +27,8 @@ export class Employee {
 
     entryDate?: string;
     leaveDate?: string;
+
+    audit?: AuditMetadata;
 
     constructor(init?: Partial<Employee>) {
         Object.assign(this, init);

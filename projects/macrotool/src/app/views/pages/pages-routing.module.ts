@@ -18,34 +18,42 @@ const routes: Routes = [
       {
         path: 'tnt',
         component: Tnt,
+        data: { animation: 'Tnt' }
       },
       {
         path: 'tnt/cds-viewer/:id',
-        component: CdsViewer
+        component: CdsViewer,
+        data: { animation: 'CdsViewer' }
       },
       {
         path: 'eployees',
-        component: Eployees
+        component: Eployees,
+        data: { animation: 'Eployees' }
       },
       {
         path: 'eployees/:id',
-        component: EmpView
+        component: EmpView,
+        data: { animation: 'EmpView' }
       },
       {
         path: 'absents',
-        component: Absents
+        component: Absents,
+        data: { animation: 'Absents' }
       },
       {
         path: 'absents/:id',
-        component: AbsentView
+        component: AbsentView,
+        data: { animation: 'AbsentView' }
       },
       {
         path: 'docs',
-        component: Docs
+        component: Docs,
+        data: { animation: 'Docs' }
       },
       {
         path: 'sgi',
-        component: Sgi
+        component: Sgi,
+        data: { animation: 'Sgi' }
       }
     ]
   },

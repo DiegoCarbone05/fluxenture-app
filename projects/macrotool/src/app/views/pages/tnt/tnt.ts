@@ -6,10 +6,10 @@ import { AddPdf } from '../../dialogs/add-pdf/add-pdf';
 import { Cd } from '../../../shared/models/Cd.model';
 import { TrackAndTrace } from '../../../shared/services/track-and-trace';
 import { Router } from '@angular/router';
-import { CdService } from '../../../core/services/cd-api/cd.service';
-import { EmployeeService } from '../../../core/services/employees/employee.service';
+import { CdService } from '../../../core/services/api/cd-api/cd.service';
+import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { Prompt } from '../../dialogs/prompt/prompt';
-import { StorageService } from '../../../core/services/storage/storage.service';
+import { StorageService } from '../../../core/services/api/storage/storage.service';
 import { AppService } from '../../../core/services/app.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ViewsService } from '../../views.service';
@@ -111,12 +111,9 @@ export class Tnt implements AfterViewInit {
   }
 
   returnEmployeeName(employeeId: string) {
-    const employee = this.employeeService.getEmployees().find((employee) => employee.id === employeeId);
-    if (employee) {
-      return employee.name;
-    } else {
-      return 'Empleado no encontrado';
-    }
+
+    const employee = this.employeeService.getLocalEmployeeById(employeeId);
+    return employee?.name || 'Empleado no encontrado';
   }
 
   getLastStatus(trackingNumber: string) {

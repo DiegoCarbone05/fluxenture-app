@@ -3,14 +3,15 @@ import { Electron } from '../../../shared/services/electron';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TrackAndTrace } from '../../../shared/services/track-and-trace';
-import { CdService } from '../../../core/services/cd-api/cd.service';
+import { CdService } from '../../../core/services/api/cd-api/cd.service';
 import { Employee } from '../../../shared/models/Employee';
 import { User } from '../../../shared/models/User';
 import { map, Observable, startWith } from 'rxjs';
-import { EmployeeService } from '../../../core/services/employees/employee.service';
+import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { Cd } from '../../../shared/models/Cd.model';
 import { STORAGE_PATH_CONSTANT } from '../../../shared/constants/storage-path.constant';
-import { StorageService } from '../../../core/services/storage/storage.service';
+import { StorageService } from '../../../core/services/api/storage/storage.service';
+import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
 
 @Component({
   selector: 'app-add-pdf',
@@ -36,9 +37,8 @@ export class AddPdf {
     private storageService: StorageService
   ) { }
 
-  options: Employee[] = [];
-  filteredOptions!: Observable<Employee[]>;
-  employeeSelected!: Employee;
+  filteredOptions!: Observable<EmployeeDTO[]>;
+  employeeSelected!: EmployeeDTO | null;
   pdId = signal<string>('');
 
 
@@ -57,7 +57,7 @@ export class AddPdf {
     this.filteredOptions = (this.form.get('cdEmployee')?.valueChanges as Observable<string | number>).pipe(
       startWith(''),
       map((value) => {
-        const employees = this.employeeService.getEmployees();
+        const employees = this.employeeService.getEmployeesSignal()();
         if (!value || (typeof value === 'string' && value.trim() === '')) {
           return employees;
         }
@@ -73,9 +73,9 @@ export class AddPdf {
     if (typeof employeeOrId === 'object' && 'name' in employeeOrId) {
       return employeeOrId.name;
     }
-    const employees = this.employeeService.getEmployees();
-    const found = employees.find((e) => e.id === employeeOrId || String(e.employeeID) === String(employeeOrId));
-    this.employeeSelected = found ?? new Employee(); // if not found, create a new employee
+    const employees = this.employeeService.getEmployeesSignal()();
+    const found = employees.find((e: any) => e.id === employeeOrId || String(e.employeeID) === String(employeeOrId));
+    this.employeeSelected = found ?? null;
     return found ? found.name : '';
   };
 
@@ -150,7 +150,7 @@ export class AddPdf {
     explorer.type = 'file';
     explorer.accept = 'application/pdf';
 
-    const fileName = `[${this.employeeSelected.name}] ${this.form.value.cdNumber}_${this.form.value.emissionDate}_${this.form.value.obs}`;
+    const fileName = `[${this.employeeSelected?.name}] ${this.form.value.cdNumber}_${this.form.value.emissionDate}_${this.form.value.obs}`;
 
     explorer.click();
     explorer.onchange = (event) => {

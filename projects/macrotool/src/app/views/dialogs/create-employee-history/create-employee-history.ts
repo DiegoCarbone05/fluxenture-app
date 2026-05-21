@@ -1,13 +1,13 @@
 import { Component, inject, Inject, OnInit, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { EmployeeHistoryService } from '../../../core/services/employee-history/employee-history.service';
+import { EmployeeHistoryService } from '../../../core/services/api/employee-history/employee-history.service';
 import { EEmployeeHistoryType, EmployeeHistory } from '../../../shared/models/EmployeeHistory.model';
 import { EMPLOYEE_HISTORY_TYPES } from '../../../shared/constants/typesValues.constant';
 import { AddDocDialog } from '../add-doc-dialog/add-doc-dialog';
 import { EDocType } from '../../../shared/models/Doc';
-import { DocsService } from '../../../core/services/docs/docs.service';
-import { EmployeeService } from '../../../core/services/employees/employee.service';
+import { DocsService } from '../../../core/services/api/docs/docs.service';
+import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 
 @Component({
   selector: 'app-create-employee-history',

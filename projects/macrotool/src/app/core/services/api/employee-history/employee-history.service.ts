@@ -1,6 +1,6 @@
 import { Injectable, Signal, signal } from '@angular/core';
-import { BaseApiService } from '../base-api.service';
-import { EmployeeHistory } from '../../../shared/models/EmployeeHistory.model';
+import { BaseApiService } from '../../base-api.service';
+import { EmployeeHistory } from '../../../../shared/models/EmployeeHistory.model';
 
 @Injectable({
   providedIn: 'root'

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BaseApiService } from '../base-api.service';
-import { Doc } from '../../../shared/models/Doc';
+import { BaseApiService } from '../../base-api.service';
+import { Doc } from '../../../../shared/models/Doc';
 import { MatDialog } from '@angular/material/dialog';
-import { AddDocDialog } from '../../../views/dialogs/add-doc-dialog/add-doc-dialog';
+import { AddDocDialog } from '../../../../views/dialogs/add-doc-dialog/add-doc-dialog';
 
 @Injectable({
   providedIn: 'root'

@@ -1,13 +1,13 @@
 import { Injectable, Signal, signal } from '@angular/core';
-import { BaseApiService } from '../base-api.service';
-import { Cd } from '../../../shared/models/Cd.model';
+import { BaseApiService } from '../../base-api.service';
+import { Cd } from '../../../../shared/models/Cd.model';
 import { tap } from 'rxjs';
-import { Employee } from '../../../shared/models/Employee';
+import { Employee } from '../../../../shared/models/Employee';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CdService extends BaseApiService<Cd>{
+export class CdService extends BaseApiService<Cd> {
   protected override readonly endpoint = this.api + '/cds';
 
   private cds = signal<Cd[]>([]);
@@ -18,25 +18,25 @@ export class CdService extends BaseApiService<Cd>{
   }
 
   refreshCds() {
-    return this.http.get<Cd[]>(this.endpoint+'/').pipe(
+    return this.http.get<Cd[]>(this.endpoint + '/').pipe(
       tap((cds) => this.cds.set(cds))
     );
   }
 
   saveCd(cd: Cd) {
-    return this.http.post<Cd>(this.endpoint+'/', cd).pipe(
+    return this.http.post<Cd>(this.endpoint + '/', cd).pipe(
       tap(() => this.refreshCds().subscribe())
     );
   }
 
   deleteCd(id: string) {
-    return this.http.delete<Cd>(this.endpoint+'/'+id).pipe(
+    return this.http.delete<Cd>(this.endpoint + '/' + id).pipe(
       tap(() => this.refreshCds().subscribe())
     );
   }
-  
+
   putCd(cd: Cd) {
-    return this.http.put<Cd>(this.endpoint+'/', cd).pipe(
+    return this.http.put<Cd>(this.endpoint + '/', cd).pipe(
       tap(() => this.refreshCds().subscribe())
     );
   }
@@ -45,8 +45,8 @@ export class CdService extends BaseApiService<Cd>{
     const formData = new FormData();
     formData.append('tnt', tnt);
     formData.append('fileId', fileId);
-    
-    return this.http.post<Cd>(this.endpoint+'/export', formData).pipe(
+
+    return this.http.post<Cd>(this.endpoint + '/export', formData).pipe(
       tap(() => this.refreshCds().subscribe())
     );
   }

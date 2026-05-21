@@ -1,14 +1,10 @@
 .table-container {
-  // padding: 16px 24px;
-  height: calc(100% - 64px);
-  overflow: auto;
   box-sizing: border-box;
 }
 
+
 .docs-table {
   width: 100%;
-  // border-radius: 8px;
-  overflow: hidden;
 
   .mat-column-actions {
     width: 60px;

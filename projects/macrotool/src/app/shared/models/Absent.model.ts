@@ -1,3 +1,5 @@
+import { AuditMetadata } from "./AuditMetadata";
+
 export class Absent {
     id!: string;
     employeeId: string;
@@ -7,6 +9,7 @@ export class Absent {
     documentId: string;    // Google Drive File ID
     observations: string;
     justified: boolean;
+    audit?: AuditMetadata;
 
     constructor(
         employeeId: string,

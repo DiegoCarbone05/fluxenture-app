@@ -6,6 +6,7 @@
 @include mat.core();
 
 :root {
+  --primary-hover: rgb(5, 87, 180);
   --primary: #0468d7;
   --primary-color: #2c3e50;
   --secondary-color: #34495e;
@@ -83,8 +84,9 @@ body {
   color: $app-text-color;
   line-height: $app-line-height;
   font-size: $app-font-size;
-  overflow: hidden;
+  // overflow: hidden;
   text-rendering: optimizeLegibility;
+  overflow: hidden;
 }
 
 html,
@@ -216,8 +218,14 @@ button {
 }
 
 .mat-mdc-dialog-surface {
-  border-radius: 12px !important;
+  // border-radius: 12px !important;
+  border-radius: 0 !important;
+}
 
+@media screen and (min-width: 940px) {
+  .mat-mdc-dialog-surface {
+    border-radius: 12px !important;
+  }
 }
 
 .cdk-overlay-pane.mat-mdc-dialog-panel {

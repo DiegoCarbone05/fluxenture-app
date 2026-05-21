@@ -1,8 +1,8 @@
 import { Injectable, Signal, signal } from '@angular/core';
-import { BaseApiService } from '../base-api.service';
-import { LoginDTO } from '../../../shared/models/LoginDTO';
+import { BaseApiService } from '../../base-api.service';
+import { LoginDTO } from '../../../../shared/models/LoginDTO';
 import { tap } from 'rxjs';
-import { UserDto } from '../../../shared/models/UserDto';
+import { UserDto } from '../../../../shared/models/UserDto';
 import { catchError, map, Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 

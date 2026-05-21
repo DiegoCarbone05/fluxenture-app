@@ -1,8 +1,8 @@
-import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, importProvidersFrom, Provider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing-module';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { App } from './app';
@@ -12,6 +12,7 @@ import { SharedModule } from './shared/shared.module';
 import { AddEmployee } from './views/dialogs/add-employee/add-employee';
 import { DatepickerDialog } from './views/dialogs/datepicker-dialog/datepicker-dialog';
 import { CreateEmployeeHistoryDialogComponent } from './views/dialogs/create-employee-history/create-employee-history';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 @NgModule({
   declarations: [
@@ -28,10 +29,12 @@ import { CreateEmployeeHistoryDialogComponent } from './views/dialogs/create-emp
     SharedModule,
     FormsModule,
     ReactiveFormsModule,
+    BrowserAnimationsModule
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
+    (provideAnimationsAsync() as any) as Provider,
     provideHttpClient(withInterceptors([authInterceptor])),
   ],
   bootstrap: [App]

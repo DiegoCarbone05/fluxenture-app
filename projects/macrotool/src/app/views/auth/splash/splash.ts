@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ViewsService } from '../../views.service';
-import { AuthService } from '../../../core/services/auth/auth.service';
+import { AuthService } from '../../../core/services/api/auth/auth.service';
 
 @Component({
   selector: 'app-splash',

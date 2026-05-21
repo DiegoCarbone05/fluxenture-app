@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { ViewsService } from '../../views.service';
 import { FormControl, Validators } from '@angular/forms';
 import { FormGroup } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth/auth.service';
+import { AuthService } from '../../../core/services/api/auth/auth.service';
 import { LoginDTO } from '../../../shared/models/LoginDTO';
 import { Router } from '@angular/router';
 

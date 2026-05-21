@@ -1,8 +1,8 @@
 import { Injectable, Signal, signal } from '@angular/core';
-import { BaseApiService } from '../base-api.service';
-import { Absent } from '../../../shared/models/Absent.model';
+import { BaseApiService } from '../../base-api.service';
+import { Absent } from '../../../../shared/models/Absent.model';
 import { tap } from 'rxjs/operators';
-import { AbsentResponseDTO } from '../../../shared/models/AbsentResponseDTO';
+import { AbsentResponseDTO } from '../../../../shared/models/AbsentResponseDTO';
 
 @Injectable({
   providedIn: 'root'

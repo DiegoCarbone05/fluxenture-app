@@ -6,18 +6,19 @@
 
     <!-- Employee Selection -->
     <mat-form-field class="full-width">
-      <mat-label>Empleado</mat-label>
-      <input type="text" placeholder="Buscar empleado..." matInput formControlName="employee" [matAutocomplete]="auto">
+      <mat-label>Buscar Empleado (Nombre o Legajo)</mat-label>
+      <input type="text" placeholder="Escriba para buscar..." matInput formControlName="employee"
+        [matAutocomplete]="auto">
       <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onEmployeeSelected($event)">
         @for (emp of filteredEmployees | async; track emp.id) {
         <mat-option [value]="emp">
-          {{emp.name}} ({{emp.employeeID}})
+          {{emp.name}} ({{emp.employeeId}})
         </mat-option>
         }
       </mat-autocomplete>
-      @if (form.get('employee')?.hasError('required')) {
-      <mat-error>El empleado es requerido</mat-error>
-      }
+      <mat-error *ngIf="form.get('employee')?.hasError('required')">
+        Debe seleccionar un empleado de la lista
+      </mat-error>
     </mat-form-field>
 
     <!-- Absence Type -->

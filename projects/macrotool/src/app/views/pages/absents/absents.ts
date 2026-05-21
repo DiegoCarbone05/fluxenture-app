@@ -2,15 +2,28 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddAbsentDialog } from '../../dialogs/add-absent-dialog/add-absent-dialog';
 import { AbsentResponseDTO } from '../../../shared/models/AbsentResponseDTO';
-import { AbsentService } from '../../../core/services/absents/absent.service';
-import { EmployeeService } from '../../../core/services/employees/employee.service';
+import { AbsentService } from '../../../core/services/api/absents/absent.service';
+import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { Router } from '@angular/router';
 import { DatepickerDialog } from '../../dialogs/datepicker-dialog/datepicker-dialog';
 import { UtilsService } from '../../../core/services/utils.service';
 import { AbsentType } from '../../../shared/models/Absent.model';
 import { MONTHS, YEARS } from '../../../shared/constants/general-constant';
-import { DocsService } from '../../../core/services/docs/docs.service';
+import { DocsService } from '../../../core/services/api/docs/docs.service';
 import { AppService } from '../../../core/services/app.service';
+
+interface EmployeeStat {
+  employeeId: string;
+  justified: number;
+  sinAviso: number;
+  suspension: number;
+  license: number;
+  ft: number;
+  art: number;
+  vacations: number;
+  totalInjust: number;
+  total: number;
+}
 
 @Component({
   selector: 'app-absents',
@@ -22,6 +35,61 @@ export class Absents implements OnInit {
   private readonly dialog = inject(MatDialog);
   absentOfMonth = signal<AbsentResponseDTO[]>([]);
   currentDate = computed(() => this.appSvc.dateOfData());
+
+  readonly STAT_LABELS: { key: keyof EmployeeStat; label: string; class: string }[] = [
+    { key: 'justified',   label: 'Justificada', class: 'justified' },
+    { key: 'sinAviso',    label: 'Sin Aviso', class: 'unjustified' },
+    { key: 'suspension',  label: 'Suspensión', class: 'suspension' },
+    { key: 'totalInjust', label: 'T.Inj.', class: 'total-injust' },
+    { key: 'license',     label: 'Licencia', class: 'license' },
+    { key: 'ft',          label: 'FT', class: 'ft' },
+    { key: 'art',         label: 'ART', class: 'art' },
+    { key: 'vacations',   label: 'Vacaciones', class: 'vacations' },
+  ];
+
+  getStatTags(stat: EmployeeStat): { label: string; value: number; class: string }[] {
+    const warnKeys = new Set(['sinAviso', 'suspension', 'totalInjust']);
+    return this.STAT_LABELS
+      .filter(({ key }) => (stat[key] as number) > 0)
+      .map(({ key, label, class: statClass }) => ({
+        label,
+        value: stat[key] as number,
+        class: statClass
+      }));
+  }
+
+  employeeStats = computed((): EmployeeStat[] => {
+    const statsMap = new Map<string, EmployeeStat>();
+
+    for (const abs of this.absentOfMonth()) {
+      if (!statsMap.has(abs.employeeId)) {
+        statsMap.set(abs.employeeId, {
+          employeeId: abs.employeeId,
+          justified: 0, sinAviso: 0, suspension: 0,
+          license: 0, ft: 0, art: 0, vacations: 0,
+          totalInjust: 0, total: 0
+        });
+      }
+      const stat = statsMap.get(abs.employeeId)!;
+      const days = abs.impactDaysInMonth;
+
+      switch (abs.type) {
+        case AbsentType.SUSPENSION: stat.suspension += days; break;
+        case AbsentType.LICENSE:    stat.license += days; break;
+        case AbsentType.FT:         stat.ft += days; break;
+        case AbsentType.ART:        stat.art += days; break;
+        case AbsentType.VACATIONS:  stat.vacations += days; break;
+        case AbsentType.DESPIDO:
+        case AbsentType.RENUNCIA:   break;
+        default:
+          abs.justified ? (stat.justified += days) : (stat.sinAviso += days);
+      }
+      if (!abs.justified) stat.totalInjust += days;
+      stat.total += days;
+    }
+
+    return [...statsMap.values()].sort((a, b) => b.total - a.total);
+  });
 
   constructor(
     private absentService: AbsentService,
@@ -58,24 +126,8 @@ export class Absents implements OnInit {
 
   openFile(docId: string, e: Event) {
     e.stopPropagation();
-    if (docId == "") return;
+    this.utilsSvc.openFile(docId);
 
-    const link = document.createElement('a');
-
-    this.docsService.getDoc(docId).subscribe({
-      next: (doc) => {
-        console.log(doc);
-        link.href = 'https://drive.google.com/file/d/' + doc.driveFileId + '/view';
-        link.target = '_blank';
-        link.click();
-      },
-      error: (err) => {
-        console.error('Error cargando doc', err);
-        link.href = 'https://drive.google.com/file/d/' + docId + '/view';
-        link.target = '_blank';
-        link.click();
-      }
-    });
   }
 
   onEditAbsent(absent: AbsentResponseDTO, e: Event) {
@@ -175,6 +227,11 @@ export class Absents implements OnInit {
   getEmployeeName(employeeId: string) {
     const employee = this.employeeService.getLocalEmployeeById(employeeId);
     return employee?.name;
+  }
+
+  getEmployeeId(employeeId: string) {
+    const employee = this.employeeService.getLocalEmployeeById(employeeId);
+    return employee?.employeeId;
   }
 
   generateCalendar(year: number, month: number) {

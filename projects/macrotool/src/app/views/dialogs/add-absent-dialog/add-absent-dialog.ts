@@ -3,16 +3,17 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { map, Observable, startWith } from 'rxjs';
-import { EmployeeService } from '../../../core/services/employees/employee.service';
+import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { Employee } from '../../../shared/models/Employee';
 import { Absent, AbsentType } from '../../../shared/models/Absent.model';
-import { StorageService } from '../../../core/services/storage/storage.service';
-import { AbsentService } from '../../../core/services/absents/absent.service';
+import { StorageService } from '../../../core/services/api/storage/storage.service';
+import { AbsentService } from '../../../core/services/api/absents/absent.service';
 import { Doc, EDocType } from '../../../shared/models/Doc';
 import { AddDocDialog } from '../add-doc-dialog/add-doc-dialog';
 import { ABSENT_TYPES, DOC_TYPES } from '../../../shared/constants/typesValues.constant';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DocsService } from '../../../core/services/docs/docs.service';
+import { DocsService } from '../../../core/services/api/docs/docs.service';
+import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
 
 export enum UploadStatus {
   IDLE,
@@ -39,7 +40,7 @@ export class AddAbsentDialog implements OnInit {
 
 
   form = new FormGroup({
-    employee: new FormControl('', Validators.required),
+    employee: new FormControl<EmployeeDTO | null>(null, Validators.required),
     employeeId: new FormControl('', Validators.required),
     type: new FormControl('', Validators.required),
     startDate: new FormControl<Date | null>(null, Validators.required),
@@ -50,8 +51,8 @@ export class AddAbsentDialog implements OnInit {
   });
 
   absentTypes = ABSENT_TYPES; // Lista de tipos
-  filteredEmployees!: Observable<Employee[]>;
-  employeeSelected!: Employee;
+  filteredEmployees!: Observable<EmployeeDTO[]>;
+  employeeSelected!: EmployeeDTO;
 
   constructor(
     private employeeService: EmployeeService,
@@ -80,15 +81,15 @@ export class AddAbsentDialog implements OnInit {
       }
     }
 
-    this.filteredEmployees = (this.form.get('employee')?.valueChanges as Observable<string>).pipe(
+    this.filteredEmployees = (this.form.get('employee')?.valueChanges as Observable<EmployeeDTO | null>).pipe(
       startWith(''),
       map((value) => {
-        const employees = this.employeeService.getEmployees();
+        const employees = this.employeeService.getEmployeesSignal()();
         if (!value || value === '') return employees;
         const search = value.toString().toLowerCase();
         return employees.filter(emp =>
           emp.name.toLowerCase().includes(search) ||
-          emp.employeeID.toString().includes(search)
+          String(emp.employeeId).toLowerCase().includes(search)
         );
       })
     );
@@ -152,20 +153,20 @@ export class AddAbsentDialog implements OnInit {
     });
   }
 
-  displayFn = (empOrStr: Employee | string | null): string => {
+  displayFn = (empOrStr: EmployeeDTO | string | null): string => {
     if (!empOrStr) return '';
     if (typeof empOrStr === 'object' && 'name' in empOrStr) return empOrStr.name;
-    const employees = this.employeeService.getEmployees();
-    const found = employees.find(e => e.id === empOrStr || String(e.employeeID) === String(empOrStr));
+    const employees = this.employeeService.getEmployeesSignal()();
+    const found = employees.find(e => String(e.employeeId) === String(empOrStr));
     return found ? found.name : '';
   };
 
   onEmployeeSelected(event: any): void {
-    const emp = event.option.value as Employee;
+    const emp = event.option.value as EmployeeDTO;
     this.employeeSelected = emp;
     this.form.patchValue({
-      employeeId: emp.id ?? '',
-      employee: emp as any
+      employeeId: String(emp.employeeId),
+      employee: emp as EmployeeDTO
     });
   }
 
@@ -173,13 +174,13 @@ export class AddAbsentDialog implements OnInit {
   onSave(): void {
     if (this.form.valid && this.uploadStatus() === UploadStatus.IDLE) {
       this.uploadStatus.set(UploadStatus.UPLOADING);
-      const { employeeId, type, startDate, endDate, observations, justified, file } = this.form.value;
+      const { employee, type, startDate, endDate, observations, justified, file, employeeId } = this.form.value;
 
-      if (!employeeId || !type || !startDate || !endDate) return;
+      if (!employee || !type || !startDate || !endDate) return;
 
       const saveAbsent = () => {
         const payload = new Absent(
-          employeeId,
+          employee.id,
           type as AbsentType,
           startDate.toISOString(),
           endDate.toISOString(),

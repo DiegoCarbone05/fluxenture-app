@@ -1,5 +1,5 @@
 import { Component, computed, effect, EventEmitter, Input, Output } from '@angular/core';
-import { AuthService } from '../../../core/services/auth/auth.service';
+import { AuthService } from '../../../core/services/api/auth/auth.service';
 import { ViewsService } from '../../../views/views.service';
 
 

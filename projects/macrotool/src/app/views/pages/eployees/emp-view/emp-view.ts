@@ -1,14 +1,15 @@
 import { Component, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { EmployeeHistoryService } from '../../../../core/services/employee-history/employee-history.service';
+import { EmployeeHistoryService } from '../../../../core/services/api/employee-history/employee-history.service';
 import { EmployeeHistory } from '../../../../shared/models/EmployeeHistory.model';
 import { Employee, ESector } from '../../../../shared/models/Employee';
-import { EmployeeService } from '../../../../core/services/employees/employee.service';
+import { EmployeeService } from '../../../../core/services/api/employees/employee.service';
 import { EMPLOYEE_HISTORY_TYPES, EMPLOYEE_SECTOR } from '../../../../shared/constants/typesValues.constant';
 import { ViewsService } from '../../../views.service';
 import { Prompt } from '../../../dialogs/prompt/prompt';
 import { CreateEmployeeHistoryDialogComponent } from '../../../dialogs/create-employee-history/create-employee-history';
 import { MatDialog } from '@angular/material/dialog';
+import { AddEmployee } from '../../../dialogs/add-employee/add-employee';
 
 @Component({
   selector: 'app-emp-view',
@@ -40,6 +41,8 @@ export class EmpView {
         this.employee.set(employee);
       });
     });
+
+
   }
 
   addHistory() {
@@ -56,6 +59,21 @@ export class EmpView {
     });
   }
 
+  editEmployee() {
+    const dialog = this.addEmployeeDialog.open(AddEmployee, {
+      panelClass: 'full-screen-dialog',
+      data: { employee: this.employee() },
+      disableClose: true
+    });
+
+    dialog.afterClosed().subscribe((result: Employee | undefined) => {
+      if (result) {
+        this.employeeService.updateEmployee(this.employee()?.id!, result).subscribe(() => {
+          this.employee.set(result);
+        });
+      }
+    });
+  }
 
   getEmployeeHistoryTypeLabel(type: string): string {
     const typeFound = this.employeeHistoryTypes.find((t) => t.value === type);
@@ -63,7 +81,6 @@ export class EmpView {
   }
 
   getEmployeeSectorLabel(sector: ESector | undefined): string {
-    console.log(sector);
     if (!sector) return '';
 
     const sectorFound = this.employeeSector.find((s) => s.value === sector);
