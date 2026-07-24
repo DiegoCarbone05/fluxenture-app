@@ -1,23 +1,32 @@
-import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { Toolbar } from '../../../../shared/components/toolbar/toolbar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Cd } from '../../../../shared/models/Cd.model';
-import { TrackAndTrace } from '../../../../shared/services/track-and-trace';
 import html2Canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { Tnt } from '../../../../shared/models/Tnt.model';
 import { CdService } from '../../../../core/services/api/cd-api/cd.service';
 import { Employee } from '../../../../shared/models/Employee';
 import { EmployeeService } from '../../../../core/services/api/employees/employee.service';
-import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { Prompt } from '../../../dialogs/prompt/prompt';
 import { StorageService } from '../../../../core/services/api/storage/storage.service';
-import { AppService } from '../../../../core/services/app.service';
 import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
 
 @Component({
   selector: 'app-cds-viewer',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule, MatTableModule, MatSortModule,
+    MatButtonModule, MatIconModule, MatCheckboxModule, Toolbar,
+  ],
   templateUrl: './cds-viewer.html',
   styleUrl: './cds-viewer.scss',
 })
@@ -27,11 +36,12 @@ export class CdsViewer {
 
   cd = signal<Cd | null>(null);
   employee = signal<EmployeeDTO | null>(null)
-  isElectron = computed(() => this.appService.isElectron());
+  tnts = signal<Tnt[]>([]);
+  loadingTracking = signal(false);
+  trackingError = signal<string | null>(null);
 
   readonly promptDialog = inject(MatDialog);
   displayedColumns: string[] = ['date', 'plant', "historyData", 'status',];
-  dataSource = new MatTableDataSource<Tnt>([]);
 
   async generarPdfDesdeHtml() {
     const data = this.imprZone.nativeElement;
@@ -43,58 +53,88 @@ export class CdsViewer {
   }
 
   changeTrackingCompleted(event: any) {
-    if (this.cd()) {
-      this.cd()!.trackingCompleted = event.checked;
-      this.cdService.putCd(this.cd()!).subscribe();
-    }
+    const current = this.cd();
+    if (!current) return;
+
+    const updated = { ...current, trackingCompleted: event.checked } as Cd;
+    this.cd.set(updated);
+    this.cdService.putCd(updated).subscribe();
   }
 
   constructor(
     private route: ActivatedRoute,
-    private trackAndTrace: TrackAndTrace,
     private router: Router,
     private cdService: CdService,
     private employeeSvc: EmployeeService,
     private storageService: StorageService,
-    private appService: AppService
   ) {
     this.route.params.subscribe((params) => {
 
       //Obtiene el Numero de seguimiento desde el params url
-      const trackingNumber = params['id'];
+      const trackingNumber = Number(params['id']);
       //Obtiene la CD del numero de seguimiento
-      const cd = this.cdService.getLocalCdByTrackingNumber(Number(trackingNumber))
+      const cd = this.cdService.getLocalCdByTrackingNumber(trackingNumber)
 
-      //Si el cdNumber existe y existe la CD, se cargan a los signals
-      if (trackingNumber && cd) {
-        this.cd.set(cd)
-
-        //Se obtiene el empleado asociado
-        const employee = this.employeeSvc.getLocalEmployeeById(cd?.employeeId)
-        //Si existe, se carga
-        if (employee) this.employee.set(employee)
+      if (cd) {
+        this.loadCd(cd);
+        return;
       }
 
-      if (this.isElectron()) {
-        if ((this.cd() && this.cd()?.trackingCompleted)) {
-          this.loadTrackingFromLocal(this.cd()!.tnt)
-        } else {
-          console.log("trackingCompleted false");
-          this.trackAndTrace.trackPackage(trackingNumber as string).then((res) => {
-            const tnt: Tnt[] = res as unknown as Tnt[];
-            this.loadTracking(tnt)
-          })
-        }
-      } else {
-        this.loadTrackingFromLocal(this.cd()!.tnt)
-      }
-
-
-
+      //Entrada directa por URL (F5): el cache todavia no esta poblado
+      this.cdService.refreshCds().subscribe(() => {
+        const fetched = this.cdService.getLocalCdByTrackingNumber(trackingNumber);
+        if (fetched) this.loadCd(fetched);
+      });
     });
   }
 
-  ngOnInit() {
+  private loadCd(cd: Cd) {
+    this.cd.set(cd)
+    //Se muestra lo persistido mientras el backend consulta el seguimiento
+    this.tnts.set(cd.tnt ?? [])
+
+    //Se obtiene el empleado asociado
+    const employee = this.employeeSvc.getLocalEmployeeById(cd.employeeId)
+    if (employee) this.employee.set(employee)
+
+    //Un seguimiento cerrado ya no cambia: se deja el historial persistido
+    if (!cd.trackingCompleted) this.refreshTracking();
+  }
+
+  /** Pide al backend que scrapee Correo Argentino y persista el resultado en la CD. */
+  refreshTracking() {
+    const cd = this.cd();
+    if (!cd) return;
+
+    this.loadingTracking.set(true);
+    this.trackingError.set(null);
+
+    this.cdService.refreshTracking(cd.id).subscribe({
+      next: (updated) => {
+        this.cd.set(updated);
+        this.tnts.set(updated.tnt ?? []);
+        this.loadingTracking.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Error obteniendo el seguimiento:', err);
+        this.trackingError.set(this.describeTrackingError(err, cd.id));
+        this.loadingTracking.set(false);
+      },
+    });
+  }
+
+  /** Traduce el fallo HTTP a algo accionable en vez de un "no se pudo" genérico. */
+  private describeTrackingError(err: HttpErrorResponse, cdId: string): string {
+    switch (err.status) {
+      case 0:
+        return 'No se pudo contactar al servidor.';
+      case 404:
+        return `El servidor no encontró la CD (id: ${cdId}).`;
+      case 502:
+        return 'Correo Argentino no responde. Reintentá en unos minutos.';
+      default:
+        return `El servidor respondió ${err.status}: ${err.error?.message ?? err.message}`;
+    }
   }
 
   async exportPDF() {
@@ -128,28 +168,6 @@ export class CdsViewer {
         URL.revokeObjectURL(url);
       });
     }
-  }
-
-  loadTrackingFromLocal(tnt: Tnt[]) {
-    this.dataSource.data = tnt
-    console.log(tnt);
-  }
-
-  loadTracking(tnt: Tnt[]) {
-    const currentCd = this.cd()!;
-    if (currentCd.tnt !== tnt) {
-      currentCd.tnt = tnt
-      this.cdService.putCd(currentCd).subscribe()
-      this.cd.set(currentCd)
-      this.dataSource.data = currentCd.tnt
-    }
-  }
-
-  copyDeliveryDate() {
-
-    // const date = this.trackAndTrace.getLastTntResult(this.trackAndTraceResult() || '').date;
-    // navigator.clipboard.writeText(date.split(' ')[0]);
-    alert('Fecha de entrega copiada al portapapeles');
   }
 
   goBack() {

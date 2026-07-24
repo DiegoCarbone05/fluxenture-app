@@ -1,47 +1,297 @@
-.table-container {
-  box-sizing: border-box;
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f5f6fa;
+  overflow: hidden;
 }
 
-
-.docs-table {
-  width: 100%;
-
-  .mat-column-actions {
-    width: 60px;
-    text-align: center;
-  }
-
-  .mat-column-description {
-    color: rgba(0, 0, 0, 0.55);
-    font-size: 0.9rem;
-  }
+.docs-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100% - 64px);
 }
 
-.type-chip {
-  background-color: rgba(var(--mat-sys-primary-rgb, 63, 81, 181), 0.1);
-  color: var(--mat-sys-primary, #3f51b5);
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
-
+// ── LOADING ───────────────────────────────────────────────────────────────────
 .loading-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 64px 0;
+  padding: 72px 0;
 }
 
-.no-data-row td {
-  padding: 32px;
-  text-align: center;
-  color: rgba(0, 0, 0, 0.45);
-  font-size: 0.95rem;
-}
-
-.actions-cell {
+// ── EMPTY STATE ───────────────────────────────────────────────────────────────
+.docs-empty {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  gap: 14px;
+  padding: 80px 24px;
+  color: #bbb;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #d8dce6;
+  }
+
+  span {
+    font-size: 15px;
+    font-weight: 500;
+    color: #999;
+    text-align: center;
+  }
+}
+
+// ── DESKTOP HEADER (oculto en mobile) ─────────────────────────────────────────
+.docs-list-header {
+  display: none;
+}
+
+// ── LISTA MOBILE ──────────────────────────────────────────────────────────────
+.docs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px 100px;
+}
+
+// ── TARJETA DE DOCUMENTO (mobile-first) ───────────────────────────────────────
+.doc-card {
+  display: grid;
+  grid-template-areas:
+    "type  date"
+    "name  name"
+    "desc  desc"
+    "user  acts";
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto auto auto;
+  column-gap: 8px;
+  row-gap: 3px;
+
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #eef0f3;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  padding: 12px 8px 8px 14px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 18px rgba(4, 104, 215, 0.09);
+    border-color: rgba(4, 104, 215, 0.22);
+    transform: translateY(-1px);
+  }
+
+  // ── GRID AREAS ────────────────────────────────────────────────────────────
+  .f-type {
+    grid-area: type;
+    display: flex;
+    align-items: center;
+    padding-bottom: 5px;
+  }
+
+  .f-employee {
+    grid-area: name;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    padding-bottom: 1px;
+  }
+
+  .f-desc {
+    grid-area: desc;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    padding-bottom: 3px;
+  }
+
+  .f-date {
+    grid-area: date;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    justify-content: flex-end;
+    padding-bottom: 5px;
+  }
+
+  .f-user {
+    grid-area: user;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .f-actions {
+    grid-area: acts;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  // ── CONTENIDO ─────────────────────────────────────────────────────────────
+  .mobile-label {
+    font-size: 10px;
+    color: #b0b5c0;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .doc-employee-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a1a2e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .doc-description {
+    font-size: 13px;
+    color: #6c757d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .meta-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #9aa0ac;
+    flex-shrink: 0;
+  }
+
+  .doc-date-text {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .doc-user-text {
+    font-size: 12px;
+    color: #9aa0ac;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// ── TYPE CHIP ─────────────────────────────────────────────────────────────────
+.doc-type-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.25px;
+  background-color: #ebebeb;
+  color: #828282;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  // Ausencias
+  &.dtype-MEDICAL_CERTIFICATE  { background-color: #ecf2fd; color: #3d7dc7; }
+  &.dtype-VACATIONS             { background-color: #d2f0e4; color: #0ead6d; }
+  &.dtype-CERTIFICATE           { background-color: #ecf2fd; color: #3d7dc7; }
+  &.dtype-SUSPENSION            { background-color: #f3e597; color: #655814; }
+  &.dtype-LICENSE               { background-color: #d2eff0; color: #0ea8ad; }
+  &.dtype-DG, &.dtype-PG       { background-color: #ebebeb; color: #828282; }
+  &.dtype-OTHER                 { background-color: #ebebeb; color: #828282; }
+
+  // Documentos empresa
+  &.dtype-CD                    { background-color: #ffe4c4; color: #a35200; }
+  &.dtype-EPP                   { background-color: #d2ffc9; color: #1d5f0e; }
+  &.dtype-TELEGRAMA             { background-color: #e8d5f0; color: #6b1d9e; }
+  &.dtype-ALTA_AFIP             { background-color: #d0e8f0; color: #0e5e8a; }
+  &.dtype-BAJA_AFIP             { background-color: #f0d2d2; color: #ad0e0e; }
+  &.dtype-PREOCUPACIONAL        { background-color: #d2eff0; color: #0ea8ad; }
+  &.dtype-APERCIBIMIENTO        { background-color: #f0d2d2; color: #ad0e0e; }
+  &.dtype-ART                   { background-color: #f0eee5; color: #877a31; }
+  &.dtype-NOTIFICATION          { background-color: #e0e0f8; color: #3f3fd4; }
+  &.dtype-RECEIPT               { background-color: #d2e8f0; color: #0e5e8a; }
+  &.dtype-INCOME                { background-color: #d2ffc9; color: #1d5f0e; }
+}
+
+// ── RESPONSIVE — ESCRITORIO ───────────────────────────────────────────────────
+@media screen and (min-width: 768px) {
+
+  .docs-table-wrap {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #eaecf0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    margin: 16px;
+    overflow: hidden;
+  }
+
+  .docs-list-header {
+    display: grid;
+    grid-template-columns: 185px 1fr 1fr 100px 100px 132px;
+    padding: 10px 16px;
+    background-color: #f7f8fc;
+    border-bottom: 2px solid #e0e4ed;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #7a8090;
+  }
+
+  .docs-list {
+    padding: 0;
+    gap: 0;
+  }
+
+  .doc-card {
+    grid-template-areas: "type name desc date user acts";
+    grid-template-columns: 185px 1fr 1fr 100px 100px 132px;
+    grid-template-rows: auto;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid #f0f0f5;
+    box-shadow: none;
+    padding: 10px 16px;
+    column-gap: 12px;
+    row-gap: 0;
+    align-items: center;
+    transform: none !important;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: #f8f9ff;
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    .f-type     { padding: 0; }
+    .f-date     { justify-content: flex-start; }
+    .f-actions  { justify-content: flex-end; }
+
+    .mobile-label       { display: none; }
+    .doc-employee-name  { font-size: 14px; }
+    .doc-description    { font-size: 13px; }
+
+    .doc-type-chip {
+      font-size: 11px;
+      max-width: 175px;
+    }
+  }
 }

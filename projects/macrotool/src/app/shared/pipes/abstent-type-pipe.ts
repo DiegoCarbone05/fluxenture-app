@@ -3,7 +3,7 @@ import { ABSENT_TYPES } from '../constants/typesValues.constant';
 
 @Pipe({
   name: 'abstentType',
-  standalone: false
+  standalone: true
 })
 export class AbstentTypePipe implements PipeTransform {
 

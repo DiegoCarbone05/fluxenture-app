@@ -1,8 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { Electron } from '../../../shared/services/electron';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { TrackAndTrace } from '../../../shared/services/track-and-trace';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { CdService } from '../../../core/services/api/cd-api/cd.service';
 import { Employee } from '../../../shared/models/Employee';
 import { User } from '../../../shared/models/User';
@@ -15,7 +20,11 @@ import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
 
 @Component({
   selector: 'app-add-pdf',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule, AsyncPipe, ReactiveFormsModule, MatDialogModule,
+    MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule,
+  ],
   templateUrl: './add-pdf.html',
   styleUrl: './add-pdf.scss',
 })
@@ -166,6 +175,7 @@ export class AddPdf {
 
   async removePDF() {
     this.pdfPath.set('');
+    this.pdId.set('');
   }
 
   async saveCd() {

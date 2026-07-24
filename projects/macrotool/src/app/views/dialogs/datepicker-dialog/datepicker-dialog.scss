@@ -1,30 +1,132 @@
-.date-container {
+.container {
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+mat-dialog-content {
+  flex: 0 0 auto;
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+
+  .wrap {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 20px;
+    min-width: 0;
+  }
 
-    p {
-        margin: 0;
-        font-weight: 500;
-        font-size: 20px;
-        margin-bottom: 25px;
+  h2 {
+    font-size: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  span {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+    margin: 0;
+  }
+
+  button {
+    display: flex;
+    cursor: pointer;
+  }
+}
+
+.form-container {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  padding: 0 25px;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+
+  .month-field {
+    flex: 2 1 180px;
+  }
+
+  .year-field {
+    flex: 1 1 120px;
+  }
+}
+
+mat-dialog-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px 24px !important;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dialog-btn {
+  flex: 1;
+  border-radius: 4px !important;
+  height: 48px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+
+  &.cancel-btn {
+    background-color: transparent;
+    color: var(--primary, #3382F9);
+
+    &:hover {
+      background-color: #eaf3fc;
     }
+  }
 
-    form {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+  &.submit-btn {
+    background-color: #3382F9;
+    color: white;
+
+    &:hover {
+      background-color: #2f76e0;
     }
+  }
+}
 
-    .actions {
-        display: flex;
-        gap: 10px;
-        width: 100%;
-        margin-top: 20px;
+@media screen and (min-width: 940px) {
+  .container {
+    width: 420px;
+    max-width: 100%;
+    height: auto;
+    max-height: 85vh;
+  }
 
-        button {
-            width: 100%;
-        }
-    }
+  .dialog-btn {
+    flex: 0 0 auto;
+    min-width: 110px;
+  }
 }

@@ -10,10 +10,24 @@ import { Prompt } from '../../../dialogs/prompt/prompt';
 import { CreateEmployeeHistoryDialogComponent } from '../../../dialogs/create-employee-history/create-employee-history';
 import { MatDialog } from '@angular/material/dialog';
 import { AddEmployee } from '../../../dialogs/add-employee/add-employee';
+import { DocsService } from '../../../../core/services/api/docs/docs.service';
+import { Doc } from '../../../../shared/models/Doc';
+import { AddDocDialog } from '../../../dialogs/add-doc-dialog/add-doc-dialog';
+import { CommonModule, DatePipe } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { DocTypePipe } from '../../../../shared/pipes/doc-type-pipe';
+import { EmpSectorPipePipe } from '../../../../shared/pipes/emp-sector-pipe-pipe';
+import { Toolbar } from '../../../../shared/components/toolbar/toolbar';
 
 @Component({
   selector: 'app-emp-view',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule, DatePipe, MatButtonModule, MatIconModule,
+    MatProgressSpinnerModule, DocTypePipe, EmpSectorPipePipe, Toolbar,
+  ],
   templateUrl: './emp-view.html',
   styleUrl: './emp-view.scss'
 })
@@ -21,16 +35,17 @@ export class EmpView {
 
   employeeHistory = signal<EmployeeHistory[]>([]);
   employee = signal<Employee | null>(null);
-  employeeHistoryTypes = EMPLOYEE_HISTORY_TYPES
-  employeeSector = EMPLOYEE_SECTOR
+  docs = signal<Doc[]>([]);
+  employeeHistoryTypes = EMPLOYEE_HISTORY_TYPES;
+  employeeSector = EMPLOYEE_SECTOR;
 
   constructor(
     private route: ActivatedRoute,
     private employeeHistoryService: EmployeeHistoryService,
     private employeeService: EmployeeService,
     private viewSvc: ViewsService,
-    private addEmployeeDialog: MatDialog
-
+    private docsService: DocsService,
+    private dialog: MatDialog
   ) {
     this.route.params.subscribe((params) => {
       const empId = params['id'];
@@ -40,13 +55,47 @@ export class EmpView {
       this.employeeService.getEmployeeById(empId).subscribe((employee) => {
         this.employee.set(employee);
       });
+      this.docsService.getDocsByEmployeeId(empId).subscribe((docs) => {
+        this.docs.set(docs);
+      });
     });
-
-
   }
 
+  // ── Docs ──────────────────────────────────────────────────────────────────
+
+  loadDocs() {
+    const id = this.employee()?.id;
+    if (!id) return;
+    this.docsService.getDocsByEmployeeId(id).subscribe((docs) => this.docs.set(docs));
+  }
+
+  addDoc() {
+    const ref = this.dialog.open(AddDocDialog, {
+      disableClose: true,
+      panelClass: 'full-screen-dialog',
+      data: { employeeId: this.employee()?.id }
+    });
+    ref.afterClosed().subscribe((result) => {
+      if (result) this.loadDocs();
+    });
+  }
+
+  viewDoc(driveFileId: string) {
+    if (!driveFileId) return;
+    window.open(`https://drive.google.com/file/d/${driveFileId}/view`, '_blank');
+  }
+
+  deleteDoc(doc: Doc) {
+    this.viewSvc.prompt('Eliminar documento', '¿Está seguro de que desea eliminar este documento?').then((confirmed) => {
+      if (!confirmed) return;
+      this.docsService.deleteDocAndFile(doc.id!, doc.driveFileId).subscribe(() => this.loadDocs());
+    });
+  }
+
+  // ── History ───────────────────────────────────────────────────────────────
+
   addHistory() {
-    const dialog = this.addEmployeeDialog.open(CreateEmployeeHistoryDialogComponent, {
+    const dialog = this.dialog.open(CreateEmployeeHistoryDialogComponent, {
       panelClass: 'full-screen-dialog',
       data: { employeeId: this.employee()?.id },
       disableClose: true
@@ -60,7 +109,7 @@ export class EmpView {
   }
 
   editEmployee() {
-    const dialog = this.addEmployeeDialog.open(AddEmployee, {
+    const dialog = this.dialog.open(AddEmployee, {
       panelClass: 'full-screen-dialog',
       data: { employee: this.employee() },
       disableClose: true

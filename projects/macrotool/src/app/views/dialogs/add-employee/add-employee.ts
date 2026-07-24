@@ -1,8 +1,16 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Employee, EGender, ECivilStatus, ESector } from '../../../shared/models/Employee';
 import { ViewsService } from '../../views.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatStepperModule } from '@angular/material/stepper';
+import { CommonModule } from '@angular/common';
 
 export interface AddEmployeeDialogData {
   employee?: Employee;
@@ -10,7 +18,12 @@ export interface AddEmployeeDialogData {
 
 @Component({
   selector: 'app-add-employee',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule, ReactiveFormsModule, MatDialogModule,
+    MatButtonModule, MatIconModule, MatFormFieldModule,
+    MatInputModule, MatSelectModule, MatCheckboxModule, MatStepperModule,
+  ],
   templateUrl: './add-employee.html',
   styleUrl: './add-employee.scss'
 })

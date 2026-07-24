@@ -1,67 +1,257 @@
-.finalized {
-  opacity: 0.5;
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f5f6fa;
+  overflow: hidden;
 }
 
-.mobile-item {
+// ── TAB GROUP ─────────────────────────────────────────────────────────────────
+:host ::ng-deep {
+  mat-tab-group {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+    overflow: hidden;
+
+    mat-tab-header {
+      font-family:
+        system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+        "Open Sans", "Helvetica Neue", sans-serif;
+      font-weight: 700;
+      background-color: white;
+      border-bottom: 1px solid #e4e4e4;
+    }
+
+    .mat-mdc-tab-body-wrapper {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .mat-mdc-tab-body-content {
+      height: 100%;
+      overflow: hidden;
+    }
+  }
+}
+
+// ── TAB COUNTER BADGE ─────────────────────────────────────────────────────────
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 6px;
+  background-color: #e8ecf5;
+  color: #5a6480;
+
+  &.active {
+    background-color: rgba(4, 104, 215, 0.12);
+    color: var(--primary, #0468d7);
+  }
+}
+
+// ── CONTENT SCROLL WRAPPER ────────────────────────────────────────────────────
+.tnt-content {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+// ── EMPTY STATE ────────────────────────────────────────────────────────────────
+.tnt-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 80px 24px;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #d8dce6;
+  }
+
+  span {
+    font-size: 15px;
+    font-weight: 500;
+    color: #999;
+    text-align: center;
+  }
+}
+
+// ── HEADER DESKTOP ─────────────────────────────────────────────────────────────
+.tnt-list-header {
+  display: none;
+}
+
+// ── LISTA MOBILE ───────────────────────────────────────────────────────────────
+.tnt-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 16px;
+  padding: 12px 16px 100px;
+}
 
-  border-bottom: 1px solid #e0e0e0;
+// ── TARJETA CD (mobile-first) ──────────────────────────────────────────────────
+.cd-card {
+  display: grid;
+  grid-template-areas:
+    "status date"
+    "name   name"
+    "track  track"
+    "obs    acts";
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto auto auto;
+  column-gap: 8px;
+  row-gap: 3px;
 
-  .mobile-item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #eef0f3;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  padding: 12px 8px 8px 14px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 
-    .mobile-item-name {
-      font-weight: 500;
-    }
+  &.completed {
+    background-color: #fafbff;
+
+    .cd-employee-name { color: #555; }
+    .cd-tracking      { color: #7a90b0; }
   }
 
-  .mobile-item-details {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  &:hover {
+    box-shadow: 0 4px 18px rgba(4, 104, 215, 0.09);
+    border-color: rgba(4, 104, 215, 0.22);
+    transform: translateY(-1px);
+  }
 
-    .mobile-item-date {
-      font-size: 12px;
-      color: #666;
-    }
+  .f-status   { grid-area: status; display: flex; align-items: center; padding-bottom: 5px; }
+  .f-employee { grid-area: name;   display: flex; flex-direction: column; gap: 1px; min-width: 0; padding-bottom: 1px; }
+  .f-tracking { grid-area: track;  display: flex; flex-direction: column; gap: 1px; min-width: 0; padding-bottom: 3px; }
+  .f-date     { grid-area: date;   display: flex; align-items: center; gap: 3px; justify-content: flex-end; padding-bottom: 5px; }
+  .f-obs      { grid-area: obs;    display: flex; flex-direction: column; gap: 1px; min-width: 0; align-self: center; }
+  .f-actions  { grid-area: acts;   display: flex; align-items: center; justify-content: flex-end; }
 
-    .mobile-item-tracking {
-      font-size: 12px;
-      color: #666;
-    }
+  .mobile-label {
+    font-size: 10px;
+    color: #b0b5c0;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .cd-employee-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a1a2e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cd-tracking {
+    font-size: 13px;
+    color: #4a6fa5;
+    font-weight: 600;
+    font-family: monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.3px;
+  }
+
+  .meta-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #9aa0ac;
+    flex-shrink: 0;
+  }
+
+  .cd-date {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .cd-obs {
+    font-size: 13px;
+    color: #6c757d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
-.table-container {
-  width: 100%;
-  height: calc(100% - 64px) !important;
-  overflow: auto;
-  padding: 0 16px;
-  background-color: white;
-  box-sizing: border-box;
+// ── RESPONSIVE (escritorio) ────────────────────────────────────────────────────
+@media screen and (min-width: 768px) {
 
-  td {
-    border: none;
-    font-size: 14px;
+  .tnt-table-wrap {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #eaecf0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    margin: 16px;
+    overflow: hidden;
   }
 
-  .mat-mdc-row {
+  .tnt-list-header {
+    display: grid;
+    grid-template-columns: 1fr 180px 90px 1fr 160px 88px;
+    padding: 10px 16px;
+    background-color: #f7f8fc;
+    border-bottom: 2px solid #e0e4ed;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #7a8090;
+  }
+
+  .tnt-list {
+    padding: 0;
+    gap: 0;
+  }
+
+  .cd-card {
+    grid-template-areas: "name track date obs status acts";
+    grid-template-columns: 1fr 180px 90px 1fr 160px 88px;
+    grid-template-rows: auto;
+    border-radius: 0;
     border: none;
+    border-bottom: 1px solid #f0f0f5;
+    box-shadow: none;
+    padding: 10px 16px;
+    column-gap: 12px;
+    row-gap: 0;
+    align-items: center;
+    transform: none !important;
+
+    &:last-child { border-bottom: none; }
 
     &:hover {
-      background-color: #f1f1f1;
-      cursor: pointer;
+      background-color: #f8f9ff;
+      border-color: transparent;
+      box-shadow: none;
     }
+
+    .f-status  { padding: 0; }
+    .f-date    { justify-content: flex-start; }
+    .f-actions { justify-content: flex-end; }
+
+    .mobile-label       { display: none; }
+    .cd-employee-name   { font-size: 14px; }
   }
-
-  .employee-name {
-    // white-space: nowrap;
-  }
-
-
 }

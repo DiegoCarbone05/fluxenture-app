@@ -1,15 +1,22 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { AbstentTypePipe } from '../../../../shared/pipes/abstent-type-pipe';
+import { Toolbar } from '../../../../shared/components/toolbar/toolbar';
 import { AbsentService } from '../../../../core/services/api/absents/absent.service';
 import { ActivatedRoute } from '@angular/router';
 import { AbsentResponseDTO } from '../../../../shared/models/AbsentResponseDTO';
 import { EmployeeService } from '../../../../core/services/api/employees/employee.service';
-import { Employee } from '../../../../shared/models/Employee';
 import { StorageService } from '../../../../core/services/api/storage/storage.service';
 import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
+import { AddAbsentDialog } from '../../../dialogs/add-absent-dialog/add-absent-dialog';
 
 @Component({
   selector: 'app-absent-view',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, DatePipe, MatButtonModule, MatIconModule, AbstentTypePipe, Toolbar],
   templateUrl: './absent-view.html',
   styleUrl: './absent-view.scss'
 })
@@ -17,6 +24,8 @@ export class AbsentView {
 
   absent = signal<AbsentResponseDTO | null>(null);
   employee = signal<EmployeeDTO | null>(null);
+
+  private readonly dialog = inject(MatDialog);
 
   constructor(
     private absentService: AbsentService,
@@ -34,6 +43,18 @@ export class AbsentView {
         this.employee.set(employee);
       }
     }
+  }
+
+  editAbsent() {
+    const dialogRef = this.dialog.open(AddAbsentDialog, {
+      disableClose: true,
+      data: this.absent()
+    });
+    dialogRef.afterClosed().subscribe((result: AbsentResponseDTO | undefined) => {
+      if (result) {
+        this.absent.set(result);
+      }
+    });
   }
 
   openFile(fileId: string | undefined) {

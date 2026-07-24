@@ -1,15 +1,15 @@
 import { Component, computed, ViewChild } from '@angular/core';
 import { AuthService } from '../../core/services/api/auth/auth.service';
 import { ViewsService } from '../views.service';
-import { MatSidenav } from '@angular/material/sidenav';
-import { ChildrenOutletContexts } from '@angular/router';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { ChildrenOutletContexts, RouterOutlet } from '@angular/router';
 import { slideInAnimation } from '../../shared/constants/slideAnimaton';
-
-
+import { Sidenav } from '../../shared/components/sidenav/sidenav';
 
 @Component({
   selector: 'app-pages',
-  standalone: false,
+  standalone: true,
+  imports: [MatSidenavModule, RouterOutlet, Sidenav],
   templateUrl: './pages.html',
   styleUrl: './pages.scss',
   animations: [slideInAnimation]

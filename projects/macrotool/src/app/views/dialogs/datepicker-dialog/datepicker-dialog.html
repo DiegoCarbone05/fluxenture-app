@@ -1,26 +1,43 @@
-<div class="date-container">
-    <p>Seleccione el mes y el año</p>
-    <form>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 150px;">
-            <mat-label>Mes</mat-label>
-            <mat-select [(value)]="currentDate.month" (selectionChange)="onDateChange()">
-                @for (month of months; track month; let i = $index) {
-                <mat-option [value]="i + 1">{{month}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 100px;">
-            <mat-label>Año</mat-label>
-            <mat-select [(value)]="currentDate.year" (selectionChange)="onDateChange()">
-                @for (year of years; track year) {
-                <mat-option [value]="year">{{year}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-    </form>
-    <div class="actions">
-        <button matButton="filled" (click)="cancelDialog()">Cancelar</button>
-        <button matButton="filled" cdkFocusInitial color="primary" (click)="acept()">Aceptar</button>
+<div class="container">
+  <div class="header">
+    <div class="wrap">
+      <h2>Seleccionar Período</h2>
+      <span>Elija el mes y el año</span>
     </div>
+
+    <button mat-icon-button (click)="cancelDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="mat-typography">
+    <form class="form-container">
+      <mat-form-field appearance="outline" class="month-field">
+        <mat-label>Mes</mat-label>
+        <mat-select [(value)]="currentDate.month" (selectionChange)="onDateChange()">
+          @for (month of months; track month; let i = $index) {
+          <mat-option [value]="i + 1">{{ month }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="year-field">
+        <mat-label>Año</mat-label>
+        <mat-select [(value)]="currentDate.year" (selectionChange)="onDateChange()">
+          @for (year of years; track year) {
+          <mat-option [value]="year">{{ year }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button type="button" class="dialog-btn cancel-btn" (click)="cancelDialog()">
+      Cancelar
+    </button>
+    <button type="button" class="dialog-btn submit-btn" cdkFocusInitial (click)="acept()">
+      Aceptar
+    </button>
+  </mat-dialog-actions>
 </div>

@@ -2,7 +2,7 @@ import { Directive, EventEmitter, HostBinding, HostListener, Output, } from '@an
 
 @Directive({
   selector: '[appDragDropFile]',
-  standalone: false
+  standalone: true
 })
 export class DragDropFileDirective {
   // Ahora emitimos un solo File

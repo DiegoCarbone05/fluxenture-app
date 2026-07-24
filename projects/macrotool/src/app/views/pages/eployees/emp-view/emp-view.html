@@ -135,6 +135,39 @@
             }
         </div>
     </div>
+    <div class="card">
+        <div class="card-header">
+            <h2>Documentos</h2>
+            <button mat-icon-button color="primary" (click)="addDoc()">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
+        <div class="card-body">
+            @if (docs().length === 0) {
+            <p class="no-history">Sin documentos registrados.</p>
+            } @else {
+            <div class="doc-list">
+                @for (doc of docs(); track doc.id) {
+                <div class="doc-item">
+                    <div class="wrap">
+                        <span class="doc-type-chip">{{ doc.type | docType }}</span>
+                        <span class="doc-date">{{ doc.uploadDate | date:'dd/MM/yyyy' }}</span>
+                        <span class="doc-desc">{{ doc.description || '—' }}</span>
+                    </div>
+                    <div class="wrap">
+                        <button mat-icon-button (click)="viewDoc(doc.driveFileId)">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="deleteDoc(doc)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+    </div>
 </div>
 }@else {
 <div class="loading">

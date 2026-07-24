@@ -1,132 +1,175 @@
-.add-employee-container {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    background-color: var(--mat-sys-surface-container-high);
-    box-sizing: border-box;
-    border-radius: 0;
-    max-width: 940px;
-    overflow: hidden;
-
-    form,
-    mat-form-field {
-        width: 100%;
-    }
-
-    mat-form-field {
-        max-width: 600px;
-    }
-
-    mat-dialog-content {
-        flex: 1;
-        overflow-y: auto;
-        min-height: 0; // Crucial para que flex y overflow funcionen juntos
-        display: flex;
-        flex-direction: column;
-        padding: 0 20px !important;
-
-        form {
-            width: 100%;
-        }
-    }
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 20px;
-        padding-right: 10px;
-        background-color: white;
-        color: rgb(27, 27, 27);
-
-        h1 {
-            font-size: 20px;
-        }
-    }
-
-    mat-checkbox {
-        margin: 8px 0;
-    }
-
-    .step-content {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        padding: 16px 0;
-    }
-
-    .step-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 16px;
-    }
-
-    .actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-    }
-
-    .actions-edit {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        padding: 0 25px;
-        margin-bottom: 25px;
-        box-sizing: border-box;
-    }
-
-    .footer-actions {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        padding: 21px 12px;
-        box-sizing: border-box;
-
-        button {
-            background-color: var(--primary);
-            height: 46px;
-            width: 100%;
-            border-radius: 4px !important;
-            color: white;
-            position: relative;
-            align-items: center;
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            border: none;
-            cursor: pointer;
-
-            &:hover {
-                background-color: var(--primary-hover);
-            }
-        }
-    }
+.container {
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--mat-sys-surface-container-high);
+  box-sizing: border-box;
 }
 
-@media (min-width: 940px) {
-    .add-employee-container {
-        height: auto;
-        max-height: 90vh;
-        border-radius: 12px;
+mat-dialog-content {
+  flex: 0 0 auto;
+  overflow: visible !important;
+  max-height: none !important;
+  padding: 0 !important;
+  background-color: white;
+}
 
-        mat-dialog-content {
-            max-height: 70vh;
-        }
+.form-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-        .footer-actions {
-            width: 100%;
-            justify-content: left;
-            padding-top: 0;
-            padding-bottom: 34px;
+::ng-deep .mat-stepper-horizontal,
+::ng-deep .mat-stepper-vertical {
+  background-color: transparent;
+}
 
-            button {
-                width: 200px;
-                margin-left: 35px;
-            }
-        }
-    }
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  mat-form-field {
+    flex: 1 1 180px;
+    min-width: 0;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-checkbox {
+  margin: 4px 0 12px;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+
+  button[mat-flat-button] {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: white;
+
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    margin: 0;
+    color: rgb(27, 27, 27);
+  }
+
+  span {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+    margin: 0;
+  }
+
+  button {
+    display: flex;
+    cursor: pointer;
+  }
+}
+
+mat-dialog-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px !important;
+  box-sizing: border-box;
+  background-color: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.submit-btn {
+  width: 100%;
+  height: 54px;
+  background-color: var(--primary, #3382F9);
+}
+
+.dialog-btn {
+  border-radius: 4px !important;
+  color: white;
+  position: relative;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--primary-hover, #2f76e0);
+  }
+
+  &:disabled {
+    background-color: #0000001f;
+    color: rgba(128, 128, 128, 0.589);
+    cursor: not-allowed;
+  }
+}
+
+@media screen and (min-width: 940px) {
+  .container {
+    width: 720px;
+    max-width: 100%;
+    height: auto;
+    max-height: 85vh;
+  }
+
+  mat-dialog-content {
+    padding: 0 20px !important;
+  }
+
+  mat-dialog-actions {
+    padding: 16px 32px !important;
+  }
+
+  .submit-btn {
+    width: 220px;
+  }
 }

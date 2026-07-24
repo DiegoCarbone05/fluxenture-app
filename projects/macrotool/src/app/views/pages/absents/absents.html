@@ -11,24 +11,37 @@
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
   <mat-tab label="AUSENCIAS">
     <div class="absent-list">
-      @for (item of absentOfMonth(); track $index) {
-        <div class="absent-container" (click)="openAbsent(item.id)">
-          <div class="absent">
-            <div class="absent-type-chip" [class]="'chip-' + item.type">
-              {{ item.type | abstentType }}
+      @if (absentOfMonth().length === 0) {
+        <div class="absent-list-empty">
+          <mat-icon>event_available</mat-icon>
+          <span>Sin ausencias en {{ months[currentDate().month - 1] }} {{ currentDate().year }}</span>
+        </div>
+      }
+      @for (item of absentOfMonth(); track item.id) {
+        <div class="absent-card" (click)="openAbsent(item.id)">
+          <div class="absent-card-body">
+            <div class="absent-card-meta">
+              <span class="absent-type-chip" [class]="'chip-' + item.type">{{ item.type | abstentType }}</span>
+              <span class="absent-justified-badge"
+                [class.justified]="item.justified"
+                [class.unjustified]="!item.justified">
+                <mat-icon>{{ item.justified ? 'check_circle' : 'cancel' }}</mat-icon>
+                {{ item.justified ? 'Justificada' : 'Sin justificar' }}
+              </span>
             </div>
-            <span class="employee">{{ getEmployeeName(item.employeeId) }}</span>
-            <span class="date"
-              >{{ item.originalStartDate }} - {{ item.originalEndDate }}</span
-            >
+            <span class="absent-employee-name">{{ getEmployeeName(item.employeeId) }}</span>
+            <div class="absent-date-info">
+              <mat-icon>event</mat-icon>
+              <span>{{ item.originalStartDate }} → {{ item.originalEndDate }}</span>
+            </div>
           </div>
-          <div class="actions">
+          <div class="absent-card-actions">
             <button
               mat-icon-button
-              color="primary"
               (click)="openFile(item.documentId, $event)"
+              [disabled]="!item.documentId"
             >
-              <mat-icon>visibility</mat-icon>
+              <mat-icon>description</mat-icon>
             </button>
             <button
               mat-icon-button
@@ -49,24 +62,27 @@
       }
     </div>
   </mat-tab>
+
   <mat-tab label="CALENDARIO">
     <div class="absent-calendar">
       <div class="days">
-        <div class="day-of-week">Dom</div>
+        <div class="day-of-week weekend">Dom</div>
         <div class="day-of-week">Lun</div>
         <div class="day-of-week">Mar</div>
         <div class="day-of-week">Mie</div>
         <div class="day-of-week">Jue</div>
         <div class="day-of-week">Vie</div>
-        <div class="day-of-week">Sab</div>
+        <div class="day-of-week weekend">Sab</div>
       </div>
       <div class="calendar">
         <div class="week">
           @for (day of daysOfMonth(); track $index) {
-            <div class="day">
-              <span>{{ day.day }}</span>
-              @if (day.hasAbsence) {
-                @for (item of day.absences; track $index) {
+            <div class="day" [class.today]="day.isToday" [class.empty-day]="!day.day">
+              @if (day.day) {
+                <span class="day-number">{{ day.day }}</span>
+              }
+              @if (day.absences?.length) {
+                @for (item of day.absences; track item.id) {
                   <div
                     (dblclick)="openAbsent(item.id)"
                     (mouseover)="onAbsentClick(item.id)"
@@ -99,15 +115,20 @@
       } @else {
         <div class="stats-list">
           @for (row of employeeStats(); track row.employeeId) {
-            <div class="stat-row">
-              <span class="stat-name"
-                ><strong> {{ getEmployeeId(row.employeeId) }} </strong> -
-                {{ getEmployeeName(row.employeeId) }}</span
-              >
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-employee-info">
+                  <span class="stat-emp-id">{{ getEmployeeId(row.employeeId) }}</span>
+                  <span class="stat-emp-name">{{ getEmployeeName(row.employeeId) }}</span>
+                </div>
+                <span class="stat-total-badge" [class.warn]="row.total >= 5">
+                  {{ row.total }} {{ row.total === 1 ? 'día' : 'días' }}
+                </span>
+              </div>
               <div class="stat-tags">
                 @for (tag of getStatTags(row); track tag.label) {
                   <span class="stat-tag" [class]="tag.class">
-                    {{ tag.label }}: <strong>{{ tag.value }}</strong>
+                    {{ tag.label }} <strong>{{ tag.value }}</strong>
                   </span>
                 }
               </div>
@@ -117,8 +138,6 @@
       }
     </div>
   </mat-tab>
-
-  <!-- <mat-tab label="Third"> Content 3 </mat-tab> -->
 </mat-tab-group>
 
 <button

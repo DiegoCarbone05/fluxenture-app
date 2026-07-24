@@ -1,4 +1,12 @@
 import { Component, computed, ElementRef, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { Toolbar } from '../../../shared/components/toolbar/toolbar';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ViewsService } from '../../views.service';
 import { FormBuilder, FormControl } from '@angular/forms';
@@ -7,7 +15,11 @@ import * as jspdf from 'jspdf';
 
 @Component({
   selector: 'app-sgi',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule, ReactiveFormsModule, FormsModule, MatButtonModule,
+    MatIconModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, Toolbar,
+  ],
   templateUrl: './sgi.html',
   styleUrl: './sgi.scss'
 })

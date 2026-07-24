@@ -3,7 +3,7 @@ import { Tnt } from '../models/Tnt.model';
 
 @Pipe({
   name: 'tntStatusPipe',
-  standalone: false
+  standalone: true
 })
 export class TntStatusPipePipe implements PipeTransform {
 

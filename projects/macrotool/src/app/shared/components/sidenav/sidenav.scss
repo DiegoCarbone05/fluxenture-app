@@ -10,9 +10,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: white;
+    color: rgb(255, 255, 255);
     border-radius: 15px;
     padding: 10px 0;
+
+    &:hover {
+      background-color: #f5f6fa17 !important;
+      cursor: pointer;
+    }
 
 
     mat-icon {
@@ -20,7 +25,7 @@
     }
 
     &.selected {
-      background-color: #484855;
+      background-color: transparent;
 
     }
 

@@ -1,6 +1,17 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Inject, OnInit, signal, ViewChild } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AsyncPipe, CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { DragDropFileDirective } from '../../../shared/directives/drag-drop-file';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { map, Observable, startWith } from 'rxjs';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
@@ -20,7 +31,13 @@ export enum UploadStatus {
 
 @Component({
   selector: 'app-add-doc-dialog',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule, AsyncPipe, ReactiveFormsModule, MatDialogModule,
+    MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule,
+    MatSelectModule, MatAutocompleteModule, MatDatepickerModule, MatProgressBarModule,
+    DragDropFileDirective,
+  ],
   templateUrl: './add-doc-dialog.html',
   styleUrl: './add-doc-dialog.scss',
   providers: [provideNativeDateAdapter()]

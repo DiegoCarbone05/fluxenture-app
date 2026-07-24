@@ -1,46 +1,136 @@
-<flux-toolbar [backButton]="true" [menuButton]="false" (backClick)="goBack()">
-  <button matButton color="primary" (click)="downloadFile()"> Descargar PDF</button>
-  <button matButton="filled" color="primary" (click)="exportPDF()"> <strong>EXPORTAR</strong></button>
+<flux-toolbar
+  [backButton]="true"
+  [menuButton]="false"
+  (backClick)="goBack()"
+  title="Carta Documento"
+  [bgColor]="cd()?.trackingCompleted ? '#0ead6d' : 'var(--primary)'"
+  theme="dark">
+  <button matButton (click)="downloadFile()">
+    <mat-icon>file_download</mat-icon>
+    Descargar
+  </button>
+  <button matButton (click)="exportPDF()">
+    <mat-icon>picture_as_pdf</mat-icon>
+    <strong>Exportar</strong>
+  </button>
 </flux-toolbar>
 
-<div class="app-container">
+@if (cd()) {
 
-  @if(isElectron()){
-  <mat-checkbox color="primary" (change)="changeTrackingCompleted($event)" [checked]="cd()?.trackingCompleted">
-    <mat-checkbox-label>Seguimiento completo</mat-checkbox-label>
-  </mat-checkbox>
-  }
-
-  <div #imprZone>
-    <h1>{{ employee()?.name }}</h1>
-    <p><b>CD Number: </b>{{ cd()?.trackingNumber }}</p>
-    <p><b>Fecha de emisión: </b>{{ cd()?.emissionDate }}</p>
-
-    <table mat-table [dataSource]="dataSource" class="tabla-custom-hover">
-      <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef>Fecha</th>
-        <td mat-cell *matCellDef="let element">{{ element.date }}</td>
-      </ng-container>
-      <ng-container matColumnDef="plant">
-        <th mat-header-cell *matHeaderCellDef>Plant</th>
-        <td mat-cell *matCellDef="let element">{{ element.plant }}</td>
-      </ng-container>
-      <ng-container matColumnDef="historyData">
-        <th mat-header-cell *matHeaderCellDef>History Data</th>
-        <td mat-cell *matCellDef="let element">{{ element.history }}</td>
-      </ng-container>
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>Status</th>
-        <td mat-cell *matCellDef="let element">{{ element.status }}</td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
-
-    @if (!isElectron() && dataSource.data.length === 0){
-    <div class="message-box">
-      Ingrese a la aplicación de escritorio para poder ver el seguimiento completo.
+  <!-- Hero (solo display web) -->
+  <div class="cds-hero" [class.completed]="cd()?.trackingCompleted">
+    <div class="content">
+      <div class="status-chip">
+        <mat-icon>{{ cd()?.trackingCompleted ? 'check_circle' : 'local_shipping' }}</mat-icon>
+        <span>{{ cd()?.trackingCompleted ? 'Seguimiento completo' : 'En seguimiento' }}</span>
+      </div>
+      <span class="employee-name">{{ employee()?.name || 'Empleado no encontrado' }}</span>
+      <div class="cd-period">
+        <mat-icon>tag</mat-icon>
+        <span>{{ cd()?.trackingNumber }}</span>
+        <span class="period-sep">·</span>
+        <mat-icon>event</mat-icon>
+        <span>{{ cd()?.emissionDate | date:'dd/MM/yyyy' }}</span>
+      </div>
     </div>
-    }
   </div>
-</div>
+
+  <div class="container">
+
+    <div class="card toggle-card">
+      <div class="card-body">
+        <mat-checkbox color="primary"
+          (change)="changeTrackingCompleted($event)"
+          [checked]="cd()?.trackingCompleted">
+          Marcar seguimiento como completado
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <!-- Este card se exporta como PDF -->
+    <div class="card" #imprZone>
+      <div class="card-header">
+        <h2>Historial de seguimiento</h2>
+        @if (loadingTracking() && tnts().length > 0) {
+          <span class="updating">
+            <mat-icon class="spin">sync</mat-icon>
+            Actualizando…
+          </span>
+        }
+      </div>
+      <div class="card-body">
+
+        <!-- Info del CD (visible en web y en PDF exportado) -->
+        <div class="info-row">
+          <div class="info-item">
+            <span class="label">Empleado</span>
+            <span class="value">{{ employee()?.name || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Nro. de seguimiento</span>
+            <span class="value tracking-number">{{ cd()?.trackingNumber }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Fecha de emisión</span>
+            <span class="value">{{ cd()?.emissionDate }}</span>
+          </div>
+        </div>
+
+        <!-- Tabla de eventos -->
+        <div class="tracking-section">
+          @if (loadingTracking() && tnts().length === 0) {
+            <div class="tracking-msg">
+              <mat-icon class="spin">sync</mat-icon>
+              <span>Consultando seguimiento en Correo Argentino…</span>
+            </div>
+          } @else if (trackingError() && tnts().length === 0) {
+            <div class="tracking-msg">
+              <mat-icon>cloud_off</mat-icon>
+              <span>{{ trackingError() }}</span>
+              <button matButton (click)="refreshTracking()">Reintentar</button>
+            </div>
+          } @else if (tnts().length === 0) {
+            <div class="tracking-msg">
+              <mat-icon>search_off</mat-icon>
+              <span>Todavía no hay eventos de seguimiento para este número.</span>
+            </div>
+          } @else {
+            <table mat-table [dataSource]="tnts()" class="tracking-table">
+
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                <td mat-cell *matCellDef="let element">{{ element.date }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="plant">
+                <th mat-header-cell *matHeaderCellDef>Planta</th>
+                <td mat-cell *matCellDef="let element">{{ element.plant }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="historyData">
+                <th mat-header-cell *matHeaderCellDef>Historial</th>
+                <td mat-cell *matCellDef="let element">{{ element.history }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let element">{{ element.status }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+          }
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+} @else {
+  <div class="loading">
+    <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+    <span>Cargando carta de documento...</span>
+  </div>
+}

@@ -44,7 +44,7 @@ export class EmployeeService extends BaseApiService<Employee> {
    */
 
   createEmployee(employee: Employee) {
-    return this.http.post<Employee>(this.endpoint, employee).pipe(
+    return this.http.post<Employee>(this.endpoint + '/', employee).pipe(
       tap(() => this.refreshEmployees().subscribe())
     );
   }

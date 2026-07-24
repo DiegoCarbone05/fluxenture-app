@@ -1,83 +1,230 @@
-.add-pdf-container {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    background-color: var(--mat-sys-surface-container-high);
+.container {
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+mat-dialog-content {
+  flex: 0 0 auto;
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 25px;
+  box-sizing: border-box;
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  mat-form-field {
+    flex: 1 1 180px;
+    min-width: 0;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.file-upload-section {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .flux-dox-loaded {
+    width: 100%;
+    padding: 10px 20px;
     box-sizing: border-box;
-    max-width: 600px;
+    background-color: #00A751;
+    border-radius: 4px;
+    color: white;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 
-    form,
-    mat-form-field {
-        width: 100%;
+    .text-container {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
 
+      .title {
+        font-weight: 500;
+        margin: 0;
+      }
+
+      .desc {
+        margin: 0;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     .actions {
-        width: 100%;
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+
+      button {
         display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        padding: 0 20px;
-        box-sizing: border-box;
-        margin: auto;
-        margin-bottom: 20px;
-
-        button {
-            width: 100%;
-        }
-
-    }
-
-    .upload-pdf-btn {
-        width: 90%;
-
-    }
-
-    form {
-        padding: 0 20px;
-        box-sizing: border-box;
-    }
-
-    h1 {
-        font-size: 20px;
-        font-weight: bold;
-    }
-
-    .pdf-path-label {
-        width: 90%;
-    }
-
-    .pdf-path-container {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
         align-items: center;
-        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  .file-input-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: #fbfdff;
+    border-radius: 8px;
+    border: 2px dashed var(--primary);
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    cursor: pointer;
+    justify-content: center;
+    gap: 12px;
+    color: var(--primary);
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
     }
 
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-
-        h1 {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        button {
-            cursor: pointer;
-        }
+    .text-container {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
     }
+
+    label {
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    small {
+      font-size: 0.75rem;
+      color: rgba(0, 0, 0, 0.55);
+    }
+
+    &:hover {
+      background-color: #eaf3fc;
+    }
+  }
 }
 
-@media (min-width: 768px) {
-    .add-pdf-container {
-        max-width: 600px;
-        height: fit-content;
-    }
+mat-dialog-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px 24px !important;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  span {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+    margin: 0;
+  }
+
+  button {
+    display: flex;
+    cursor: pointer;
+  }
+}
+
+.submit-btn {
+  width: 100%;
+  height: 54px;
+  background-color: #3382F9;
+}
+
+.dialog-btn {
+  border-radius: 4px !important;
+  color: white;
+  position: relative;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #2f76e0;
+  }
+
+  &:disabled {
+    background-color: #0000001f;
+    color: rgba(128, 128, 128, 0.589);
+    cursor: not-allowed;
+  }
+}
+
+@media screen and (min-width: 940px) {
+  .container {
+    width: 520px;
+    max-width: 100%;
+    height: auto;
+    max-height: 85vh;
+  }
 }

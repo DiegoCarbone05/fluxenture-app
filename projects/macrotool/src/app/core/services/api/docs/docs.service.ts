@@ -18,6 +18,10 @@ export class DocsService extends BaseApiService<string> {
     return this.http.get<Doc[]>(this.endpoint);
   }
 
+  getDocsByEmployeeId(employeeId: string) {
+    return this.http.get<Doc[]>(`${this.endpoint}employee/${employeeId}`);
+  }
+
   getDoc(id: string) {
     return this.http.get<Doc>(`${this.endpoint + id}`);
   }

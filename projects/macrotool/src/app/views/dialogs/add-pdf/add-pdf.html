@@ -1,48 +1,77 @@
-<div class="add-pdf-container">
-  <div class="header-dialog">
-    <h1>{{ data ? 'Modificar seguimiento' : 'Agregar seguimiento' }}</h1>
+<div class="container">
+  <div class="header">
+    <div class="wrap">
+      <h2>{{ data ? 'Modificar seguimiento' : 'Agregar seguimiento' }}</h2>
+      <span>Complete los datos del CD y adjunte el PDF</span>
+    </div>
+
     <button mat-icon-button (click)="closeDialog()">
       <mat-icon>close</mat-icon>
     </button>
   </div>
-  <form class="example-form" [formGroup]="form">
-    <!-- CD EMPLOYEE -->
 
-    <mat-form-field class="example-full-width" appearance="outline">
-      <mat-label>Nombre del empleado</mat-label>
-      <input type="text" matInput formControlName="cdEmployee" [matAutocomplete]="auto">
-      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-        <mat-option *ngFor="let option of filteredOptions | async" [value]="option.id">
-          {{option.name}}
-        </mat-option>
-      </mat-autocomplete>
-    </mat-form-field>
+  <form [formGroup]="form" (ngSubmit)="saveCd()">
+    <mat-dialog-content class="mat-typography">
+      <div class="form-container">
 
-    <!-- cd number -->
-    <mat-form-field appearance="outline">
-      <mat-label>Numero de CD</mat-label>
-      <input matInput formControlName="cdNumber" />
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Fecha de emisión</mat-label>
-      <input matInput type="date" formControlName="emissionDate" (paste)="onDatePaste($event)" />
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Observacion</mat-label>
-      <input matInput formControlName="obs" />
-    </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre del empleado</mat-label>
+          <input type="text" matInput formControlName="cdEmployee" [matAutocomplete]="auto">
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+            <mat-option *ngFor="let option of filteredOptions | async" [value]="option.id">
+              {{ option.name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <div class="row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Numero de CD</mat-label>
+            <input matInput formControlName="cdNumber" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha de emisión</mat-label>
+            <input matInput type="date" formControlName="emissionDate" (paste)="onDatePaste($event)" />
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Observación</mat-label>
+          <input matInput formControlName="obs" />
+        </mat-form-field>
+
+        <div class="file-upload-section">
+          @if (pdfPath()) {
+          <div class="flux-dox-loaded">
+            <div class="text-container">
+              <p class="title">PDF cargado</p>
+              <small class="desc">{{ pdfPath() }}</small>
+            </div>
+            <div class="actions">
+              <button type="button" matIconButton style="background-color: #01964e;" (click)="removePDF()">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          } @else {
+          <div class="file-input-wrapper" (click)="addPDF()">
+            <mat-icon>upload_file</mat-icon>
+            <div class="text-container">
+              <label>Cargar PDF</label>
+              <small>Seleccione el archivo del seguimiento</small>
+            </div>
+          </div>
+          }
+        </div>
+
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button type="submit" class="dialog-btn submit-btn" [disabled]="form.invalid || pdfPath().length === 0">
+        <mat-icon>save</mat-icon>
+        {{ data ? 'Guardar' : 'Agregar' }}
+      </button>
+    </mat-dialog-actions>
   </form>
-
-  @if (pdfPath()) {
-  <div class="pdf-path-container">
-    <p class="pdf-path-label">PDF cargado: {{ pdfPath() }}</p>
-    <button matButton (click)="removePDF()">Eliminar</button>
-  </div>
-  } @else {
-  <button class="upload-pdf-btn" matButton="outlined" (click)="addPDF()">Cargar PDF</button>
-  }
-  <div class="actions">
-    <button matButton="filled" color="primary" (click)="saveCd()" [disabled]="form.invalid || pdfPath().length === 0">{{
-      data ? 'Guardar' : 'Agregar' }}</button>
-  </div>
 </div>

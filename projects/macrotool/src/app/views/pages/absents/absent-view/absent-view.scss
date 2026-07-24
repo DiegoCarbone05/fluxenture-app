@@ -1,69 +1,428 @@
-.absent-view {
-    width: 100%;
-    height: calc(100% - 64px);
+:host {
     display: flex;
     flex-direction: column;
-    padding: 16px;
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+}
+
+flux-toolbar {
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.loading {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #6c757d;
+
+    .loading-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        animation: spin 1.4s linear infinite;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// ── HERO ─────────────────────────────────────────────────────────────────────
+.absent-hero {
+    width: 100%;
+    padding: 25px;
+    background-color: var(--primary);
     box-sizing: border-box;
+    transition: all 0.3s ease-in-out;
 
-    .absent-text {
-        color: gray;
+    &.unjustified {
+        background-color: var(--warn);
     }
 
-    .employee-name {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin: 0;
-    }
-
-    button {
-        width: fit-content;
-    }
-
-    .content-item {
-        font-size: 1rem;
-        margin: 0;
+    .content {
         display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-    }
+        flex-direction: column;
+        gap: 10px;
 
-    .file-buttons {
-        display: flex;
-        gap: 8px;
-    }
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 4px 12px 4px 8px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            width: fit-content;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
 
-    .title-item {
-        font-size: 1rem;
-        font-weight: bold;
-        margin: 0;
-        color: gray;
-        text-transform: uppercase;
-    }
+            mat-icon {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+            }
+        }
 
-    .chip {
-        border-radius: 50px;
-        width: fit-content;
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: #333;
-        margin-right: 8px;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #FF5500;
+        .employee-name {
+            color: white;
+            font-size: 34px;
+            font-weight: 600;
+            line-height: 1.1;
+        }
 
-        &.justified {
-            color: #30a775;
+        .absent-period {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+
+            mat-icon {
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+            }
+
+            .period-arrow {
+                opacity: 0.7;
+                margin: 0 2px;
+            }
         }
     }
 }
 
+// ── CONTAINER ────────────────────────────────────────────────────────────────
+.container {
+    width: 90%;
+    padding: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.card-header {
+    background: #ffffff;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 16px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.info-item {
+    flex: 1 1 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .label {
+        font-size: 12px;
+        color: #6c757d;
+        text-transform: uppercase;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    .value {
+        font-size: 16px;
+        color: #212529;
+        font-weight: 500;
+    }
+}
+
+// ── DAYS IMPACT ──────────────────────────────────────────────────────────────
+.days-impact {
+    display: flex !important;
+    align-items: baseline;
+    gap: 6px;
+
+    .days-number {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--primary);
+        line-height: 1;
+    }
+
+    .days-label {
+        font-size: 14px;
+        color: #6c757d;
+        font-weight: 500;
+    }
+}
+
+// ── STATUS PILL ──────────────────────────────────────────────────────────────
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px 4px 8px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    width: fit-content;
+
+    mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+
+    &.justified {
+        background-color: #d2f0e4;
+        color: #0ead6d;
+    }
+
+    &.not-justified {
+        background-color: #f0d2d2;
+        color: #ad0e0e;
+    }
+}
+
+// ── ABSENT TYPE CHIP (consistent with calendar) ─────────────────────────────
+.absent-type-chip {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    background-color: #eee;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    width: fit-content;
+
+    &.absent-VACATIONS {
+        background-color: #d2f0e4;
+        color: #0ead6d;
+    }
+
+    &.absent-MEDICAL_CERTIFICATE,
+    &.absent-CERTIFICATE {
+        background-color: #ecf2fd;
+        color: #3d7dc7;
+    }
+
+    &.absent-LICENSE {
+        background-color: #d2eff0;
+        color: #0ea8ad;
+    }
+
+    &.absent-SUSPENSION {
+        background-color: #f3e597;
+        color: #655814;
+    }
+
+    &.absent-FT,
+    &.absent-DT {
+        background-color: #f0d2d2;
+        color: #ad0e0e;
+    }
+
+    &.absent-DG,
+    &.absent-PG {
+        background-color: #ebebeb;
+        color: #828282;
+    }
+
+    &.absent-DESPIDO {
+        background-color: #313131;
+        color: #ffffff;
+    }
+
+    &.absent-RENUNCIA {
+        background-color: white;
+        border: 1px solid #313131;
+        color: #313131;
+    }
+
+    &.absent-FERIADO {
+        background-color: #d89a64;
+        color: #603d35;
+    }
+
+    &.absent-ART {
+        background-color: #f0eee5;
+        color: #877a31;
+    }
+}
+
+// ── OBSERVATIONS ─────────────────────────────────────────────────────────────
+.observations-text {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #333;
+    white-space: pre-wrap;
+}
+
+.no-data {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 12px 0;
+    margin: 0;
+}
+
+// ── DOCUMENT ─────────────────────────────────────────────────────────────────
+.doc-attached {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+    flex-wrap: wrap;
+
+    .doc-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background-color: rgba(13, 110, 253, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        mat-icon {
+            color: var(--primary);
+            font-size: 26px;
+            width: 26px;
+            height: 26px;
+        }
+    }
+
+    .doc-info {
+        flex: 1 1 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+
+        .doc-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .doc-meta {
+            font-size: 12px;
+            color: #6c757d;
+        }
+    }
+
+    .doc-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+
+            mat-icon {
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+            }
+        }
+    }
+}
+
+.no-doc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px 0;
+    color: #adb5bd;
+
+    mat-icon {
+        font-size: 40px;
+        width: 40px;
+        height: 40px;
+    }
+
+    span {
+        font-size: 14px;
+        font-weight: 500;
+    }
+}
+
+// ── EDIT FAB ──────────────────────────────────────────────────────────────────
+.edit-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100;
+}
+
+// ── RESPONSIVE ───────────────────────────────────────────────────────────────
 @media screen and (min-width: 768px) {
-    .absent-view {
-        padding: 40px;
+    .absent-hero {
+        padding: 50px;
+
+        .content {
+            .employee-name {
+                font-size: 28px;
+            }
+        }
+    }
+
+    .doc-attached {
+        flex-wrap: nowrap;
+
+        .doc-actions {
+            margin-left: auto;
+        }
     }
 }

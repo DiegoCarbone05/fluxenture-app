@@ -3,7 +3,7 @@ import { DOC_TYPES } from '../constants/typesValues.constant';
 
 @Pipe({
   name: 'docType',
-  standalone: false
+  standalone: true
 })
 export class DocTypePipe implements PipeTransform {
 

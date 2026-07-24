@@ -4,7 +4,7 @@ import { ESector } from '../models/Employee';
 
 @Pipe({
   name: 'empSectorPipe',
-  standalone: false
+  standalone: true
 })
 export class EmpSectorPipePipe implements PipeTransform {
 

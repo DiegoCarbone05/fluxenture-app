@@ -3,6 +3,7 @@ import { BaseApiService } from '../../base-api.service';
 import { Cd } from '../../../../shared/models/Cd.model';
 import { tap } from 'rxjs';
 import { Employee } from '../../../../shared/models/Employee';
+import { Tnt } from '../../../../shared/models/Tnt.model';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +48,18 @@ export class CdService extends BaseApiService<Cd> {
     formData.append('fileId', fileId);
 
     return this.http.post<Cd>(this.endpoint + '/export', formData).pipe(
+      tap(() => this.refreshCds().subscribe())
+    );
+  }
+
+  /** Consulta viva a Correo Argentino vía backend. No persiste nada. */
+  trackByNumber(trackingNumber: number | string) {
+    return this.http.get<Tnt[]>(this.endpoint + '/tracking/' + trackingNumber);
+  }
+
+  /** Scrapea el seguimiento en el backend y lo persiste en la CD. Devuelve la CD actualizada. */
+  refreshTracking(id: string) {
+    return this.http.put<Cd>(this.endpoint + '/' + id + '/tracking', {}).pipe(
       tap(() => this.refreshCds().subscribe())
     );
   }

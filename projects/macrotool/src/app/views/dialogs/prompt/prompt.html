@@ -1,10 +1,15 @@
-<div class="prompt-container">
-  <div class="text">
-    <h2>{{data?.title}}</h2>
-    <p>{{data?.desc}}</p>
+<div class="container">
+  <div class="content">
+    <h2>{{ data?.title }}</h2>
+    <p>{{ data?.desc }}</p>
   </div>
-  <div class="buttons-container">
-    <button matButton [mat-dialog-close]="false">Cancelar</button>
-    <button matButton="filled" color="primary" [mat-dialog-close]="true" cdkFocusInitial>Aceptar</button>
+
+  <div class="actions">
+    <button type="button" class="dialog-btn cancel-btn" [mat-dialog-close]="false">
+      Cancelar
+    </button>
+    <button type="button" class="dialog-btn submit-btn" cdkFocusInitial [mat-dialog-close]="true">
+      Aceptar
+    </button>
   </div>
 </div>

@@ -1,43 +1,126 @@
-<flux-toolbar title="Ausencia" [menuButton]="false" [backButton]="true">
+@if (absent()) {
+<flux-toolbar [backButton]="true" [menuButton]="false" title="Ausencia"
+    [bgColor]="absent()?.justified ? 'var(--primary)' : 'var(--warn)'" theme="dark">
 </flux-toolbar>
-<div class="absent-view">
-    <div class="chip" [class.justified]="absent()?.justified">
-        <mat-icon>{{absent()?.justified ? 'check_circle' : 'cancel'}}</mat-icon>
-        <span>{{absent()?.justified ? 'Ausencia Justificada' : 'Ausencia No Justificada'}}</span>
-    </div>
-    <p class="employee-name">{{employee()?.name}}</p>
-    <br>
 
-
-    <div style="display: flex; flex-direction: column; gap: 8px;">
-        <span class="title-item">tipo de ausencia: </span>
-        <div class="absent-type-chip" [class]="'chip-' + absent()?.type">
-            {{absent()?.type | abstentType}}
+<div class="absent-hero" [class.unjustified]="!absent()?.justified">
+    <div class="content">
+        <div class="status-chip">
+            <mat-icon>{{ absent()?.justified ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span>{{ absent()?.justified ? 'Justificada' : 'No Justificada' }}</span>
         </div>
-
+        <span class="employee-name">{{ employee()?.name || 'Empleado no encontrado' }}</span>
+        <span class="absent-period">
+            <mat-icon>event</mat-icon>
+            {{ absent()?.originalStartDate | date:'dd/MM/yyyy' }}
+            <span class="period-arrow">→</span>
+            {{ absent()?.originalEndDate | date:'dd/MM/yyyy' }}
+        </span>
     </div>
-    <br>
-    <p class="title-item">ARCHIVO</p>
-    <div class="file-buttons">
-        <button mat-button (click)="openFile(absent()?.documentId)">
-            Abrir archivo
-            <mat-icon>file_open</mat-icon>
-        </button>
-        <button mat-flat-button color="primary" (click)="downloadFile(absent()?.documentId)">
-            Descargar archivo
-            <mat-icon>file_download</mat-icon>
-        </button>
-    </div>
-
-    <br>
-    <p class="title-item">periodo de ausencia</p>
-    <p class="content-item">De <b>{{absent()?.originalStartDate | date:"dd/MM/yyyy"}}</b> a
-        <b>{{absent()?.originalEndDate | date:"dd/MM/yyyy"}}</b>
-    </p>
-    <br>
-    <p class="title-item">dias ausente</p>
-    <p class="content-item">{{absent()?.impactDaysInMonth}}</p>
-    <br>
-    <p class="title-item">OBSERVACIONES</p>
-    <p class="content-item">{{absent()?.observations || 'Sin observaciones'}}</p>
 </div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h2>Detalles de la Ausencia</h2>
+        </div>
+        <div class="card-body">
+            <div class="info-row">
+                <div class="info-item">
+                    <span class="label">Tipo</span>
+                    <div class="value">
+                        <span class="absent-type-chip" [class]="'absent-' + absent()?.type">
+                            {{ absent()?.type | abstentType }}
+                        </span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="label">Estado</span>
+                    <div class="value">
+                        <span class="status-pill" [class.justified]="absent()?.justified"
+                            [class.not-justified]="!absent()?.justified">
+                            <mat-icon>{{ absent()?.justified ? 'check' : 'priority_high' }}</mat-icon>
+                            {{ absent()?.justified ? 'Justificada' : 'Sin justificar' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="info-item">
+                    <span class="label">Fecha de Inicio</span>
+                    <span class="value">{{ absent()?.originalStartDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Fecha de Fin</span>
+                    <span class="value">{{ absent()?.originalEndDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="info-item">
+                    <span class="label">Días de impacto en el mes</span>
+                    <div class="value days-impact">
+                        <span class="days-number">{{ absent()?.impactDaysInMonth }}</span>
+                        <span class="days-label">{{ absent()?.impactDaysInMonth === 1 ? 'día' : 'días' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Observaciones</h2>
+        </div>
+        <div class="card-body">
+            @if (absent()?.observations) {
+            <p class="observations-text">{{ absent()?.observations }}</p>
+            } @else {
+            <p class="no-data">Sin observaciones registradas.</p>
+            }
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Documento Adjunto</h2>
+        </div>
+        <div class="card-body">
+            @if (absent()?.documentId) {
+            <div class="doc-attached">
+                <div class="doc-icon-wrap">
+                    <mat-icon>description</mat-icon>
+                </div>
+                <div class="doc-info">
+                    <span class="doc-title">Comprobante de ausencia</span>
+                    <span class="doc-meta">{{ absent()?.type | abstentType }} · {{ employee()?.name }}</span>
+                </div>
+                <div class="doc-actions">
+                    <button mat-stroked-button (click)="openFile(absent()?.documentId)">
+                        <mat-icon>open_in_new</mat-icon>
+                        Abrir
+                    </button>
+                    <button mat-flat-button color="primary" (click)="downloadFile(absent()?.documentId)">
+                        <mat-icon>file_download</mat-icon>
+                        Descargar
+                    </button>
+                </div>
+            </div>
+            } @else {
+            <div class="no-doc">
+                <mat-icon>folder_off</mat-icon>
+                <span>No hay documento adjunto.</span>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+<button matFab color="primary" class="edit-fab" (click)="editAbsent()">
+    <mat-icon>edit</mat-icon>
+</button>
+} @else {
+<div class="loading">
+    <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+    <span>Cargando ausencia...</span>
+</div>
+}

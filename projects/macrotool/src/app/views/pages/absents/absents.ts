@@ -1,4 +1,12 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AbstentTypePipe } from '../../../shared/pipes/abstent-type-pipe';
+import { Toolbar } from '../../../shared/components/toolbar/toolbar';
 import { MatDialog } from '@angular/material/dialog';
 import { AddAbsentDialog } from '../../dialogs/add-absent-dialog/add-absent-dialog';
 import { AbsentResponseDTO } from '../../../shared/models/AbsentResponseDTO';
@@ -27,7 +35,11 @@ interface EmployeeStat {
 
 @Component({
   selector: 'app-absents',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule, MatTabsModule, MatButtonModule, MatIconModule,
+    MatMenuModule, MatProgressSpinnerModule, AbstentTypePipe, Toolbar,
+  ],
   templateUrl: './absents.html',
   styleUrl: './absents.scss'
 })
@@ -37,14 +49,14 @@ export class Absents implements OnInit {
   currentDate = computed(() => this.appSvc.dateOfData());
 
   readonly STAT_LABELS: { key: keyof EmployeeStat; label: string; class: string }[] = [
-    { key: 'justified',   label: 'Justificada', class: 'justified' },
-    { key: 'sinAviso',    label: 'Sin Aviso', class: 'unjustified' },
-    { key: 'suspension',  label: 'Suspensión', class: 'suspension' },
+    { key: 'justified', label: 'Justificada', class: 'justified' },
+    { key: 'sinAviso', label: 'Sin Aviso', class: 'unjustified' },
+    { key: 'suspension', label: 'Suspensión', class: 'suspension' },
     { key: 'totalInjust', label: 'T.Inj.', class: 'total-injust' },
-    { key: 'license',     label: 'Licencia', class: 'license' },
-    { key: 'ft',          label: 'FT', class: 'ft' },
-    { key: 'art',         label: 'ART', class: 'art' },
-    { key: 'vacations',   label: 'Vacaciones', class: 'vacations' },
+    { key: 'license', label: 'Licencia', class: 'license' },
+    { key: 'ft', label: 'FT', class: 'ft' },
+    { key: 'art', label: 'ART', class: 'art' },
+    { key: 'vacations', label: 'Vacaciones', class: 'vacations' },
   ];
 
   getStatTags(stat: EmployeeStat): { label: string; value: number; class: string }[] {
@@ -75,12 +87,12 @@ export class Absents implements OnInit {
 
       switch (abs.type) {
         case AbsentType.SUSPENSION: stat.suspension += days; break;
-        case AbsentType.LICENSE:    stat.license += days; break;
-        case AbsentType.FT:         stat.ft += days; break;
-        case AbsentType.ART:        stat.art += days; break;
-        case AbsentType.VACATIONS:  stat.vacations += days; break;
+        case AbsentType.LICENSE: stat.license += days; break;
+        case AbsentType.FT: stat.ft += days; break;
+        case AbsentType.ART: stat.art += days; break;
+        case AbsentType.VACATIONS: stat.vacations += days; break;
         case AbsentType.DESPIDO:
-        case AbsentType.RENUNCIA:   break;
+        case AbsentType.RENUNCIA: break;
         default:
           abs.justified ? (stat.justified += days) : (stat.sinAviso += days);
       }
@@ -236,35 +248,29 @@ export class Absents implements OnInit {
 
   generateCalendar(year: number, month: number) {
     this.daysOfMonth.set([]);
-    const firstDay = new Date(year, month - 1, 1).getDay(); // Qué día de la semana cae el 1
-    const totalDays = new Date(year, month, 0).getDate();    // Cuántos días tiene el mes
+    const firstDay = new Date(year, month - 1, 1).getDay();
+    const totalDays = new Date(year, month, 0).getDate();
+    const today = new Date();
+    const isCurrentMonthYear = today.getFullYear() === year && (today.getMonth() + 1) === month;
 
-    console.log("AAA");
-
-
-    // 1. Celdas vacías (o del mes anterior) para alinear el día 1
     for (let i = 0; i < firstDay; i++) {
       this.daysOfMonth.update(prev => [...prev, { day: null, currentMonth: false }]);
     }
 
-    // 2. Los días del mes actual
     for (let i = 1; i <= totalDays; i++) {
       this.daysOfMonth.update(prev => [...prev, {
         day: i,
         currentMonth: true,
-        // Aquí después podés filtrar tus 'absences' para ver si este día tiene una
         hasAbsence: this.checkAbsence(i),
-        absences: this.getAbsencesForDay(i)
+        absences: this.getAbsencesForDay(i),
+        isToday: isCurrentMonthYear && today.getDate() === i
       }]);
-
     }
 
-    // 3. Celdas vacías (o del mes siguiente) para completar las 6 filas
-    const remainingDays = 5 - this.daysOfMonth.length; // 42 = 6 filas * 7 días
+    const remainingDays = 5 - this.daysOfMonth.length;
     for (let i = 2; i <= remainingDays; i++) {
       this.daysOfMonth.update(prev => [...prev, { day: null, currentMonth: false }]);
     }
-
   }
 
   // En tu componente.ts

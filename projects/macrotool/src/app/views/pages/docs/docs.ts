@@ -1,7 +1,13 @@
-import { Component, inject, OnInit, ViewChild, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { DocTypePipe } from '../../../shared/pipes/doc-type-pipe';
+import { Toolbar } from '../../../shared/components/toolbar/toolbar';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AddDocDialog } from '../../dialogs/add-doc-dialog/add-doc-dialog';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
@@ -16,7 +22,12 @@ import { UtilsService } from '../../../core/services/utils.service';
 
 @Component({
   selector: 'app-docs',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule, MatButtonModule, MatIconModule,
+    MatTooltipModule, MatProgressSpinnerModule, MatSnackBarModule,
+    DocTypePipe, Toolbar,
+  ],
   templateUrl: './docs.html',
   styleUrl: './docs.scss'
 })
@@ -24,24 +35,11 @@ export class Docs implements OnInit {
 
   readonly dialog = inject(MatDialog);
 
-  months = MONTHS
+  months = MONTHS;
   years = YEARS;
   currentDate = computed(() => this.appSvc.dateOfData());
 
-  @ViewChild(MatSort) set sort(matSort: MatSort) {
-    if (matSort) {
-      this.dataSource.sort = matSort;
-      this.dataSource.sortingDataAccessor = (item, property) => {
-        if (property === 'uploadDate') {
-          return new Date(item.uploadDate).getTime() || 0;
-        }
-        return (item as any)[property] ?? '';
-      };
-    }
-  }
-
-  displayedColumns = ['employee', 'type', 'uploadDate', 'description', 'user', 'actions'];
-  dataSource = new MatTableDataSource<Doc>([]);
+  docs = signal<Doc[]>([]);
   isLoading = signal(true);
 
   constructor(
@@ -51,55 +49,26 @@ export class Docs implements OnInit {
     private storageSvc: StorageService,
     private appSvc: AppService,
     private utilsSvc: UtilsService
-  ) {
-  }
+  ) { }
 
   ngOnInit(): void {
     this.loadDocs();
   }
 
-  editDoc(docId: string) {
-    const dialogRef = this.dialog.open(AddDocDialog, {
-      data: {
-        editDocId: docId
-      },
-      disableClose: true
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) this.loadDocs();
-    });
-  }
-
-
-  openDatePickerDialog() {
-    const dialogRef = this.dialog.open(DatepickerDialog, {
-      disableClose: true,
-      data: this.currentDate()
-    });
-    dialogRef.afterClosed().subscribe(
-      {
-        next: (result) => {
-          if (result) {
-            this.appSvc.setDateOfData(result)
-            this.loadDocs();
-          }
-        }
-      }
-    );
-  }
-
-  /**
-   * Carga los documentos desde la API
-   */
   loadDocs(): void {
     this.isLoading.set(true);
     this.docsService.getDocs().subscribe({
-      next: (docs) => {
-        docs = docs.filter(doc => {
-          const docDate = new Date(doc.uploadDate);
-          return docDate.getMonth() + 1 === this.currentDate().month && docDate.getFullYear() === this.currentDate().year;
-        });
-        this.dataSource.data = docs;
+      next: (allDocs) => {
+        const filtered = allDocs
+          .filter(doc => {
+            const d = new Date(doc.uploadDate);
+            return d.getMonth() + 1 === this.currentDate().month
+              && d.getFullYear() === this.currentDate().year;
+          })
+          .sort((a, b) =>
+            new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()
+          );
+        this.docs.set(filtered);
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -109,74 +78,79 @@ export class Docs implements OnInit {
     });
   }
 
-  openFile(docId: string) {
+  editDoc(docId: string | undefined): void {
+    if (!docId) return;
+    const dialogRef = this.dialog.open(AddDocDialog, {
+      data: { editDocId: docId },
+      disableClose: true
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) this.loadDocs();
+    });
+  }
+
+  openDatePickerDialog(): void {
+    const dialogRef = this.dialog.open(DatepickerDialog, {
+      disableClose: true,
+      data: this.currentDate()
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.appSvc.setDateOfData(result);
+        this.loadDocs();
+      }
+    });
+  }
+
+  openFile(docId: string): void {
     this.utilsSvc.openFile(docId);
   }
 
-  /**
-   * Obtiene los empleados por ID
-   */
   getEmployeeName(employeeId: string): string {
-    return this.employeeService.getLocalEmployeeById(employeeId)?.name || '';
+    return this.employeeService.getLocalEmployeeById(employeeId)?.name || '—';
   }
 
-  /**
-   * Abre el diálogo para agregar un documento
-   */
-  openDialog() {
-    const ref = this.dialog.open(AddDocDialog, {
-      disableClose: true
-    });
+  openDialog(): void {
+    const ref = this.dialog.open(AddDocDialog, { disableClose: true });
     ref.afterClosed().subscribe(result => {
       if (result) this.loadDocs();
     });
   }
 
-  /**
-   * Elimina un documento
-   */
   deleteDoc(doc: Doc): void {
     if (!doc.id) return;
-
-    // Abre un diálogo de confirmación
     const dialogRef = this.dialog.open(Prompt, {
       data: {
         title: 'Eliminar documento',
-        desc: `¿Está seguro que desea eliminar el documento?`
+        desc: '¿Está seguro que desea eliminar el documento?'
       }
     });
-
-    // Si se confirma la eliminación, se elimina el documento
     dialogRef.afterClosed().subscribe(result => {
-      if (result) { //Verifica que el resultado sea true
-        if (!doc.id) return; //Verifica que el documento tenga un ID
-        this.docsService.deleteDoc(doc.id).subscribe({
-          next: () => { //Si se elimina el documento, se elimina el archivo
-            this.storageSvc.deleteFile(doc.driveFileId).subscribe({
-              next: () => { //Si se elimina el archivo, se recarga la lista de documentos
-                this.loadDocs()
-                this.snackBar.open('Documento eliminado correctamente', 'OK', { duration: 2000 });
-              },
-              error: (err) => { //Si hay un error al eliminar el archivo, se muestra un mensaje de error
-                console.error('Error borrando archivo', err)
-                this.snackBar.open('Error borrando archivo', 'OK', { duration: 2000 });
-              }
-            });
-          },
-          error: (err) => { //Si hay un error al eliminar el documento, se muestra un mensaje de error
-            console.error('Error borrando doc', err)
-            this.snackBar.open('Error borrando documento', 'OK', { duration: 2000 });
-          }
-        });
-      }
+      if (!result) return;
+      if (!doc.id) return;
+      this.docsService.deleteDoc(doc.id).subscribe({
+        next: () => {
+          this.storageSvc.deleteFile(doc.driveFileId).subscribe({
+            next: () => {
+              this.loadDocs();
+              this.snackBar.open('Documento eliminado correctamente', 'OK', { duration: 2000 });
+            },
+            error: (err) => {
+              console.error('Error borrando archivo', err);
+              this.snackBar.open('Error borrando archivo', 'OK', { duration: 2000 });
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error borrando doc', err);
+          this.snackBar.open('Error borrando documento', 'OK', { duration: 2000 });
+        }
+      });
     });
   }
 
-  /**
-   * Formatea la fecha
-   */
   formatDate(date: any): string {
-    if (!date) return '-';
+    if (!date) return '—';
     return new Date(date).toLocaleDateString('es-AR');
   }
 }

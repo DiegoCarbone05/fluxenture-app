@@ -3,7 +3,8 @@ import { ETrackingStatus } from '../../models/Tnt.model';
 
 @Component({
   selector: 'app-cd-status-chip',
-  standalone: false,
+  standalone: true,
+  imports: [],
   templateUrl: './cd-status-chip.html',
   styleUrl: './cd-status-chip.scss'
 })

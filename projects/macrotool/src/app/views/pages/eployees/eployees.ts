@@ -1,4 +1,10 @@
 import { AfterViewInit, Component, computed, effect, inject, signal, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Toolbar } from '../../../shared/components/toolbar/toolbar';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -14,7 +20,11 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-eployees',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule, ReactiveFormsModule, MatButtonModule,
+    MatIconModule, MatProgressSpinnerModule, Toolbar,
+  ],
   templateUrl: './eployees.html',
   styleUrl: './eployees.scss'
 })

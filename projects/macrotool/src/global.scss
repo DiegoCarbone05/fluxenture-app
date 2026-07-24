@@ -42,7 +42,7 @@ mat-dialog-content {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(241, 241, 241, 0.534);
+  background: #f5f6fa67;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
 }

@@ -1,45 +1,67 @@
-<h2 mat-dialog-title>Nuevo cambio en empleado</h2>
-<mat-dialog-content [formGroup]="historyForm">
-  <div class="form-grid">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Tipo de Evento</mat-label>
-      <mat-select formControlName="type" required>
-        <mat-option *ngFor="let type of eventTypes" [value]="type.value">{{type.label}}</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Descripción</mat-label>
-      <textarea matInput formControlName="description" rows="3"></textarea>
-    </mat-form-field>
-  </div>
-
-  @if (historyForm.get('docId')?.value) {
-  <div class="flux-dox-loaded">
-    <div class="text-container">
-      <p class="title">Archivo cargado</p>
+<div class="container">
+  <div class="header">
+    <div class="wrap">
+      <h2>Nuevo cambio en empleado</h2>
+      <span>Registre un evento del historial del empleado</span>
     </div>
 
-    <div class="actions">
-      <button matIconButton>
-        <mat-icon>visibility</mat-icon>
-      </button>
-      <button matIconButton style="background-color: #01964e;" (click)="deleteFile()">
-        <mat-icon>delete</mat-icon>
-      </button>
-    </div>
+    <button mat-icon-button mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
-  }@else {
 
-  <button mat-flat-button color="primary" (click)="addDocument()">
-    <mat-icon>attach_file</mat-icon>
-    Agregar documento
-  </button>
+  <form [formGroup]="historyForm" (ngSubmit)="save()">
+    <mat-dialog-content class="mat-typography">
+      <div class="form-container">
 
-  }
-</mat-dialog-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Tipo de Evento</mat-label>
+          <mat-select formControlName="type" required>
+            <mat-option *ngFor="let type of eventTypes" [value]="type.value">{{ type.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
 
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-flat-button color="primary" [disabled]="historyForm.invalid" (click)="save()">Guardar Registro</button>
-</mat-dialog-actions>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="description" rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="file-upload-section">
+          @if (historyForm.get('docId')?.value) {
+          <div class="flux-dox-loaded">
+            <div class="text-container">
+              <p class="title">Archivo cargado</p>
+              <small class="desc">Documento adjunto al evento</small>
+            </div>
+
+            <div class="actions">
+              <button type="button" matIconButton>
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button type="button" matIconButton style="background-color: #01964e;" (click)="deleteFile()">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          } @else {
+          <div class="file-input-wrapper" (click)="addDocument()">
+            <mat-icon>attach_file</mat-icon>
+            <div class="text-container">
+              <label>Agregar documento</label>
+              <small>Adjunte el respaldo del evento</small>
+            </div>
+          </div>
+          }
+        </div>
+
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button type="submit" class="dialog-btn submit-btn" [disabled]="historyForm.invalid">
+        <mat-icon>save</mat-icon>
+        Guardar Registro
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

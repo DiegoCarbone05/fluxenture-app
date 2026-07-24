@@ -1,37 +1,84 @@
-.prompt-container {
+.container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   width: 100%;
-  max-width: 400px;
-  border-radius: 10px;
+  min-width: 280px;
+  max-width: 440px;
+  max-height: 85vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 
-  .text{
-    padding: 20px;
-    box-sizing: border-box;  
-    
-    p{
-        margin-bottom: 0;
-    }
-
-    h2{
-        margin: 0;
-      }
-
-  }
-
-
-  .buttons-container {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    background-color: #f4f4f4;
-    width: 100%;
-    padding: 20px;
+  .content {
+    padding: 24px;
     box-sizing: border-box;
 
-    button{
-        width: 100%;
+    h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: bold;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+      line-height: 1.4;
+    }
+  }
+
+  .actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-top: auto;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: 100%;
+    padding: 16px 24px 24px;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+}
+
+.dialog-btn {
+  flex: 1;
+  height: 48px;
+  border-radius: 4px !important;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+
+  &.cancel-btn {
+    background-color: transparent;
+    color: var(--primary, #3382F9);
+
+    &:hover {
+      background-color: #eaf3fc;
+    }
+  }
+
+  &.submit-btn {
+    background-color: #3382F9;
+    color: white;
+
+    &:hover {
+      background-color: #2f76e0;
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container {
+    width: 100vw;
+    max-width: none;
   }
 }

@@ -3,7 +3,8 @@ import { ViewsService } from '../../../views/views.service';
 
 @Component({
   selector: 'app-titlebar',
-  standalone: false,
+  standalone: true,
+  imports: [],
   templateUrl: './titlebar.html',
   styleUrl: './titlebar.scss'
 })

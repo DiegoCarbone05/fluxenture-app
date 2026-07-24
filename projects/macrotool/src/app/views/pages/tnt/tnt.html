@@ -1,87 +1,149 @@
-<flux-toolbar title="Track & Trace"></flux-toolbar>
-<div class="table-container">
-    <table *ngIf="!isMobile()" mat-table [dataSource]="dataSource" matSort matSortActive="emission_date"
-        matSortDirection="desc" class="tabla-custom-hover">
-        <ng-container matColumnDef="follow_number">
-            <th mat-header-cell *matHeaderCellDef>Numero de seguimiento</th>
-            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
-                <div class="td-content">
-                    {{ element.trackingNumber }}
-                </div>
-            </td>
-        </ng-container>
+<flux-toolbar title="Track & Trace" class="glass-tab"></flux-toolbar>
 
-        <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
-                <div class="td-content employee-name">
-                    {{returnEmployeeName(element.employeeId) }}
-                </div>
-            </td>
-        </ng-container>
-        <ng-container matColumnDef="emission_date">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de emisión</th>
-            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
-                <div class="td-content">
-                    {{ element.emissionDate | date: 'dd/MM/yy' }}
-                </div>
-            </td>
-        </ng-container>
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
 
+  <!-- ── TAB: EN SEGUIMIENTO ──────────────────────────────────────────────── -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      En seguimiento
+      @if (activeCds().length > 0) {
+        <span class="tab-count active">{{ activeCds().length }}</span>
+      }
+    </ng-template>
 
-        <ng-container matColumnDef="cd_path">
-            <th mat-header-cell *matHeaderCellDef>Carta de documento</th>
-            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
-                <div class="td-content">
-                    {{element.cdPath}}
-                </div>
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="obs">
-            <th mat-header-cell *matHeaderCellDef>Observacion</th>
-            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
-                <div class="td-content">
-                    {{ element.obs }}
-                </div>
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="last_status">
-            <th mat-header-cell *matHeaderCellDef>Progreso</th>
-            <td mat-cell *matCellDef="let element" (click)="openCdsViewer(element)">
-                <app-cd-status-chip [status]="element.tnt | tntStatusPipe | async"></app-cd-status-chip>
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let element">
-                <button matIconButton color="primary" (click)="editCd(element)"><mat-icon>edit</mat-icon></button>
-                <button matIconButton color="warn" (click)="deleteCd(element)"><mat-icon>delete</mat-icon></button>
-            </td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr [class.finalized]="row.trackingCompleted" mat-row *matRowDef="let row; columns: displayedColumns">
-        </tr>
-    </table>
-
-    <div *ngIf="isMobile()" class="mobile-list">
-        @for (item of sortedCds(); track $index) {
-        <div class="mobile-item" (click)="openCdsViewer(item)">
-            <div class="mobile-item-header">
-                <span class="mobile-item-name">{{returnEmployeeName(item.employeeId) }}</span>
-                <app-cd-status-chip [status]="item.tnt | tntStatusPipe | async"></app-cd-status-chip>
-            </div>
-            <div class="mobile-item-details">
-                <span class="mobile-item-date">{{ item.emissionDate | date: 'dd/MM/yy' }}</span>
-                <span class="mobile-item-tracking">{{ item.trackingNumber }}</span>
-            </div>
+    <div class="tnt-content">
+      @if (activeCds().length === 0) {
+        <div class="tnt-empty">
+          <mat-icon>check_circle</mat-icon>
+          <span>No hay cartas en seguimiento activo.</span>
         </div>
-        }
+      } @else {
+        <div class="tnt-table-wrap">
+          <div class="tnt-list-header">
+            <span>Empleado</span>
+            <span>Nro. Seguimiento</span>
+            <span>Fecha</span>
+            <span>Observación</span>
+            <span>Progreso</span>
+            <span></span>
+          </div>
+          <div class="tnt-list">
+            @for (item of activeCds(); track item.id) {
+              <div class="cd-card" (click)="openCdsViewer(item)">
+
+                <div class="f-status">
+                  <app-cd-status-chip [status]="item.tnt | tntStatusPipe | async"></app-cd-status-chip>
+                </div>
+
+                <div class="f-employee">
+                  <span class="mobile-label">Empleado</span>
+                  <span class="cd-employee-name">{{ returnEmployeeName(item.employeeId) }}</span>
+                </div>
+
+                <div class="f-tracking">
+                  <span class="mobile-label">Nro. Seguimiento</span>
+                  <span class="cd-tracking">{{ item.trackingNumber }}</span>
+                </div>
+
+                <div class="f-date">
+                  <mat-icon class="meta-icon">event</mat-icon>
+                  <span class="cd-date">{{ item.emissionDate | date: 'dd/MM/yy' }}</span>
+                </div>
+
+                <div class="f-obs">
+                  <span class="mobile-label">Observación</span>
+                  <span class="cd-obs">{{ item.obs || '—' }}</span>
+                </div>
+
+                <div class="f-actions" (click)="$event.stopPropagation()">
+                  <button mat-icon-button color="primary" (click)="editCd(item)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="deleteCd(item)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+
+              </div>
+            }
+          </div>
+        </div>
+      }
     </div>
-</div>
+  </mat-tab>
+
+  <!-- ── TAB: FINALIZADOS ─────────────────────────────────────────────────── -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      Finalizados
+      @if (completedCds().length > 0) {
+        <span class="tab-count">{{ completedCds().length }}</span>
+      }
+    </ng-template>
+
+    <div class="tnt-content">
+      @if (completedCds().length === 0) {
+        <div class="tnt-empty">
+          <mat-icon>local_post_office</mat-icon>
+          <span>Aún no hay cartas marcadas como finalizadas.</span>
+        </div>
+      } @else {
+        <div class="tnt-table-wrap">
+          <div class="tnt-list-header">
+            <span>Empleado</span>
+            <span>Nro. Seguimiento</span>
+            <span>Fecha</span>
+            <span>Observación</span>
+            <span>Progreso</span>
+            <span></span>
+          </div>
+          <div class="tnt-list">
+            @for (item of completedCds(); track item.id) {
+              <div class="cd-card completed" (click)="openCdsViewer(item)">
+
+                <div class="f-status">
+                  <app-cd-status-chip [status]="item.tnt | tntStatusPipe | async"></app-cd-status-chip>
+                </div>
+
+                <div class="f-employee">
+                  <span class="mobile-label">Empleado</span>
+                  <span class="cd-employee-name">{{ returnEmployeeName(item.employeeId) }}</span>
+                </div>
+
+                <div class="f-tracking">
+                  <span class="mobile-label">Nro. Seguimiento</span>
+                  <span class="cd-tracking">{{ item.trackingNumber }}</span>
+                </div>
+
+                <div class="f-date">
+                  <mat-icon class="meta-icon">event</mat-icon>
+                  <span class="cd-date">{{ item.emissionDate | date: 'dd/MM/yy' }}</span>
+                </div>
+
+                <div class="f-obs">
+                  <span class="mobile-label">Observación</span>
+                  <span class="cd-obs">{{ item.obs || '—' }}</span>
+                </div>
+
+                <div class="f-actions" (click)="$event.stopPropagation()">
+                  <button mat-icon-button color="primary" (click)="editCd(item)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="deleteCd(item)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </mat-tab>
+
+</mat-tab-group>
 
 <button matFab color="primary" class="add-button" (click)="loadPDF()">
-    <mat-icon>add</mat-icon>
+  <mat-icon>add</mat-icon>
 </button>

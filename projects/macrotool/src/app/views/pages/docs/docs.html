@@ -1,88 +1,93 @@
-<flux-toolbar class="glass-tab" title="Documentos" subTitle="{{ months[ currentDate().month - 1]}} - {{currentDate().year}}">
-    <button matIconButton (click)="openDatePickerDialog()">
-        <mat-icon>calendar_today</mat-icon>
-    </button>
+<flux-toolbar class="glass-tab" title="Documentos"
+  subTitle="{{ months[currentDate().month - 1] }} - {{ currentDate().year }}">
+  <button matIconButton (click)="openDatePickerDialog()">
+    <mat-icon>calendar_today</mat-icon>
+  </button>
 </flux-toolbar>
 
-<div class="table-container">
+<div class="docs-content">
 
-    <!-- Loading -->
-    @if (isLoading()) {
+  @if (isLoading()) {
     <div class="loading-wrapper">
-        <mat-spinner diameter="40"></mat-spinner>
+      <mat-spinner diameter="44"></mat-spinner>
     </div>
-    } @else {
 
-    <!-- Tabla -->
-    <mat-table [dataSource]="dataSource" matSort matSortActive="uploadDate" matSortDirection="desc"
-        class="docs-table mat-elevation-z2">
+  } @else if (docs().length === 0) {
+    <div class="docs-empty">
+      <mat-icon>folder_open</mat-icon>
+      <span>No hay documentos en {{ months[currentDate().month - 1] }} {{ currentDate().year }}.</span>
+    </div>
 
-        <!-- Empleado -->
-        <ng-container matColumnDef="employee">
-            <mat-header-cell *matHeaderCellDef> Empleado </mat-header-cell>
-            <mat-cell *matCellDef="let doc">
-                {{ getEmployeeName(doc.employeeId) }}
-            </mat-cell>
-        </ng-container>
+  } @else {
 
-        <!-- Tipo -->
-        <ng-container matColumnDef="type">
-            <mat-header-cell *matHeaderCellDef> Tipo </mat-header-cell>
-            <mat-cell *matCellDef="let doc">
-                <span class="type-chip">{{ doc.type | docType }}</span>
-            </mat-cell>
-        </ng-container>
+    <div class="docs-table-wrap">
 
-        <!-- Fecha -->
-        <ng-container matColumnDef="uploadDate">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Fecha de Subida </mat-header-cell>
-            <mat-cell *matCellDef="let doc"> {{ formatDate(doc.uploadDate) }} </mat-cell>
-        </ng-container>
+      <!-- Cabecera de columnas (solo escritorio) -->
+      <div class="docs-list-header">
+        <span>Tipo</span>
+        <span>Empleado</span>
+        <span>Descripción</span>
+        <span>Fecha</span>
+        <span>Usuario</span>
+        <span></span>
+      </div>
 
-        <!-- Descripción -->
-        <ng-container matColumnDef="description">
-            <mat-header-cell *matHeaderCellDef> Descripción </mat-header-cell>
-            <mat-cell *matCellDef="let doc"> {{ doc.description || '-' }} </mat-cell>
-        </ng-container>
+      <!-- Lista de documentos -->
+      <div class="docs-list">
+        @for (doc of docs(); track doc.id) {
+          <div class="doc-card">
 
-        <!-- Usuario -->
-        <ng-container matColumnDef="user">
-            <mat-header-cell *matHeaderCellDef> Usuario </mat-header-cell>
-            <mat-cell *matCellDef="let doc"> {{ doc.user || '-' }} </mat-cell>
-        </ng-container>
+            <!-- Tipo -->
+            <div class="f-type">
+              <span class="doc-type-chip" [class]="'dtype-' + doc.type">{{ doc.type | docType }}</span>
+            </div>
 
-        <!-- Acciones -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef></mat-header-cell>
-            <mat-cell *matCellDef="let doc" class="actions-cell">
-                <button mat-icon-button color="primary" (click)="editDoc(doc.id)" matTooltip="Editar">
-                    <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button color="primary" (click)="openFile(doc.driveFileId)" matTooltip="Ver">
-                    <mat-icon>visibility</mat-icon>
-                </button>
-                <button mat-icon-button color="warn" (click)="deleteDoc(doc)" matTooltip="Eliminar">
-                    <mat-icon>delete</mat-icon>
-                </button>
-            </mat-cell>
-        </ng-container>
+            <!-- Empleado -->
+            <div class="f-employee">
+              <span class="mobile-label">Empleado</span>
+              <span class="doc-employee-name">{{ getEmployeeName(doc.employeeId) }}</span>
+            </div>
 
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            <!-- Descripción -->
+            <div class="f-desc">
+              <span class="mobile-label">Descripción</span>
+              <span class="doc-description">{{ doc.description || '—' }}</span>
+            </div>
 
-        <!-- Sin datos -->
-        <tr class="mat-row no-data-row" *matNoDataRow>
-            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
-                <span>No hay documentos registrados este mes.</span>
-            </td>
-        </tr>
+            <!-- Fecha -->
+            <div class="f-date">
+              <mat-icon class="meta-icon">event</mat-icon>
+              <span class="doc-date-text">{{ formatDate(doc.uploadDate) }}</span>
+            </div>
 
-    </mat-table>
+            <!-- Usuario -->
+            <div class="f-user">
+              <mat-icon class="meta-icon">person</mat-icon>
+              <span class="doc-user-text">{{ doc.user || '—' }}</span>
+            </div>
 
-    }
+            <!-- Acciones -->
+            <div class="f-actions">
+              <button mat-icon-button color="primary" (click)="editDoc(doc.id)" matTooltip="Editar">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="primary" (click)="openFile(doc.driveFileId)" matTooltip="Ver archivo">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteDoc(doc)" matTooltip="Eliminar">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
 </div>
 
-
 <button matFab color="primary" class="add-button" (click)="openDialog()">
-    <mat-icon>add</mat-icon>
+  <mat-icon>add</mat-icon>
 </button>

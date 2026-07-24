@@ -5,7 +5,8 @@ import { AuthService } from '../../../core/services/api/auth/auth.service';
 
 @Component({
   selector: 'app-splash',
-  standalone: false,
+  standalone: true,
+  imports: [],
   templateUrl: './splash.html',
   styleUrl: './splash.scss'
 })

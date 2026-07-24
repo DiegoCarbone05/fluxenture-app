@@ -1,12 +1,14 @@
 :host {
-  background-color: white;
+  background-color: #f5f6fa;
 }
 
 :host ::ng-deep {
   mat-tab-group {
     display: grid;
     grid-template-rows: auto 1fr;
+    height: calc(100% - 64px);
     overflow: auto;
+    background-color: #f5f6fa;
 
     mat-tab-header {
       font-family:
@@ -32,6 +34,7 @@
   }
 }
 
+// ── CALENDAR ──────────────────────────────────────────────────────────────────
 .absent-calendar {
   width: 100%;
   height: calc(100% - 1px);
@@ -44,14 +47,29 @@
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     width: 100%;
-    height: 100%;
+    background-color: #f7f8fc;
+    border-bottom: 2px solid #e0e4ed;
 
     .day-of-week {
       display: flex;
       justify-content: center;
       align-items: center;
-      border-right: 1px solid #e4e4e4;
-      height: 50px;
+      border-right: 1px solid #e0e4ed;
+      height: 40px;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #606878;
+
+      &.weekend {
+        color: #b04040;
+        background-color: rgba(176, 64, 64, 0.05);
+      }
+
+      &:last-child {
+        border-right: none;
+      }
     }
   }
 
@@ -60,7 +78,6 @@
     display: grid;
     grid-template-columns: 1fr;
 
-    // border-top-left-radius: 10px;
     .week {
       width: 100%;
       display: grid;
@@ -77,19 +94,43 @@
         align-items: center;
         min-width: 0;
         overflow: hidden;
-        transition: all 1s cubic-bezier(0.02, 0.61, 0.17, 1.01);
+        transition: all 0.2s ease-in-out;
         outline: 3px solid transparent;
         border-radius: 8px;
+        padding-top: 4px;
 
-        span {
-          margin-top: 10px;
-          color: rgb(94, 94, 94);
-          font-weight: 500;
-          text-overflow: clip;
-          overflow: hidden;
-          white-space: nowrap;
-          text-align: center;
-          display: block;
+        .day-number {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          font-size: 12px;
+          font-weight: 600;
+          color: #555;
+          margin: 4px auto 3px;
+          transition: background-color 0.2s ease, color 0.2s ease;
+          flex-shrink: 0;
+        }
+
+        &.today {
+          .day-number {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(4, 104, 215, 0.35);
+          }
+        }
+
+        &.empty-day {
+          background-color: #f9fafc !important;
+          pointer-events: none;
+
+          &:hover {
+            transform: none;
+            box-shadow: none;
+            outline: none;
+          }
         }
 
         .absent {
@@ -105,12 +146,11 @@
           overflow: hidden;
           white-space: nowrap;
           cursor: pointer;
-          transition: all 1s ease-in-out;
+          transition: all 0.3s ease-in-out;
 
           &.highlight {
             background-color: var(--primary) !important;
             color: #ffffff !important;
-            animation: highlight 1s ease-in-out;
             transition: all 0.3s ease-in-out;
           }
 
@@ -123,78 +163,66 @@
           &.absent-VACATIONS {
             background-color: #d2f0e4;
             color: #0ead6d;
-            transition: all 0.3s ease-in-out;
           }
 
           &.absent-MEDICAL {
             background-color: #ecf2fd;
             color: #3d7dc7;
-            transition: all 0.3s ease-in-out;
           }
 
           &.absent-LICENSE {
             background-color: #d2eff0;
             color: #0ea8ad;
-            transition: all 0.3s ease-in-out;
           }
 
           &.absent-SUSPENSION {
             background-color: #f3e597;
             color: #655814;
-            transition: all 0.3s ease-in-out;
           }
 
           &.absent-FT {
             background-color: #f0d2d2;
             color: #ad0e0e;
-            transition: all 0.3s ease-in-out;
           }
 
           &.absent-DT {
             background-color: #f0d2d2;
             color: #ad0e0e;
-            transition: all 0.3s ease-in-out;
-            transition: all 0.3s ease-in-out;
           }
 
           &.absent-DG {
             background-color: #ebebeb;
             color: #828282;
-            transition: all 0.3s ease-in-out;
           }
 
           &.absent-PG {
             background-color: #ebebeb;
             color: #828282;
-            transition: all 0.3s ease-in-out;
           }
 
           &.absent-DESPIDO {
             background-color: #313131;
             color: #ffffff;
-            transition: all 0.3s ease-in-out;
           }
 
           &.absent-RENUNCIA {
             background-color: white;
             border: 1px solid #313131;
             color: #313131;
-            transition: all 0.3s ease-in-out;
           }
 
           &.absent-FERIADO {
             background-color: #d89a64;
             color: #603d35;
-            transition: all 0.3s ease-in-out;
           }
         }
 
         &:nth-child(7n + 1) {
-          background-color: #ffffff;
+          background-color: rgba(176, 64, 64, 0.022);
         }
 
         &:nth-child(7n) {
-          background-color: #ffffff;
+          background-color: rgba(176, 64, 64, 0.022);
           border-right: none;
         }
 
@@ -210,73 +238,132 @@
   }
 }
 
+// ── ABSENT LIST ───────────────────────────────────────────────────────────────
 .absent-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  padding: 12px 16px;
   padding-bottom: 100px;
-  padding-top: 10px;
   touch-action: pan-y;
 
-  .absent-container {
+  .absent-list-empty {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    border-bottom: 1px solid #e4e4e4;
-    padding: 8px 16px;
+    justify-content: center;
+    gap: 12px;
+    padding: 60px 0;
+    color: #888;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #4caf50;
+    }
+
+    span {
+      font-size: 15px;
+    }
+  }
+
+  .absent-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eef0f3;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    padding: 12px 6px 12px 14px;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    gap: 4px;
     touch-action: pan-y;
 
-    // &:hover {
-    //     background-color: #f8f8f8;
-    // }
-
-    .actions {
-      display: flex;
-      gap: 2px;
+    &:hover {
+      box-shadow: 0 4px 18px rgba(4, 104, 215, 0.1);
+      border-color: rgba(4, 104, 215, 0.25);
+      transform: translateY(-1px);
     }
 
-    .absent {
-      width: 100%;
-      cursor: pointer;
-      box-sizing: border-box;
+    .absent-card-body {
       display: flex;
       flex-direction: column;
-      position: relative;
-      touch-action: pan-y;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
 
-      .employee {
-        margin-top: 10px;
-        font-weight: 700;
-        font-size: 16px;
+      .absent-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
       }
 
-      .date {
+      .absent-justified-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px 2px 4px;
+        border-radius: 50px;
+        white-space: nowrap;
+
+        mat-icon {
+          font-size: 13px;
+          width: 13px;
+          height: 13px;
+        }
+
+        &.justified {
+          background-color: #d2f0e4;
+          color: #0ead6d;
+        }
+
+        &.unjustified {
+          background-color: #f0d2d2;
+          color: #ad0e0e;
+        }
+      }
+
+      .absent-employee-name {
+        font-weight: 700;
+        font-size: 16px;
+        color: #1a1a2e;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .absent-date-info {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #6c757d;
         font-size: 12px;
-        color: #666;
+
+        mat-icon {
+          font-size: 14px;
+          width: 14px;
+          height: 14px;
+        }
       }
     }
 
-    &:hover {
-      background-color: #f0f0f0;
+    .absent-card-actions {
+      display: flex;
+      flex-shrink: 0;
     }
   }
 }
 
-.absents {
-  width: 20vw;
-  max-width: 400px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  background-color: rgb(255, 255, 255);
-  border-left: 1px solid #e4e4e4;
-}
-
+// ── STATS ─────────────────────────────────────────────────────────────────────
 .stats-container {
   height: 100%;
   display: flex;
-  align-items: center;
   flex-direction: column;
   overflow: hidden;
 }
@@ -287,7 +374,7 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  height: 200px;
+  padding: 60px 0;
   color: #888;
 
   mat-icon {
@@ -302,45 +389,81 @@
   }
 }
 
-.stats-table-wrapper {
-  overflow: auto;
-  flex: 1;
-}
-
 .stats-list {
-  max-width: 1000px;
-  width: 100%;
+  flex: 1;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding-bottom: 100px;
+  gap: 10px;
+  padding: 14px 16px 100px;
 }
 
-.stat-row {
+// ── STAT CARD ─────────────────────────────────────────────────────────────────
+.stat-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #eef0f3;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  padding: 14px 16px 12px;
   display: flex;
-  align-items: start;
   flex-direction: column;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px 16px;
-
-  &:nth-child(odd) {
-    background-color: #f5f5f500;
-  }
-  &:nth-child(even) {
-    background-color: #ffffff;
-  }
+  gap: 10px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 
   &:hover {
-    background-color: #f0f0f0;
+    box-shadow: 0 4px 16px rgba(4, 104, 215, 0.08);
+    border-color: rgba(4, 104, 215, 0.2);
   }
 }
 
-.stat-name {
-  font-weight: 600;
-  font-size: 14px;
-  color: #222;
-  min-width: 160px;
+.stat-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stat-employee-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+
+  .stat-emp-id {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary, #0468d7);
+    background-color: rgba(4, 104, 215, 0.1);
+    border-radius: 50px;
+    padding: 2px 9px;
+    letter-spacing: 0.3px;
+  }
+
+  .stat-emp-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.stat-total-badge {
   flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  background-color: #f0f0f5;
+  color: #555;
+  border-radius: 50px;
+  padding: 3px 12px;
+  white-space: nowrap;
+
+  &.warn {
+    background-color: #f0d2d2;
+    color: #ad0e0e;
+  }
 }
 
 .stat-tags {
@@ -351,10 +474,15 @@
 
 .stat-tag {
   font-size: 12px;
+  font-weight: 500;
   color: #555;
   background-color: #efefef;
-  border-radius: 4px;
-  padding: 2px 8px;
+  border-radius: 50px;
+  padding: 3px 11px;
+
+  strong {
+    font-weight: 800;
+  }
 
   &.justified {
     background-color: #f6d4d3;
@@ -368,6 +496,11 @@
     background-color: #feede0;
     color: #9c6b43;
   }
+  &.total-injust {
+    background-color: #fce4e4;
+    color: #c0392b;
+    outline: 1px solid rgba(192, 57, 43, 0.35);
+  }
   &.license {
     background-color: #e3ecd2;
     color: #59673f;
@@ -375,7 +508,7 @@
   &.ft {
     background-color: #ffffa1;
     color: #777701;
-    outline: 1px solid #777701;
+    outline: 1px solid #77770166;
   }
   &.art {
     background-color: #f0eee5;
@@ -387,18 +520,21 @@
   }
 }
 
+// ── RESPONSIVE ────────────────────────────────────────────────────────────────
 @media screen and (min-width: 768px) {
 
-  .stat-row{
-    flex-direction: row;
-    justify-content: space-between;
+  .stats-list {
+    padding: 16px 24px 100px;
+    max-width: 860px;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .absent-calendar {
     .calendar {
       .week {
         .day {
-          gap: 5px;
+          gap: 4px;
 
           .absent {
             width: 90%;
@@ -413,23 +549,19 @@
   }
 
   .absent-list {
-    padding: 10px 50px;
+    padding: 12px 50px;
 
-    .absent {
-      padding: 10px;
+    .absent-card {
+      padding: 14px 10px 14px 18px;
 
-      .employee {
-        font-weight: 700;
-        font-size: 20px;
-      }
+      .absent-card-body {
+        .absent-employee-name {
+          font-size: 18px;
+        }
 
-      .date {
-        font-size: 16px;
-        color: #666;
-      }
-
-      .chip {
-        margin-bottom: 10px;
+        .absent-date-info {
+          font-size: 13px;
+        }
       }
     }
   }
