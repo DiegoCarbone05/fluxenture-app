@@ -28,7 +28,7 @@
 
   <div class="header">
     <div class="wrap">
-      <h2>Agregar Nuevo Documento</h2>
+      <h2>{{ editMode() ? 'Editar Documento' : 'Agregar Nuevo Documento' }}</h2>
       <span>Archivos soportados: PDF, JPG o PNG, DOCX</span>
     </div>
 
@@ -124,7 +124,7 @@
             </div>
 
             <div class="actions">
-              <button matIconButton>
+              <button matIconButton (click)="viewCurrentFile()">
                 <mat-icon>visibility</mat-icon>
               </button>
               <button matIconButton style="background-color: #01964e;" (click)="onDeleteFile()">
@@ -135,13 +135,28 @@
           }
         </div>
 
+        @if (editMode()) {
+        <div class="usages-section">
+          @if (usageEntries().length > 0) {
+          <span class="usages-label">En uso en:</span>
+          <div class="usage-chips">
+            @for (u of usageEntries(); track u.module) {
+            <span class="usage-chip">{{ u.label }} · {{ u.count }}</span>
+            }
+          </div>
+          } @else {
+          <span class="usages-label free">No está en uso en ningún otro registro todavía.</span>
+          }
+        </div>
+        }
+
       </div>
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
       <button color="primary" type="submit" class="dialog-btn submit-btn" [disabled]="form.invalid">
         <mat-icon>cloud_upload</mat-icon>
-        Subir Documento
+        {{ editMode() ? 'Guardar Cambios' : 'Subir Documento' }}
         <div class="progress-bar" [style.width.%]="progress()"></div>
       </button>
     </mat-dialog-actions>

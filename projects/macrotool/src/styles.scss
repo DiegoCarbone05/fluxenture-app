@@ -1,4 +1,4 @@
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 @import url("./global.scss");
 
 // Angular Material theme (Material Design 2 / M2).
@@ -11,13 +11,13 @@
   --primary-color: #2c3e50;
   --secondary-color: #34495e;
   --accent-color: #3498db;
-  --bg-color: #f8f9fa;
+  --bg-color: #f8f8f8;
   --border-color: #dee2e6;
   --text-color: #333;
 
   --warn: #d1002d;
 
-
+  --header-color: #f5f5f5;
 }
 
 // Custom palette based on #0468D7
@@ -32,7 +32,8 @@ $fluxenture-primary-palette: (
   700: #0355ad,
   800: #024a98,
   900: #013a7a,
-  contrast: (50: rgba(black, 0.87),
+  contrast: (
+    50: rgba(black, 0.87),
     100: rgba(black, 0.87),
     200: rgba(black, 0.87),
     300: rgba(black, 0.87),
@@ -42,9 +43,8 @@ $fluxenture-primary-palette: (
     700: white,
     800: white,
     900: white,
-  )
+  ),
 );
-
 
 .add-button {
   position: fixed !important;
@@ -57,12 +57,16 @@ $primary: mat.m2-define-palette($fluxenture-primary-palette);
 $accent: mat.m2-define-palette($fluxenture-primary-palette, 200, 100, 400);
 $warn: mat.m2-define-palette(mat.$m2-red-palette);
 
-$macrotools-theme: mat.m2-define-light-theme((color: (primary: $primary,
-        accent: $accent,
-        warn: $warn,
-      ),
-      density: 0,
-    ));
+$macrotools-theme: mat.m2-define-light-theme(
+  (
+    color: (
+      primary: $primary,
+      accent: $accent,
+      warn: $warn,
+    ),
+    density: 0,
+  )
+);
 
 @include mat.all-component-themes($macrotools-theme);
 
@@ -70,9 +74,18 @@ $macrotools-theme: mat.m2-define-light-theme((color: (primary: $primary,
 $app-primary-color: #0468d7;
 $app-background-color: #ffffff;
 $app-text-color: #333333;
-$app-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$app-font-family: "Plus Jakarta Sans", sans-serif;
 $app-font-size: 16px;
 $app-line-height: 1.5;
+
+// Sidenav
+mat-drawer {
+  background: transparent !important;
+}
+.mat-drawer-container {
+  background: #f5f5f500 !important;
+}
+/// /// ///
 
 body {
   min-height: 100vh;
@@ -87,6 +100,11 @@ body {
   // overflow: hidden;
   text-rendering: optimizeLegibility;
   overflow: hidden;
+}
+
+.mat-mdc-tab-labels {
+  max-width: 1200px !important;
+  margin: auto !important;
 }
 
 html,
@@ -111,7 +129,7 @@ $icon-weight-bold: 700;
 
 // Configure mat-icon to use Material Symbols
 mat-icon {
-  font-family: 'Material Symbols Outlined';
+  font-family: "Material Symbols Outlined";
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -122,74 +140,74 @@ mat-icon {
   white-space: nowrap;
   word-wrap: normal;
   direction: ltr;
-  font-feature-settings: 'liga';
-  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
   -webkit-font-smoothing: antialiased;
 
   // Default weight configuration
   font-variation-settings:
-    'FILL' 0,
-    'wght'$icon-weight-light,
-    'GRAD' 0,
-    'opsz' 24;
+    "FILL" 0,
+    "wght" $icon-weight-light,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 // Icon weight utility classes
 .mat-icon-weight-thin {
   font-variation-settings:
-    'FILL' 0,
-    'wght'$icon-weight-thin,
-    'GRAD' 0,
-    'opsz' 24;
+    "FILL" 0,
+    "wght" $icon-weight-thin,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 .mat-icon-weight-light {
   font-variation-settings:
-    'FILL' 0,
-    'wght'$icon-weight-light,
-    'GRAD' 0,
-    'opsz' 24;
+    "FILL" 0,
+    "wght" $icon-weight-light,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 .mat-icon-weight-regular {
   font-variation-settings:
-    'FILL' 0,
-    'wght'$icon-weight-regular,
-    'GRAD' 0,
-    'opsz' 24;
+    "FILL" 0,
+    "wght" $icon-weight-regular,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 .mat-icon-weight-medium {
   font-variation-settings:
-    'FILL' 0,
-    'wght'$icon-weight-medium,
-    'GRAD' 0,
-    'opsz' 24;
+    "FILL" 0,
+    "wght" $icon-weight-medium,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 .mat-icon-weight-semibold {
   font-variation-settings:
-    'FILL' 0,
-    'wght'$icon-weight-semibold,
-    'GRAD' 0,
-    'opsz' 24;
+    "FILL" 0,
+    "wght" $icon-weight-semibold,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 .mat-icon-weight-bold {
   font-variation-settings:
-    'FILL' 0,
-    'wght'$icon-weight-bold,
-    'GRAD' 0,
-    'opsz' 24;
+    "FILL" 0,
+    "wght" $icon-weight-bold,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 // Filled variant (optional)
 .mat-icon-filled {
   font-variation-settings:
-    'FILL' 1,
-    'wght'$icon-weight-default,
-    'GRAD' 0,
-    'opsz' 24;
+    "FILL" 1,
+    "wght" $icon-weight-default,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 /* Apply to specific elements or globally */
@@ -206,7 +224,6 @@ div {
   -webkit-tap-highlight-color: transparent;
   /* Makes the highlight invisible */
 }
-
 
 .mdc-dialog--open .mat-mdc-dialog-surface,
 .mdc-dialog--closing .mat-mdc-dialog-surface {

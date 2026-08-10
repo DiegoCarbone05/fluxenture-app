@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+<style>
+  body { margin: 0; padding: 0; font-family: "Plus Jakarta Sans", sans-serif; background-color: #ffffff; color: #333333; line-height: 1.5; font-size: 16px; text-rendering: optimizeLegibility; }
+  a { color: #0468d7; text-decoration: none; }
+  a:hover { color: rgb(5, 87, 180); }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</helmet>
+
+<div style="display:flex; flex-direction:column; gap:40px; padding:40px; background:#ffffff; box-sizing:border-box; align-items:flex-start">
+
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; align-items:baseline; gap:10px">
+      <span style="font-size:13px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; color:#1a1a2e">Empleados v3 — panel con tabla</span>
+      <span style="font-size:12px; color:#9aa0ac; font-weight:600">1440 × 900 · métricas + tabla filtrable</span>
+    </div>
+
+    <div data-screen-label="Empleados v3 escritorio" style="position:relative; width:1440px; height:900px; overflow:hidden; border:1px solid #e4e4e4; border-radius:4px; background:#f8f8f8; display:flex">
+
+      <!-- ── SIDENAV ─────────────────────────────────────────────────────── -->
+      <div style="width:264px; flex-shrink:0; height:100%; box-sizing:border-box; padding:20px 16px; display:flex; flex-direction:column; background:#ffffff">
+        <div style="display:flex; align-items:center; gap:10px; padding:8px 8px 28px">
+          <img src="assets/flux-logo-icon.png" alt="logo" style="width:32px; height:32px; border-radius:8px; object-fit:contain" />
+          <span style="font-size:21px; font-weight:700; color:#222227">Fluxenture</span>
+        </div>
+        <nav style="display:flex; flex-direction:column; gap:6px">
+          <a href="#" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; color:#35353c; font-size:15px; font-weight:500" style-hover="background-color:rgba(0,0,0,0.05)">
+            <span style="font-family:'Material Symbols Outlined'; font-size:22px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">track_changes</span>
+            <span>Track &amp; Trace</span>
+          </a>
+          <a href="#" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; background-color:#0468d7; color:#ffffff; font-size:15px; font-weight:600">
+            <span style="font-family:'Material Symbols Outlined'; font-size:22px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">people</span>
+            <span>Empleados</span>
+          </a>
+          <a href="#" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; color:#35353c; font-size:15px; font-weight:500" style-hover="background-color:rgba(0,0,0,0.05)">
+            <span style="font-family:'Material Symbols Outlined'; font-size:22px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">event_busy</span>
+            <span>Ausencias</span>
+          </a>
+          <a href="#" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; color:#35353c; font-size:15px; font-weight:500" style-hover="background-color:rgba(0,0,0,0.05)">
+            <span style="font-family:'Material Symbols Outlined'; font-size:22px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">description</span>
+            <span>Documentos</span>
+          </a>
+          <a href="#" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; color:#35353c; font-size:15px; font-weight:500" style-hover="background-color:rgba(0,0,0,0.05)">
+            <span style="font-family:'Material Symbols Outlined'; font-size:22px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">falling</span>
+            <span>SGI</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- ── CONTENIDO ───────────────────────────────────────────────────── -->
+      <div style="flex:1; min-width:0; height:100%; overflow-y:auto; box-sizing:border-box; padding:28px 32px 40px">
+
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:22px">
+          <div style="display:flex; flex-direction:column; gap:2px">
+            <h1 style="margin:0; font-size:28px; font-weight:800; color:#1a1a2e; letter-spacing:-0.4px">Empleados</h1>
+            <span style="font-size:14px; color:#6c757d; font-weight:500">{{ subtitle }}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px">
+            <button style="display:flex; align-items:center; gap:8px; height:40px; padding:0 14px; border:none; border-radius:55px; background:#f1f1f1; color:#35353c; font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:600; cursor:pointer" style-hover="background:#e9e9e9">
+              <span style="font-family:'Material Symbols Outlined'; font-size:22px; line-height:1; color:#5a6480; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">account_circle</span>
+              <span>Hola, <strong>{{ userName }}</strong></span>
+            </button>
+            <button style="display:flex; align-items:center; gap:8px; height:40px; padding:0 20px; border:none; border-radius:55px; background:#0468d7; color:#ffffff; font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:700; cursor:pointer" style-hover="background:rgb(5,87,180)">
+              <span style="font-family:'Material Symbols Outlined'; font-size:20px; line-height:1; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24">add</span>
+              <span>Nuevo empleado</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <sc-if value="{{ showStats }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:20px">
+            <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+              <div style="background:#ffffff; border-radius:12px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; box-sizing:border-box; animation:fade-in 0.3s ease-in-out">
+                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                  <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#7a8090">{{ s.label }}</span>
+                  <div style="width:34px; height:34px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center; background:{{ s.iconBg }}; color:{{ s.iconFg }}">
+                    <span style="font-family:'Material Symbols Outlined'; font-size:19px; line-height:1; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20">{{ s.icon }}</span>
+                  </div>
+                </div>
+                <span style="font-size:32px; font-weight:800; color:#1a1a2e; line-height:1.1; letter-spacing:-0.5px">{{ s.value }}</span>
+                <div style="display:flex; align-items:center; gap:4px">
+                  <span style="font-family:'Material Symbols Outlined'; font-size:15px; line-height:1; color:{{ s.deltaFg }}; font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20">{{ s.deltaIcon }}</span>
+                  <span style="font-size:12px; font-weight:700; color:{{ s.deltaFg }}">{{ s.delta }}</span>
+                  <span style="font-size:12px; font-weight:500; color:#9aa0ac">vs. mes anterior</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- Tabla -->
+        <div style="background:#ffffff; border-radius:12px; overflow:hidden">
+
+          <div style="display:flex; align-items:center; gap:12px; padding:14px 16px">
+            <div style="flex:1; min-width:0; max-width:420px; display:flex; align-items:center; gap:10px; height:40px; padding:0 14px; background-color:rgba(0,0,0,0.045); border-radius:10px; box-sizing:border-box">
+              <span style="font-family:'Material Symbols Outlined'; font-size:20px; line-height:1; color:#7a8090; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">search</span>
+              <input type="text" placeholder="Buscar por nombre, DNI o legajo" value="{{ term }}" onChange="{{ onSearch }}" style="flex:1; min-width:0; background:none; border:none; outline:none; font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; color:#333" />
+            </div>
+            <select value="{{ sector }}" onChange="{{ onSector }}" style="height:40px; padding:0 12px; border:none; border-radius:10px; background:#f1f1f1; color:#35353c; font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; outline:none">
+              <option value="todos">Sector: todos</option>
+              <option value="Desmalezado">Desmalezado</option>
+              <option value="Limpieza">Limpieza</option>
+              <option value="Administracion">Administracion</option>
+            </select>
+            <select value="{{ status }}" onChange="{{ onStatus }}" style="height:40px; padding:0 12px; border:none; border-radius:10px; background:#f1f1f1; color:#35353c; font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; outline:none">
+              <option value="todos">Estado: todos</option>
+              <option value="operativos">Operativo</option>
+              <option value="inactivos">Inactivo</option>
+            </select>
+            <div style="flex:1"></div>
+            <button onClick="{{ toggleSort }}" style="display:flex; align-items:center; gap:6px; height:40px; padding:0 14px; border:none; border-radius:10px; background:#f1f1f1; color:#5a6480; font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#e9e9e9">
+              <span style="font-family:'Material Symbols Outlined'; font-size:19px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">swap_vert</span>
+              <span>{{ sortLabel }}</span>
+            </button>
+            <button style="display:flex; align-items:center; gap:6px; height:40px; padding:0 14px; border:none; border-radius:10px; background:rgba(4,104,215,0.1); color:#0468d7; font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer" style-hover="background:rgba(4,104,215,0.12)">
+              <span style="font-family:'Material Symbols Outlined'; font-size:19px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">download</span>
+              <span>Exportar</span>
+            </button>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1.5fr 1.3fr 120px 130px 150px 132px; padding:10px 16px; background-color:#f7f7f7; border-bottom:1px solid #f0f0f0; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#7a8090">
+            <span>Empleado y sector</span>
+            <span>Contacto</span>
+            <span>Ingreso</span>
+            <span>Estado</span>
+            <span>Acceso al sistema</span>
+            <span style="text-align:right">Acciones</span>
+          </div>
+
+          <sc-for list="{{ employees }}" as="emp" hint-placeholder-count="8">
+            <div style="display:grid; grid-template-columns:1.5fr 1.3fr 120px 130px 150px 132px; align-items:center; column-gap:12px; padding:10px 16px; border-bottom:1px solid #f0f0f0; background:{{ emp.rowBg }}; cursor:pointer" style-hover="background-color:#f7f8fa">
+              <div style="display:flex; align-items:center; gap:10px; min-width:0">
+                <div style="width:38px; height:38px; flex-shrink:0; border-radius:50%; background-color:#0468d7; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; letter-spacing:0.5px">{{ emp.initials }}</div>
+                <div style="display:flex; flex-direction:column; min-width:0; gap:1px">
+                  <span style="font-size:14px; font-weight:700; color:#1a1a2e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ emp.name }}</span>
+                  <div style="display:flex; align-items:center; gap:6px; min-width:0">
+                    <span style="flex-shrink:0; font-size:10px; font-weight:700; color:#0468d7; background-color:rgba(4,104,215,0.1); border-radius:50px; padding:0 7px; letter-spacing:0.3px">{{ emp.legajo }}</span>
+                    <span style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; color:#9aa0ac; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ emp.sector }}</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; min-width:0; gap:1px">
+                <span style="font-size:13px; color:#35353c; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ emp.email }}</span>
+                <span style="font-family:monospace; font-size:12px; font-weight:600; color:#4a6fa5; letter-spacing:0.3px">{{ emp.phone }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:4px; min-width:0">
+                <span style="font-family:'Material Symbols Outlined'; font-size:14px; line-height:1; color:#9aa0ac; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 20">event</span>
+                <span style="font-size:12px; font-weight:600; color:#6c757d; white-space:nowrap">{{ emp.entryDate }}</span>
+              </div>
+              <div>
+                <span style="display:inline-flex; align-items:center; gap:4px; padding:2px 10px 2px 7px; border-radius:50px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; white-space:nowrap; background-color:{{ emp.statusBg }}; color:{{ emp.statusFg }}">
+                  <span style="font-family:'Material Symbols Outlined'; font-size:14px; line-height:1; font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20">{{ emp.statusIcon }}</span>
+                  <span>{{ emp.statusLabel }}</span>
+                </span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px">
+                <button onClick="{{ emp.toggleAccess }}" style="width:38px; height:22px; flex-shrink:0; padding:2px; border:none; border-radius:50px; background:{{ emp.trackBg }}; cursor:pointer; display:flex; align-items:center; justify-content:{{ emp.knobAlign }}; box-sizing:border-box; transition:background 0.2s ease">
+                  <span style="width:18px; height:18px; border-radius:50%; background:#ffffff"></span>
+                </button>
+                <span style="font-size:12px; font-weight:600; color:{{ emp.accessFg }}">{{ emp.accessLabel }}</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:flex-end; gap:2px">
+                <button style="width:34px; height:34px; padding:0; border:none; border-radius:55px; background:transparent; color:#5a6480; display:flex; align-items:center; justify-content:center; cursor:pointer" style-hover="background:rgba(0,0,0,0.05)">
+                  <span style="font-family:'Material Symbols Outlined'; font-size:18px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 20">visibility</span>
+                </button>
+                <button style="width:34px; height:34px; padding:0; border:none; border-radius:55px; background:transparent; color:#0468d7; display:flex; align-items:center; justify-content:center; cursor:pointer" style-hover="background:rgba(4,104,215,0.1)">
+                  <span style="font-family:'Material Symbols Outlined'; font-size:18px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 20">edit</span>
+                </button>
+                <button style="width:34px; height:34px; padding:0; border:none; border-radius:55px; background:transparent; color:#d1002d; display:flex; align-items:center; justify-content:center; cursor:pointer" style-hover="background:rgba(209,0,45,0.08)">
+                  <span style="font-family:'Material Symbols Outlined'; font-size:18px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 20">delete</span>
+                </button>
+              </div>
+            </div>
+          </sc-for>
+
+          <sc-if value="{{ isEmpty }}">
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:64px 24px">
+              <img draggable="false" src="assets/pictures/undraw_no-data_ig65.svg" alt="" style="width:180px; margin-bottom:4px" />
+              <span style="font-size:16px; font-weight:700; color:#1a1a2e">Sin resultados</span>
+              <span style="font-size:14px; font-weight:500; color:#999">Probá con otro nombre, sector o estado.</span>
+            </div>
+          </sc-if>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 16px; border-top:1px solid #f0f0f0">
+            <span style="font-size:12px; font-weight:600; color:#7a8090">{{ rangeLabel }}</span>
+            <div style="display:flex; align-items:center; gap:4px">
+              <button style="width:34px; height:34px; padding:0; border:none; border-radius:55px; background:#f5f5f5; color:#c9cdd6; display:flex; align-items:center; justify-content:center; cursor:not-allowed">
+                <span style="font-family:'Material Symbols Outlined'; font-size:18px; line-height:1; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20">chevron_left</span>
+              </button>
+              <span style="min-width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; border-radius:55px; background:#0468d7; color:#ffffff; font-size:13px; font-weight:700">1</span>
+              <span style="min-width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; border-radius:55px; color:#5a6480; font-size:13px; font-weight:600">2</span>
+              <span style="min-width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; border-radius:55px; color:#5a6480; font-size:13px; font-weight:600">3</span>
+              <button style="width:34px; height:34px; padding:0; border:none; border-radius:55px; background:#f1f1f1; color:#5a6480; display:flex; align-items:center; justify-content:center; cursor:pointer" style-hover="background:#e9e9e9">
+                <span style="font-family:'Material Symbols Outlined'; font-size:18px; line-height:1; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20">chevron_right</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MÓVIL (Android · Material 3) ───────────────────────────────────── -->
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; align-items:baseline; gap:10px">
+      <span style="font-size:13px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; color:#1a1a2e">Empleados v3 — Android</span>
+      <span style="font-size:12px; color:#9aa0ac; font-weight:600">412 × 892 · Material 3: search bar, chips, navigation bar</span>
+    </div>
+
+    <div data-screen-label="Empleados v3 Android">
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="position:relative; height:100%; display:flex; flex-direction:column; background:#ffffff; font-family:Roboto, system-ui, sans-serif">
+
+          <!-- M3 docked search bar -->
+          <div style="flex-shrink:0; padding:8px 16px 12px">
+            <div style="display:flex; align-items:center; gap:4px; height:56px; padding:0 4px 0 4px; background:#f0f2f5; border-radius:28px; box-sizing:border-box">
+              <button style="width:48px; height:48px; flex-shrink:0; padding:0; border:none; border-radius:24px; background:transparent; color:#49454f; display:flex; align-items:center; justify-content:center; cursor:pointer" style-hover="background:rgba(0,0,0,0.06)">
+                <span style="font-family:'Material Symbols Outlined'; font-size:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24">menu</span>
+              </button>
+              <input type="text" placeholder="Buscar empleados" value="{{ term }}" onChange="{{ onSearch }}" style="flex:1; min-width:0; background:none; border:none; outline:none; font-family:Roboto, system-ui, sans-serif; font-size:16px; letter-spacing:0.5px; color:#1d1b20" />
+              <div style="width:40px; height:40px; flex-shrink:0; margin-right:8px; border-radius:20px; background:#0468d7; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:500; letter-spacing:0.5px">{{ userInitials }}</div>
+            </div>
+          </div>
+
+          <!-- M3 filter chips -->
+          <div style="flex-shrink:0; display:flex; align-items:center; gap:8px; padding:0 16px 12px; overflow-x:auto">
+            <sc-for list="{{ mdChips }}" as="c" hint-placeholder-count="3">
+              <button onClick="{{ c.select }}" style="display:flex; align-items:center; gap:8px; height:32px; flex-shrink:0; padding:{{ c.padding }}; border:none; border-radius:8px; background:{{ c.bg }}; color:{{ c.fg }}; font-family:Roboto, system-ui, sans-serif; font-size:14px; font-weight:500; letter-spacing:0.1px; cursor:pointer; white-space:nowrap">
+                <sc-if value="{{ c.selected }}">
+                  <span style="font-family:'Material Symbols Outlined'; font-size:18px; line-height:1; font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20">check</span>
+                </sc-if>
+                <span>{{ c.label }}</span>
+              </button>
+            </sc-for>
+          </div>
+
+          <!-- Scroll region -->
+          <div style="flex:1; min-height:0; overflow-y:auto; padding-bottom:96px">
+
+            <sc-if value="{{ showStats }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex; gap:8px; padding:0 16px 8px; overflow-x:auto">
+                <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+                  <div style="flex-shrink:0; width:148px; padding:12px 16px 14px; border-radius:12px; background:#f0f2f5; display:flex; flex-direction:column; gap:4px; box-sizing:border-box">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px">
+                      <span style="min-height:32px; line-height:16px; font-size:11px; font-weight:500; letter-spacing:0.5px; text-transform:uppercase; color:#49454f">{{ s.label }}</span>
+                      <span style="font-family:'Material Symbols Outlined'; font-size:18px; line-height:1; color:{{ s.iconFg }}; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20">{{ s.icon }}</span>
+                    </div>
+                    <span style="font-size:28px; font-weight:400; color:#1d1b20; line-height:36px">{{ s.value }}</span>
+                    <span style="font-size:12px; font-weight:500; letter-spacing:0.4px; color:{{ s.deltaFg }}">{{ s.delta }} vs. mes ant.</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <!-- M3 list subheader -->
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px 6px">
+              <span style="font-size:14px; font-weight:500; letter-spacing:0.1px; color:#0468d7">{{ resultsLabel }}</span>
+              <button onClick="{{ toggleSort }}" style="display:flex; align-items:center; gap:8px; height:32px; padding:0 12px 0 10px; border:none; border-radius:8px; background:transparent; color:#49454f; font-family:Roboto, system-ui, sans-serif; font-size:14px; font-weight:500; letter-spacing:0.1px; cursor:pointer" style-hover="background:rgba(0,0,0,0.06)">
+                <span style="font-family:'Material Symbols Outlined'; font-size:18px; line-height:1; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20">swap_vert</span>
+                <span>{{ sortLabel }}</span>
+              </button>
+            </div>
+
+            <!-- M3 three-line list items -->
+            <sc-for list="{{ employees }}" as="emp" hint-placeholder-count="6">
+              <div style="display:flex; align-items:center; gap:16px; min-height:88px; padding:12px 16px; box-sizing:border-box; cursor:pointer" style-hover="background:rgba(4,104,215,0.05)">
+                <div style="width:40px; height:40px; flex-shrink:0; border-radius:20px; background:#0468d7; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:500; letter-spacing:0.5px">{{ emp.initials }}</div>
+                <div style="flex:1; min-width:0; display:flex; flex-direction:column">
+                  <span style="font-size:16px; font-weight:400; letter-spacing:0.5px; line-height:24px; color:#1d1b20; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ emp.nameTitle }}</span>
+                  <span style="font-size:14px; font-weight:400; letter-spacing:0.25px; line-height:20px; color:#49454f; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ emp.legajo }} · {{ emp.sector }}</span>
+                  <span style="font-size:14px; font-weight:400; letter-spacing:0.25px; line-height:20px; color:#49454f; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ emp.phone }}</span>
+                </div>
+                <div style="flex-shrink:0; display:flex; align-items:center; height:24px; padding:0 8px; border-radius:8px; background:{{ emp.statusBg }}; color:{{ emp.statusFg }}; font-size:11px; font-weight:500; letter-spacing:0.5px; text-transform:uppercase; white-space:nowrap">{{ emp.statusLabel }}</div>
+              </div>
+            </sc-for>
+
+            <sc-if value="{{ isEmpty }}">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:48px 32px">
+                <img draggable="false" src="assets/pictures/undraw_no-data_ig65.svg" alt="" style="width:160px; margin-bottom:8px" />
+                <span style="font-size:16px; font-weight:500; letter-spacing:0.15px; color:#1d1b20">Sin resultados</span>
+                <span style="font-size:14px; letter-spacing:0.25px; color:#49454f; text-align:center">Probá con otro nombre, sector o estado.</span>
+              </div>
+            </sc-if>
+          </div>
+
+          <!-- M3 FAB -->
+          <button style="position:absolute; right:16px; bottom:120px; width:56px; height:56px; padding:0; border:none; border-radius:16px; background:#0468d7; color:#ffffff; display:flex; align-items:center; justify-content:center; cursor:pointer" style-hover="background:rgb(5,87,180)">
+            <span style="font-family:'Material Symbols Outlined'; font-size:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24">add</span>
+          </button>
+
+          <!-- M3 navigation bar -->
+          <div style="flex-shrink:0; height:80px; display:flex; align-items:flex-start; justify-content:space-around; padding:12px 0 16px; background:#f0f2f5; box-sizing:border-box">
+            <sc-for list="{{ mdNav }}" as="n" hint-placeholder-count="5">
+              <div style="width:20%; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer">
+                <div style="width:64px; height:32px; border-radius:16px; display:flex; align-items:center; justify-content:center; background:{{ n.pillBg }}; color:{{ n.iconFg }}">
+                  <span style="font-family:'Material Symbols Outlined'; font-size:24px; line-height:1; font-variation-settings:'FILL' {{ n.fill }},'wght' 400,'GRAD' 0,'opsz' 24">{{ n.icon }}</span>
+                </div>
+                <span style="font-size:12px; font-weight:{{ n.labelWeight }}; letter-spacing:0.5px; color:{{ n.labelFg }}; white-space:nowrap">{{ n.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </x-import>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showStats&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Vista&quot;},&quot;zebra&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Vista&quot;},&quot;totalEmployees&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:128,&quot;min&quot;:8,&quot;max&quot;:999,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Vista&quot;},&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;jsanchez&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vista&quot;}}">
+const EMPLOYEES = [
+  { name: "ACOSTA MARIANO EZEQUIEL", legajo: "1042", sector: "Desmalezado", email: "macosta@servisub.com.ar", phone: "+54 9 351 402-1188", entryDate: "12/03/2023", isOperational: true, access: true },
+  { name: "BENITEZ CARLA SOLEDAD", legajo: "0876", sector: "Administracion", email: "cbenitez@servisub.com.ar", phone: "+54 9 351 655-0921", entryDate: "04/08/2021", isOperational: true, access: true },
+  { name: "CABRERA JOSE LUIS", legajo: "0311", sector: "Limpieza", email: "jcabrera@servisub.com.ar", phone: "+54 9 351 210-7734", entryDate: "27/01/2019", isOperational: false, access: false },
+  { name: "DOMINGUEZ RAMON ALBERTO", legajo: "0954", sector: "Desmalezado", email: "rdominguez@servisub.com.ar", phone: "+54 9 351 774-3390", entryDate: "15/06/2022", isOperational: true, access: true },
+  { name: "ESPINOZA VALERIA NOEMI", legajo: "1188", sector: "Limpieza", email: "vespinoza@servisub.com.ar", phone: "+54 9 351 508-6612", entryDate: "02/11/2023", isOperational: true, access: false },
+  { name: "FERNANDEZ HUGO DANIEL", legajo: "0642", sector: "Limpieza", email: "hfernandez@servisub.com.ar", phone: "+54 9 351 331-4407", entryDate: "19/09/2020", isOperational: false, access: false },
+  { name: "GIMENEZ LUCAS MARTIN", legajo: "1273", sector: "Desmalezado", email: "lgimenez@servisub.com.ar", phone: "+54 9 351 917-2256", entryDate: "08/02/2024", isOperational: true, access: true },
+  { name: "HERRERA SILVINA BEATRIZ", legajo: "0498", sector: "Administracion", email: "sherrera@servisub.com.ar", phone: "+54 9 351 460-8813", entryDate: "23/05/2020", isOperational: true, access: true },
+];
+
+class Component extends DCLogic {
+  state = { term: "", sector: "todos", status: "todos", asc: true, access: {} };
+
+  initials(name) {
+    const p = name.trim().split(/\s+/);
+    return (p[0][0] + (p[1] ? p[1][0] : "")).toUpperCase();
+  }
+
+  renderVals() {
+    const zebra = this.props.zebra ?? false;
+    const total = this.props.totalEmployees ?? 128;
+    const { term, sector, status, asc } = this.state;
+    const t = term.trim().toLowerCase();
+
+    let rows = EMPLOYEES.filter((e) => {
+      if (sector !== "todos" && e.sector !== sector) return false;
+      if (status === "operativos" && !e.isOperational) return false;
+      if (status === "inactivos" && e.isOperational) return false;
+      if (t && !(e.name.toLowerCase().includes(t) || e.legajo.includes(t) || e.phone.includes(t))) return false;
+      return true;
+    });
+    rows = [...rows].sort((a, b) => (asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)));
+
+    const operativos = EMPLOYEES.filter((e) => e.isOperational).length;
+    const employees = rows.map((e, i) => {
+      const access = this.state.access[e.legajo] ?? e.access;
+      return {
+        id: e.legajo,
+        name: e.name,
+        nameTitle: e.name
+          .toLowerCase()
+          .replace(/(^|\s)([a-záéíóúñ])/g, (m, p, c) => p + c.toUpperCase()),
+        legajo: "N° " + e.legajo,
+        sector: e.sector,
+        email: e.email,
+        phone: e.phone,
+        entryDate: e.entryDate,
+        initials: this.initials(e.name),
+        rowBg: zebra && i % 2 === 1 ? "#fbfbfd" : "#ffffff",
+        statusBg: e.isOperational ? "#d4edbc" : "#ffcfc9",
+        statusFg: e.isOperational ? "#11734b" : "#b10202",
+        statusIcon: e.isOperational ? "check" : "close",
+        statusLabel: e.isOperational ? "Operativo" : "Inactivo",
+        trackBg: access ? "#0468d7" : "#c9cdd6",
+        knobAlign: access ? "flex-end" : "flex-start",
+        accessLabel: access ? "Activo" : "Sin acceso",
+        accessFg: access ? "#11734b" : "#9aa0ac",
+        toggleAccess: (ev) => {
+          ev.stopPropagation();
+          this.setState((s) => ({ access: { ...s.access, [e.legajo]: !(s.access[e.legajo] ?? e.access) } }));
+        },
+      };
+    });
+
+    const n = employees.length;
+
+    const mdChip = (key, label) => {
+      const selected = status === key;
+      return {
+        key,
+        label,
+        selected,
+        padding: selected ? "0 16px 0 8px" : "0 16px",
+        bg: selected ? "rgba(4,104,215,0.14)" : "#f0f2f5",
+        fg: selected ? "#0468d7" : "#49454f",
+        select: () => this.setState({ status: key }),
+      };
+    };
+
+    const navItem = (label, icon, active) => ({
+      label,
+      icon,
+      fill: active ? 1 : 0,
+      pillBg: active ? "rgba(4,104,215,0.14)" : "transparent",
+      iconFg: active ? "#0468d7" : "#49454f",
+      labelFg: active ? "#0468d7" : "#49454f",
+      labelWeight: active ? 600 : 500,
+    });
+
+    return {
+      employees,
+      mdChips: [mdChip("todos", "Todos"), mdChip("operativos", "Operativos"), mdChip("inactivos", "Inactivos")],
+      mdNav: [
+        navItem("Envíos", "track_changes", false),
+        navItem("Empleados", "people", true),
+        navItem("Ausencias", "event_busy", false),
+        navItem("Docs", "description", false),
+        navItem("SGI", "falling", false),
+      ],
+      userInitials: (this.props.userName ?? "jsanchez").slice(0, 2).toUpperCase(),
+      isEmpty: n === 0,
+      showStats: this.props.showStats ?? true,
+      stats: [
+        { label: "Total empleados", value: total, icon: "groups", iconBg: "rgba(4,104,215,0.1)", iconFg: "#0468d7", delta: "+4", deltaIcon: "trending_up", deltaFg: "#11734b" },
+        { label: "Operativos", value: 112, icon: "check_circle", iconBg: "#d4edbc", iconFg: "#11734b", delta: "+6", deltaIcon: "trending_up", deltaFg: "#11734b" },
+        { label: "Ausentes del mes", value: 9, icon: "event_busy", iconBg: "#ecf2fd", iconFg: "#3d7dc7", delta: "−2", deltaIcon: "trending_down", deltaFg: "#3d7dc7" },
+        { label: "Inactivos", value: 16, icon: "person_off", iconBg: "#ffcfc9", iconFg: "#b10202", delta: "+1", deltaIcon: "trending_up", deltaFg: "#b10202" },
+      ],
+      subtitle: total + " empleados · " + operativos + " operativos en esta página",
+      resultsLabel: n === 1 ? "1 resultado" : n + " resultados",
+      rangeLabel: n === 0 ? "Sin resultados" : "1 – " + n + " de " + total + " empleados",
+      sortLabel: asc ? "A → Z" : "Z → A",
+      term,
+      sector,
+      status,
+      onSearch: (e) => this.setState({ term: e.target.value }),
+      onSector: (e) => this.setState({ sector: e.target.value }),
+      onStatus: (e) => this.setState({ status: e.target.value }),
+      toggleSort: () => this.setState((s) => ({ asc: !s.asc })),
+      userName: this.props.userName ?? "jsanchez",
+    };
+  }
+}
+
+</script>
+</body>
+</html>

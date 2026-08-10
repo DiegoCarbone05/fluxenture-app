@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { afterNextRender, Component, ElementRef, inject, Injector, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatTableModule } from '@angular/material/table';
@@ -10,15 +10,12 @@ import { Toolbar } from '../../../../shared/components/toolbar/toolbar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Cd } from '../../../../shared/models/Cd.model';
 import html2Canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 import { Tnt } from '../../../../shared/models/Tnt.model';
 import { CdService } from '../../../../core/services/api/cd-api/cd.service';
-import { Employee } from '../../../../shared/models/Employee';
 import { EmployeeService } from '../../../../core/services/api/employees/employee.service';
-import { MatDialog } from '@angular/material/dialog';
-import { Prompt } from '../../../dialogs/prompt/prompt';
 import { StorageService } from '../../../../core/services/api/storage/storage.service';
 import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-cds-viewer',
@@ -39,8 +36,10 @@ export class CdsViewer {
   tnts = signal<Tnt[]>([]);
   loadingTracking = signal(false);
   trackingError = signal<string | null>(null);
+  savingSnapshot = signal(false);
+  downloadingFile = signal(false);
 
-  readonly promptDialog = inject(MatDialog);
+  private readonly injector = inject(Injector);
   displayedColumns: string[] = ['date', 'plant', "historyData", 'status',];
 
   async generarPdfDesdeHtml() {
@@ -106,14 +105,22 @@ export class CdsViewer {
     const cd = this.cd();
     if (!cd) return;
 
+    const previousTnt = cd.tnt;
     this.loadingTracking.set(true);
     this.trackingError.set(null);
 
     this.cdService.refreshTracking(cd.id).subscribe({
       next: (updated) => {
+        const changed = JSON.stringify(updated.tnt) !== JSON.stringify(previousTnt);
         this.cd.set(updated);
         this.tnts.set(updated.tnt ?? []);
         this.loadingTracking.set(false);
+
+        // Se espera a que Angular termine de pintar la tabla con los datos nuevos
+        // antes de sacar la foto que se sube a Drive.
+        if (changed) {
+          afterNextRender(() => this.syncSnapshotToDrive(), { injector: this.injector });
+        }
       },
       error: (err: HttpErrorResponse) => {
         console.error('Error obteniendo el seguimiento:', err);
@@ -137,28 +144,42 @@ export class CdsViewer {
     }
   }
 
-  async exportPDF() {
+  /**
+   * Sube a Drive una foto del historial de seguimiento tal como se ve ahora,
+   * fusionada con la carta original (siempre reemplaza el snapshot anterior,
+   * nunca acumula páginas). Se dispara sola cuando cambia el T&T; el botón
+   * manual queda como resincronización de emergencia.
+   */
+  async syncSnapshotToDrive(): Promise<void> {
+    const cd = this.cd();
+    if (!cd) return;
 
-    const fileId = this.cd()?.fileId;
-    const imgData = await this.generarPdfDesdeHtml();
-
-    if (fileId && imgData) {
-      this.promptDialog.open(Prompt, {
-        data: {
-          title: 'Exportar PDF',
-          desc: 'La carta de documento con el seguimiento adjuntado sera cargada al sistema, ¿estás seguro de querer continuar?',
-        }
-      }).afterClosed().subscribe((result) => {
-        if (result) this.cdService.exportCd(imgData, fileId).subscribe();
-      });
+    this.savingSnapshot.set(true);
+    try {
+      const imgData = await this.generarPdfDesdeHtml();
+      await firstValueFrom(this.cdService.syncTrackingSnapshot(cd.id, imgData));
+    } catch (err) {
+      console.error('Error subiendo el seguimiento a Drive:', err);
+    } finally {
+      this.savingSnapshot.set(false);
     }
   }
 
+  async downloadFile() {
+    const cd = this.cd();
+    const fileId = cd?.fileId;
+    if (!cd || !fileId) return;
 
-  downloadFile() {
-    const fileId = this.cd()?.fileId;
-    if (fileId) {
-      this.storageService.downloadFile(fileId).subscribe((res) => {
+    this.downloadingFile.set(true);
+
+    // Siempre se sincroniza antes de bajar el archivo: el merge se regenera
+    // desde el original inmutable + la foto actual (nunca acumula paginas),
+    // asi que resincronizar en cada descarga es seguro y barato, y evita
+    // servir una copia vieja si el auto-sync de refreshTracking no llego a correr.
+    await this.syncSnapshotToDrive();
+
+    this.storageService.downloadFile(fileId).subscribe({
+      next: (res) => {
         const blob = new Blob([res], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -166,8 +187,13 @@ export class CdsViewer {
         link.download = `${this.cd()?.trackingNumber} - ${this.employee()?.name}.pdf`;
         link.click();
         URL.revokeObjectURL(url);
-      });
-    }
+        this.downloadingFile.set(false);
+      },
+      error: (err) => {
+        console.error('Error descargando el archivo:', err);
+        this.downloadingFile.set(false);
+      },
+    });
   }
 
   goBack() {

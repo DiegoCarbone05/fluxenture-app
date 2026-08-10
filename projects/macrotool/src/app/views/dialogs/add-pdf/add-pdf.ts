@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
-import { Electron } from '../../../shared/services/electron';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { CdService } from '../../../core/services/api/cd-api/cd.service';
 import { Employee } from '../../../shared/models/Employee';
@@ -14,8 +14,8 @@ import { User } from '../../../shared/models/User';
 import { map, Observable, startWith } from 'rxjs';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { Cd } from '../../../shared/models/Cd.model';
-import { STORAGE_PATH_CONSTANT } from '../../../shared/constants/storage-path.constant';
-import { StorageService } from '../../../core/services/api/storage/storage.service';
+import { Doc, EDocType } from '../../../shared/models/Doc';
+import { SelectDocDialog } from '../select-doc-dialog/select-doc-dialog';
 import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
 
 @Component({
@@ -24,13 +24,15 @@ import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
   imports: [
     CommonModule, AsyncPipe, ReactiveFormsModule, MatDialogModule,
     MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule,
+    MatSnackBarModule,
   ],
   templateUrl: './add-pdf.html',
   styleUrl: './add-pdf.scss',
 })
 export class AddPdf {
   readonly dialogRef = inject(MatDialogRef<AddPdf>);
-  readonly data = inject<Cd>(MAT_DIALOG_DATA, { optional: true });
+  /** O bien un Cd completo (edicion, viene con id), o { presetDoc: Doc } (alta nueva con documento ya elegido). */
+  readonly data = inject<any>(MAT_DIALOG_DATA, { optional: true });
 
   form = new FormGroup({
     cdEmployee: new FormControl('', Validators.required),
@@ -43,16 +45,19 @@ export class AddPdf {
   constructor(
     private cdService: CdService,
     private employeeService: EmployeeService,
-    private storageService: StorageService
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
   ) { }
 
   filteredOptions!: Observable<EmployeeDTO[]>;
   employeeSelected!: EmployeeDTO | null;
   pdId = signal<string>('');
+  selectedDoc = signal<Doc | null>(null);
 
 
   ngOnInit() {
-    if (this.data) {
+    if (this.data?.id) {
+      // Editando un CD existente (this.data es un Cd completo)
       this.form.patchValue({
         cdEmployee: this.data.employeeId,
         cdNumber: String(this.data.trackingNumber),
@@ -61,6 +66,13 @@ export class AddPdf {
       });
       this.pdId.set(this.data.fileId);
       this.pdfPath.set('Archivo existente'); // Or you can try to fetch the file name if needed
+    } else if (this.data?.presetDoc) {
+      // Alta nueva con el documento ya elegido (ej: "Crear CD" desde Documentos)
+      const doc: Doc = this.data.presetDoc;
+      this.selectedDoc.set(doc);
+      this.pdfPath.set(doc.description || 'Documento seleccionado');
+      this.pdId.set(doc.driveFileId);
+      this.form.patchValue({ cdEmployee: doc.employeeId });
     }
 
     this.filteredOptions = (this.form.get('cdEmployee')?.valueChanges as Observable<string | number>).pipe(
@@ -154,39 +166,48 @@ export class AddPdf {
     return null;
   }
 
-  async addPDF() {
-    const explorer = document.createElement('input');
-    explorer.type = 'file';
-    explorer.accept = 'application/pdf';
+  addPDF() {
+    const employeeId = this.form.value.cdEmployee;
+    if (!employeeId || !this.employeeSelected) {
+      this.snackBar.open('Seleccione un empleado antes de adjuntar la carta', 'OK', { duration: 2500 });
+      return;
+    }
 
-    const fileName = `[${this.employeeSelected?.name}] ${this.form.value.cdNumber}_${this.form.value.emissionDate}_${this.form.value.obs}`;
-
-    explorer.click();
-    explorer.onchange = (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (file) {
-        this.storageService.uploadFile(file, STORAGE_PATH_CONSTANT.ROOT_CD + "/" + new Date().getFullYear(), fileName).subscribe((result: any) => {
-          this.pdfPath.set(file.name); // result is the path of the file
-          this.pdId.set(result.response);
-        });
+    const ref = this.dialog.open(SelectDocDialog, {
+      disableClose: true,
+      data: {
+        employeeId,
+        employee: this.employeeSelected,
+        filterType: EDocType.CD,
+        defaultUploadType: EDocType.CD,
       }
-    };
+    });
+
+    ref.afterClosed().subscribe((doc: Doc | undefined) => {
+      if (!doc) return;
+      this.selectedDoc.set(doc);
+      this.pdfPath.set(doc.description || 'Documento seleccionado');
+      this.pdId.set(doc.driveFileId);
+    });
   }
 
-  async removePDF() {
+  removePDF() {
     this.pdfPath.set('');
     this.pdId.set('');
+    this.selectedDoc.set(null);
   }
 
   async saveCd() {
     const input = this.form.value
 
-    if (this.data) {
+    if (this.data?.id) {
       // Editing existing CD
       this.data.trackingNumber = Number(input.cdNumber);
       this.data.emissionDate = input.emissionDate || '';
       this.data.employeeId = input.cdEmployee || '';
       this.data.fileId = this.pdId() || this.data.fileId;
+      // Solo se pisa docId si se selecciono un doc nuevo en esta sesion; si no, se preserva el que tenia.
+      this.data.docId = this.selectedDoc()?.id || this.data.docId;
       this.data.obs = input.obs || '';
 
       this.cdService.putCd(this.data).subscribe({
@@ -203,6 +224,7 @@ export class AddPdf {
         input.obs || '',
         false
       )
+      cd.docId = this.selectedDoc()?.id;
 
       this.cdService.saveCd(cd).subscribe({
         next: () => this.closeDialog(),

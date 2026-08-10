@@ -58,3 +58,12 @@ export const EMPLOYEE_SECTOR = [
     { value: ESector.DESMALEZADO, label: 'Desmalezado' },
 ];
 
+// Nombre legible para cada modulo que puede aparecer en DocUsages.byModule (ver backend DocUsageChecker).
+// Sumar un modulo nuevo (Factura, SGI, EPP...) es agregar una entrada aca, nada mas.
+export const DOC_USAGE_MODULE_LABELS: Record<string, string> = {
+    absent: 'Ausencia',
+    employeeHistory: 'Legajo',
+    cd: 'CD (TNT)',
+    novedad: 'Novedad',
+};
+

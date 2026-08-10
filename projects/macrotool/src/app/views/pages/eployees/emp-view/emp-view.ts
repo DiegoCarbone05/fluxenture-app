@@ -17,6 +17,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { DocTypePipe } from '../../../../shared/pipes/doc-type-pipe';
 import { EmpSectorPipePipe } from '../../../../shared/pipes/emp-sector-pipe-pipe';
 import { Toolbar } from '../../../../shared/components/toolbar/toolbar';
@@ -45,7 +46,8 @@ export class EmpView {
     private employeeService: EmployeeService,
     private viewSvc: ViewsService,
     private docsService: DocsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {
     this.route.params.subscribe((params) => {
       const empId = params['id'];
@@ -88,7 +90,15 @@ export class EmpView {
   deleteDoc(doc: Doc) {
     this.viewSvc.prompt('Eliminar documento', '¿Está seguro de que desea eliminar este documento?').then((confirmed) => {
       if (!confirmed) return;
-      this.docsService.deleteDocAndFile(doc.id!, doc.driveFileId).subscribe(() => this.loadDocs());
+      this.docsService.deleteDocAndFile(doc.id!, doc.driveFileId).subscribe({
+        next: () => this.loadDocs(),
+        error: (err) => {
+          const msg = err?.status === 409
+            ? 'Este documento esta en uso (ausencia u otro registro), no se puede eliminar'
+            : 'Error al eliminar el documento';
+          this.snackBar.open(msg, 'OK', { duration: 3000 });
+        }
+      });
     });
   }
 

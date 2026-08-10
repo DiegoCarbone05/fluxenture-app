@@ -5,12 +5,21 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AbstentTypePipe } from '../../../shared/pipes/abstent-type-pipe';
+import { DocTypePipe } from '../../../shared/pipes/doc-type-pipe';
 import { Toolbar } from '../../../shared/components/toolbar/toolbar';
 import { MatDialog } from '@angular/material/dialog';
 import { AddAbsentDialog } from '../../dialogs/add-absent-dialog/add-absent-dialog';
+import { AddDocDialog } from '../../dialogs/add-doc-dialog/add-doc-dialog';
+import { FileViewerDialog } from '../../dialogs/file-viewer-dialog/file-viewer-dialog';
 import { AbsentResponseDTO } from '../../../shared/models/AbsentResponseDTO';
 import { AbsentService } from '../../../core/services/api/absents/absent.service';
+import { AbsentDocRecordCreatorService } from '../../../core/services/api/absents/absent-doc-record-creator.service';
+import { NovedadService } from '../../../core/services/api/novedades/novedad.service';
+import { NovedadResponseDTO } from '../../../shared/models/Novedad';
+import { Doc } from '../../../shared/models/Doc';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { Router } from '@angular/router';
 import { DatepickerDialog } from '../../dialogs/datepicker-dialog/datepicker-dialog';
@@ -38,7 +47,8 @@ interface EmployeeStat {
   standalone: true,
   imports: [
     CommonModule, MatTabsModule, MatButtonModule, MatIconModule,
-    MatMenuModule, MatProgressSpinnerModule, AbstentTypePipe, Toolbar,
+    MatMenuModule, MatProgressSpinnerModule, MatTooltipModule, MatSnackBarModule,
+    AbstentTypePipe, DocTypePipe, Toolbar,
   ],
   templateUrl: './absents.html',
   styleUrl: './absents.scss'
@@ -109,7 +119,10 @@ export class Absents implements OnInit {
     private router: Router,
     private utilsSvc: UtilsService,
     private docsService: DocsService,
-    private appSvc: AppService
+    private appSvc: AppService,
+    private novedadService: NovedadService,
+    private absentDocRecordCreator: AbsentDocRecordCreatorService,
+    private snackBar: MatSnackBar
   ) {
   }
 
@@ -219,6 +232,69 @@ export class Absents implements OnInit {
 
   ngOnInit(): void {
     this.loadAbsents();
+    this.loadNovedades();
+  }
+
+  // ── Novedades ─────────────────────────────────────────────────────────────
+
+  activeTabIndex = signal(0);
+  novedades = signal<NovedadResponseDTO[]>([]);
+
+  loadNovedades(): void {
+    this.novedadService.getPending().subscribe({
+      next: (list) => this.novedades.set(list),
+      error: (err) => console.error('Error cargando novedades', err)
+    });
+  }
+
+  uploadNovedad(): void {
+    const ref = this.dialog.open(AddDocDialog, {
+      disableClose: true,
+      panelClass: 'full-screen-dialog',
+    });
+    ref.afterClosed().subscribe((doc: Doc | undefined) => {
+      if (!doc?.id) return;
+      this.novedadService.create(doc.id).subscribe({
+        next: () => {
+          this.snackBar.open('Novedad cargada correctamente', 'OK', { duration: 2000 });
+          this.loadNovedades();
+        },
+        error: (err) => {
+          console.error('Error al cargar la novedad', err);
+          this.snackBar.open('Error al cargar la novedad', 'OK', { duration: 3000 });
+        }
+      });
+    });
+  }
+
+  viewNovedadFile(doc: Doc, e: Event): void {
+    e.stopPropagation();
+    this.dialog.open(FileViewerDialog, {
+      panelClass: 'full-screen-dialog',
+      data: { driveFileId: doc.driveFileId, title: doc.description || this.utilsSvc.getDocFullName(doc.type) }
+    });
+  }
+
+  convertToAbsent(novedad: NovedadResponseDTO, e: Event): void {
+    e.stopPropagation();
+    this.absentDocRecordCreator.create(novedad.doc).subscribe((result) => {
+      if (result) {
+        this.loadNovedades();
+        this.loadAbsents();
+      }
+    });
+  }
+
+  discardNovedad(novedad: NovedadResponseDTO, e: Event): void {
+    e.stopPropagation();
+    if (!confirm('¿Descartar esta novedad? El documento no se borra, solo sale de la cola.')) return;
+    this.novedadService.discard(novedad.id).subscribe({
+      next: () => this.loadNovedades(),
+      error: (err) => {
+        console.error('Error al descartar la novedad', err);
+        this.snackBar.open('Error al descartar la novedad', 'OK', { duration: 3000 });
+      }
+    });
   }
 
   loadAbsents(): void {

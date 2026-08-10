@@ -29,9 +29,6 @@
     },
     {
       "path": "./projects/macrotool/tsconfig.spec.json"
-    },
-    {
-      "path": "./electron/tsconfig.json"
     }
   ]
 }

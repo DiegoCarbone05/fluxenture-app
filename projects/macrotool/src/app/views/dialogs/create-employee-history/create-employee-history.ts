@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 import { EmployeeHistoryService } from '../../../core/services/api/employee-history/employee-history.service';
 import { EEmployeeHistoryType, EmployeeHistory } from '../../../shared/models/EmployeeHistory.model';
 import { EMPLOYEE_HISTORY_TYPES } from '../../../shared/constants/typesValues.constant';
-import { AddDocDialog } from '../add-doc-dialog/add-doc-dialog';
+import { SelectDocDialog } from '../select-doc-dialog/select-doc-dialog';
 import { EDocType } from '../../../shared/models/Doc';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
@@ -30,6 +30,7 @@ export class CreateEmployeeHistoryDialogComponent implements OnInit {
   eventTypes = EMPLOYEE_HISTORY_TYPES;
   readonly addEmployeeDialog = inject(MatDialog);
   currentDocId = signal(null);
+  private currentDriveFileId = signal<string | null>(null);
 
   constructor(
     private fb: FormBuilder,
@@ -94,10 +95,10 @@ export class CreateEmployeeHistoryDialogComponent implements OnInit {
         break;
     }
 
-    this.addEmployeeDialog.open(AddDocDialog, {
+    this.addEmployeeDialog.open(SelectDocDialog, {
       data: {
         employeeId: this.data.employeeId,
-        type: docType
+        defaultUploadType: docType
       },
       disableClose: true
     }).afterClosed().subscribe((result) => {
@@ -105,18 +106,23 @@ export class CreateEmployeeHistoryDialogComponent implements OnInit {
         this.historyForm.patchValue({
           docId: result.id
         })
+        this.currentDriveFileId.set(result.driveFileId);
 
       }
     });
   }
 
   deleteFile() {
-    if (!this.historyForm.get('docId')?.value) return;
-    this.docService.deleteDoc(this.historyForm.get('docId')?.value).subscribe({
+    const docId = this.historyForm.get('docId')?.value;
+    if (!docId) return;
+    // Este dialog es siempre de alta (no hay modo edicion para EmployeeHistory), asi que el doc
+    // recien se adjunto en esta sesion: se borra tambien el archivo de Drive, no solo el registro.
+    this.docService.deleteDocAndFile(docId, this.currentDriveFileId() ?? '').subscribe({
       next: () => {
         this.historyForm.patchValue({
           docId: null
         })
+        this.currentDriveFileId.set(null);
       },
       error: (err) => {
         console.error('Error al eliminar el documento:', err);

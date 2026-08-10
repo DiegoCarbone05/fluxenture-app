@@ -1,0 +1,61 @@
+<div class="container">
+  <div class="header">
+    <div class="wrap">
+      <h2>Seleccionar documento</h2>
+      <span>Reutilizá un documento ya cargado o subí uno nuevo</span>
+    </div>
+    <button mat-icon-button (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="mat-typography">
+    @if (loading()) {
+      <div class="loading-state">
+        <mat-spinner diameter="36"></mat-spinner>
+      </div>
+    } @else {
+      @if (docs().length > 0) {
+        <mat-form-field appearance="outline" class="full-width search-field">
+          <mat-label>Buscar</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="Tipo o descripción...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      }
+
+      @if (filteredDocs().length === 0) {
+        <div class="empty-state">
+          <mat-icon>folder_open</mat-icon>
+          <span>
+            @if (docs().length === 0) {
+              Este empleado todavía no tiene documentos cargados.
+            } @else {
+              Ningún documento coincide con la búsqueda.
+            }
+          </span>
+        </div>
+      } @else {
+        <div class="doc-list">
+          @for (doc of filteredDocs(); track doc.id) {
+            <div class="doc-card" (click)="selectDoc(doc)">
+              <div class="doc-info">
+                <span class="doc-type">{{ doc.type | docType }}</span>
+                <span class="doc-desc">{{ doc.description || 'Sin descripción' }}</span>
+              </div>
+              <button mat-stroked-button color="primary" (click)="selectDoc(doc); $event.stopPropagation()">
+                Usar este
+              </button>
+            </div>
+          }
+        </div>
+      }
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button type="button" mat-flat-button color="primary" (click)="uploadNew()">
+      <mat-icon>upload_file</mat-icon>
+      Subir uno nuevo
+    </button>
+  </mat-dialog-actions>
+</div>

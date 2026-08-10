@@ -1,37 +1,71 @@
 <div class="login-container">
+  <div class="filter">
     <form class="login-form" [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="header">
-            <img src="assets/pictures/fluxenture_logo_light.svg" alt="logo" class="logo">
-            <p class="title">Iniciar sesión</p>
-        </div>
+      <div class="header">
+        <img src="flux-logo-icon.png" alt="logo" class="logo" />
 
-        <div class="form-content">
-            <mat-form-field appearance="outline">
-                <mat-label>Email</mat-label>
-                <input matInput type="email" formControlName="email" />
-                <mat-error *ngIf="form.get('email')?.errors?.['email']">El email no es válido</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Contraseña</mat-label>
-                <input matInput [type]="showPassword() ? 'text' : 'password'    " formControlName="password" />
-                <button type="button" matIconButton matSuffix (click)="togglePasswordVisibility()"
-                    [attr.aria-label]="'Hide password'" [attr.aria-pressed]="showPassword()">
-                    <mat-icon>{{showPassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
-                </button>
-            </mat-form-field>
-        </div>
-
-        @if(errMsg()) {
-        <div class="auth-error-messagge">
-            <mat-icon>error</mat-icon>
-            <span>Email o contraseña incorrectos</span>
-        </div>
+        @if (step() === "email") {
+          <h1>Accede a Fluxenture</h1>
+          <p class="title">Usa tu cuenta de Servaltek para continuar</p>
+        } @else {
+          <h1>Ingresa tu contraseña</h1>
+          <button type="button" class="email-chip" (click)="goToEmailStep()">
+            <span>{{ form.value.email }}</span>
+            <mat-icon>edit</mat-icon>
+          </button>
         }
-        <button class="login-button" mat-flat-button type="submit" color="primary">Iniciar sesión</button>
+      </div>
+
+      <div class="form-content">
+        @if (step() === "email") {
+          <flux-input
+            formControlName="email"
+            type="email"
+            placeholder="Ingrese su correo"
+            autocomplete="username"
+            [error]="emailError()"
+          />
+        } @else {
+          <flux-input
+            formControlName="password"
+            type="password"
+            placeholder="Ingrese su contraseña"
+            autocomplete="current-password"
+          />
+        }
+      </div>
+
+      @if (errMsg()) {
+        <div class="auth-error-messagge">
+          <mat-icon>error</mat-icon>
+          <span>Email o contraseña incorrectos</span>
+        </div>
+      }
+
+      @if (step() === "email") {
+        <button
+          class="login-button"
+          mat-flat-button
+          type="button"
+          color="primary"
+          (click)="goToPasswordStep()"
+        >
+          Siguiente
+        </button>
+      } @else {
+        <button
+          class="login-button"
+          mat-flat-button
+          type="submit"
+          color="primary"
+        >
+          Iniciar sesión
+        </button>
+      }
     </form>
+  </div>
 
-
-    <p class="footer">
-        <span>2026 Fluxenture. Creado por Servaltek.</span>
-    </p>
+  <p class="footer">
+    <span>© 2026 Servaltek. Todos los derechos reservados.</span>
+  </p>
 </div>

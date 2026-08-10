@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #f5f6fa;
+  background: #ffffff;
   overflow: hidden;
 }
 
@@ -74,10 +74,13 @@
 
   background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #eef0f3;
+  border: 1px solid #eeeeee;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
   padding: 12px 8px 8px 14px;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 
   &:hover {
     box-shadow: 0 4px 18px rgba(4, 104, 215, 0.09);
@@ -205,35 +208,89 @@
   text-overflow: ellipsis;
 
   // Ausencias
-  &.dtype-MEDICAL_CERTIFICATE  { background-color: #ecf2fd; color: #3d7dc7; }
-  &.dtype-VACATIONS             { background-color: #d2f0e4; color: #0ead6d; }
-  &.dtype-CERTIFICATE           { background-color: #ecf2fd; color: #3d7dc7; }
-  &.dtype-SUSPENSION            { background-color: #f3e597; color: #655814; }
-  &.dtype-LICENSE               { background-color: #d2eff0; color: #0ea8ad; }
-  &.dtype-DG, &.dtype-PG       { background-color: #ebebeb; color: #828282; }
-  &.dtype-OTHER                 { background-color: #ebebeb; color: #828282; }
+  &.dtype-MEDICAL_CERTIFICATE {
+    background-color: #ecf2fd;
+    color: #3d7dc7;
+  }
+  &.dtype-VACATIONS {
+    background-color: #d2f0e4;
+    color: #0ead6d;
+  }
+  &.dtype-CERTIFICATE {
+    background-color: #ecf2fd;
+    color: #3d7dc7;
+  }
+  &.dtype-SUSPENSION {
+    background-color: #f3e597;
+    color: #655814;
+  }
+  &.dtype-LICENSE {
+    background-color: #d2eff0;
+    color: #0ea8ad;
+  }
+  &.dtype-DG,
+  &.dtype-PG {
+    background-color: #ebebeb;
+    color: #828282;
+  }
+  &.dtype-OTHER {
+    background-color: #ebebeb;
+    color: #828282;
+  }
 
   // Documentos empresa
-  &.dtype-CD                    { background-color: #ffe4c4; color: #a35200; }
-  &.dtype-EPP                   { background-color: #d2ffc9; color: #1d5f0e; }
-  &.dtype-TELEGRAMA             { background-color: #e8d5f0; color: #6b1d9e; }
-  &.dtype-ALTA_AFIP             { background-color: #d0e8f0; color: #0e5e8a; }
-  &.dtype-BAJA_AFIP             { background-color: #f0d2d2; color: #ad0e0e; }
-  &.dtype-PREOCUPACIONAL        { background-color: #d2eff0; color: #0ea8ad; }
-  &.dtype-APERCIBIMIENTO        { background-color: #f0d2d2; color: #ad0e0e; }
-  &.dtype-ART                   { background-color: #f0eee5; color: #877a31; }
-  &.dtype-NOTIFICATION          { background-color: #e0e0f8; color: #3f3fd4; }
-  &.dtype-RECEIPT               { background-color: #d2e8f0; color: #0e5e8a; }
-  &.dtype-INCOME                { background-color: #d2ffc9; color: #1d5f0e; }
+  &.dtype-CD {
+    background-color: #ffe4c4;
+    color: #a35200;
+  }
+  &.dtype-EPP {
+    background-color: #d2ffc9;
+    color: #1d5f0e;
+  }
+  &.dtype-TELEGRAMA {
+    background-color: #e8d5f0;
+    color: #6b1d9e;
+  }
+  &.dtype-ALTA_AFIP {
+    background-color: #d0e8f0;
+    color: #0e5e8a;
+  }
+  &.dtype-BAJA_AFIP {
+    background-color: #f0d2d2;
+    color: #ad0e0e;
+  }
+  &.dtype-PREOCUPACIONAL {
+    background-color: #d2eff0;
+    color: #0ea8ad;
+  }
+  &.dtype-APERCIBIMIENTO {
+    background-color: #f0d2d2;
+    color: #ad0e0e;
+  }
+  &.dtype-ART {
+    background-color: #f0eee5;
+    color: #877a31;
+  }
+  &.dtype-NOTIFICATION {
+    background-color: #e0e0f8;
+    color: #3f3fd4;
+  }
+  &.dtype-RECEIPT {
+    background-color: #d2e8f0;
+    color: #0e5e8a;
+  }
+  &.dtype-INCOME {
+    background-color: #d2ffc9;
+    color: #1d5f0e;
+  }
 }
 
 // ── RESPONSIVE — ESCRITORIO ───────────────────────────────────────────────────
 @media screen and (min-width: 768px) {
-
   .docs-table-wrap {
     background: white;
     border-radius: 12px;
-    border: 1px solid #eaecf0;
+    border: 1px solid #eaeaea;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     margin: 16px;
     overflow: hidden;
@@ -241,10 +298,10 @@
 
   .docs-list-header {
     display: grid;
-    grid-template-columns: 185px 1fr 1fr 100px 100px 132px;
+    grid-template-columns: 185px 1fr 1fr 100px 100px 210px;
     padding: 10px 16px;
-    background-color: #f7f8fc;
-    border-bottom: 2px solid #e0e4ed;
+    background-color: #f7f7f7;
+    border-bottom: 2px solid #e4e4e4;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -259,11 +316,11 @@
 
   .doc-card {
     grid-template-areas: "type name desc date user acts";
-    grid-template-columns: 185px 1fr 1fr 100px 100px 132px;
+    grid-template-columns: 185px 1fr 1fr 100px 100px 210px;
     grid-template-rows: auto;
     border-radius: 0;
     border: none;
-    border-bottom: 1px solid #f0f0f5;
+    border-bottom: 1px solid #f0f0f0;
     box-shadow: none;
     padding: 10px 16px;
     column-gap: 12px;
@@ -281,13 +338,41 @@
       box-shadow: none;
     }
 
-    .f-type     { padding: 0; }
-    .f-date     { justify-content: flex-start; }
-    .f-actions  { justify-content: flex-end; }
+    .f-type {
+      padding: 0;
+    }
+    .f-date {
+      justify-content: flex-start;
+    }
+    .f-actions {
+      justify-content: flex-end;
+      gap: 2px;
 
-    .mobile-label       { display: none; }
-    .doc-employee-name  { font-size: 14px; }
-    .doc-description    { font-size: 13px; }
+      button {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+
+    .mobile-label {
+      display: none;
+    }
+    .doc-employee-name {
+      font-size: 14px;
+    }
+    .doc-description {
+      font-size: 13px;
+    }
 
     .doc-type-chip {
       font-size: 11px;

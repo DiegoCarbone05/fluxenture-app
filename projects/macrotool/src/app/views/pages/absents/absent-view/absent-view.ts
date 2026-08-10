@@ -12,6 +12,8 @@ import { EmployeeService } from '../../../../core/services/api/employees/employe
 import { StorageService } from '../../../../core/services/api/storage/storage.service';
 import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
 import { AddAbsentDialog } from '../../../dialogs/add-absent-dialog/add-absent-dialog';
+import { DocsService } from '../../../../core/services/api/docs/docs.service';
+import { UtilsService } from '../../../../core/services/utils.service';
 
 @Component({
   selector: 'app-absent-view',
@@ -31,7 +33,9 @@ export class AbsentView {
     private absentService: AbsentService,
     private route: ActivatedRoute,
     private employeeService: EmployeeService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private docsService: DocsService,
+    private utilsSvc: UtilsService,
   ) {
     const id = this.route.snapshot.params['id'];
     const absent = this.absentService.getAbsentById(id);
@@ -57,27 +61,31 @@ export class AbsentView {
     });
   }
 
-  openFile(fileId: string | undefined) {
-    if (!fileId) return;
-    const link = document.createElement('a');
-    link.href = 'https://drive.google.com/file/d/' + fileId + '/view';
-    link.target = '_blank';
-    link.click();
+  // `docId` guarda un Doc.id (FluxDocs), no un id de Drive directo.
+  openFile(docId: string | undefined) {
+    if (!docId) return;
+    this.utilsSvc.openFile(docId);
   }
 
-  downloadFile(fileId: string | undefined) {
-    if (fileId) {
-      this.storageService.downloadFile(fileId).subscribe((res) => {
-        const blob = new Blob([res], { type: res.type });
-        const type = res.type.split("/")[1]
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `DOC. DE AUSENCIA [${this.absent()?.type}] - ${this.employee()?.name} - [${this.absent()?.originalStartDate} - ${this.absent()?.originalEndDate}].${type}`;
-        link.click();
-        URL.revokeObjectURL(url);
-      });
-    }
+  downloadFile(docId: string | undefined) {
+    if (!docId) return;
+    this.docsService.getDoc(docId).subscribe({
+      next: (doc) => this.downloadDriveFile(doc.driveFileId),
+      error: () => this.downloadDriveFile(docId),
+    });
+  }
+
+  private downloadDriveFile(driveFileId: string) {
+    this.storageService.downloadFile(driveFileId).subscribe((res) => {
+      const blob = new Blob([res], { type: res.type });
+      const type = res.type.split("/")[1]
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `DOC. DE AUSENCIA [${this.absent()?.type}] - ${this.employee()?.name} - [${this.absent()?.originalStartDate} - ${this.absent()?.originalEndDate}].${type}`;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
   }
 
 }

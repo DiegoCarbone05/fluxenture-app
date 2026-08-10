@@ -1,0 +1,16 @@
+<div class="viewer-container">
+  <div class="viewer-header">
+    <span class="title">{{ data.title || 'Vista previa' }}</span>
+    <div class="actions">
+      @if (externalUrl) {
+      <a mat-icon-button [href]="externalUrl" target="_blank" matTooltip="Abrir en una pestaña nueva">
+        <mat-icon>open_in_new</mat-icon>
+      </a>
+      }
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <iframe [src]="previewUrl" class="viewer-frame" allow="autoplay"></iframe>
+</div>

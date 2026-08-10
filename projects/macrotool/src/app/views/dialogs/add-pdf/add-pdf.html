@@ -1,7 +1,7 @@
 <div class="container">
   <div class="header">
     <div class="wrap">
-      <h2>{{ data ? 'Modificar seguimiento' : 'Agregar seguimiento' }}</h2>
+      <h2>{{ data?.id ? 'Modificar seguimiento' : 'Agregar seguimiento' }}</h2>
       <span>Complete los datos del CD y adjunte el PDF</span>
     </div>
 
@@ -70,7 +70,7 @@
     <mat-dialog-actions align="end">
       <button type="submit" class="dialog-btn submit-btn" [disabled]="form.invalid || pdfPath().length === 0">
         <mat-icon>save</mat-icon>
-        {{ data ? 'Guardar' : 'Agregar' }}
+        {{ data?.id ? 'Guardar' : 'Agregar' }}
       </button>
     </mat-dialog-actions>
   </form>

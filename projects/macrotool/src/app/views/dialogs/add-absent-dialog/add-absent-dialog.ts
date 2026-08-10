@@ -19,7 +19,7 @@ import { Absent, AbsentType } from '../../../shared/models/Absent.model';
 import { StorageService } from '../../../core/services/api/storage/storage.service';
 import { AbsentService } from '../../../core/services/api/absents/absent.service';
 import { Doc, EDocType } from '../../../shared/models/Doc';
-import { AddDocDialog } from '../add-doc-dialog/add-doc-dialog';
+import { SelectDocDialog } from '../select-doc-dialog/select-doc-dialog';
 import { ABSENT_TYPES, DOC_TYPES } from '../../../shared/constants/typesValues.constant';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
@@ -52,6 +52,8 @@ export class AddAbsentDialog implements OnInit {
   errorMessage = signal<string>('');
   documentSelected = signal<Doc | null>(null);
   editMode = signal<boolean>(false);
+  /** true solo si el documento se adjunto en esta sesion del dialog (no si ya venia de una ausencia existente). */
+  private isNewlyAttachedDoc = signal(false);
 
   readonly dialog = inject(MatDialog);
 
@@ -89,11 +91,29 @@ export class AddAbsentDialog implements OnInit {
         this.form.patchValue({
           employee: emp as any,
           employeeId: emp.id ?? '',
-          type: this.data.type,
-          startDate: new Date(this.data.originalStartDate + 'T00:00:00'),
-          endDate: new Date(this.data.originalEndDate + 'T00:00:00'),
-          observations: this.data.observations,
-          justified: this.data.justified
+        });
+        if (this.data.originalStartDate && this.data.originalEndDate) {
+          // Edicion completa de una ausencia existente: trae fechas/tipo/observaciones.
+          this.form.patchValue({
+            type: this.data.type,
+            startDate: new Date(this.data.originalStartDate + 'T00:00:00'),
+            endDate: new Date(this.data.originalEndDate + 'T00:00:00'),
+            observations: this.data.observations,
+            justified: this.data.justified
+          });
+        } else if (this.data.type) {
+          // Alta nueva con tipo sugerido (ej: "Crear Ausencia" desde un documento en Documentos/Novedades).
+          // Las fechas las define RRHH: no hay de donde inferirlas de forma confiable.
+          this.form.patchValue({ type: this.data.type });
+        }
+      }
+      if (this.data.docId) {
+        this.docsSvc.getDoc(this.data.docId).subscribe({
+          next: (doc) => {
+            this.documentSelected.set(doc);
+            this.form.get('file')?.setValue(doc.id ?? null);
+          },
+          error: (err) => console.error('No se pudo cargar el documento adjunto', err)
         });
       }
     }
@@ -132,37 +152,42 @@ export class AddAbsentDialog implements OnInit {
         break;
     }
 
-    const ref = this.dialog.open(AddDocDialog, {
+    const ref = this.dialog.open(SelectDocDialog, {
       disableClose: true,
       data: {
         employeeId,
         employee: this.employeeSelected,
-        type: docType,
+        defaultUploadType: docType,
       }
     });
     ref.afterClosed().subscribe(result => {
       if (!result) return;
       this.documentSelected.set(result);
+      this.isNewlyAttachedDoc.set(true);
       this.form.get('file')?.setValue(result.id);
       this.form.get('file')?.markAsTouched();
     });
   }
 
-  /**
-   * Elimina el documento seleccionado de todos lados (Dialog, Drive y DB)
-   */
+  // Elimina el documento seleccionado de todos lados (Dialog, Drive y DB)
   deleteDocument() {
     const doc = this.documentSelected();
     if (!doc) return;
-    this.docsSvc.deleteDocAndFile(doc.id ?? '', doc.driveFileId ?? '').subscribe({
+    // Se excluye esta misma ausencia del chequeo de uso: en edicion, la ausencia todavia
+    // apunta a este doc en la DB hasta que se guarde, y no es un uso "de otro lado".
+    this.docsSvc.deleteDocAndFile(doc.id ?? '', doc.driveFileId ?? '', { absentId: this.data?.id }).subscribe({
       next: () => {
         this.documentSelected.set(null);
+        this.isNewlyAttachedDoc.set(false);
         this.form.get('file')?.setValue(null);
         this.form.get('file')?.markAsTouched();
         this.snackBar.open('Documento y archivo eliminado correctamente', 'OK', { duration: 2000 });
       },
       error: (err) => {
-        this.snackBar.open('Error borrando archivo', 'OK', { duration: 2000 });
+        const msg = err?.status === 409
+          ? 'Este documento tambien esta usado en otra ausencia u otro registro, no se puede eliminar'
+          : 'Error borrando archivo';
+        this.snackBar.open(msg, 'OK', { duration: 3000 });
         console.error(err);
       }
     });
@@ -180,7 +205,9 @@ export class AddAbsentDialog implements OnInit {
     const emp = event.option.value as EmployeeDTO;
     this.employeeSelected = emp;
     this.form.patchValue({
-      employeeId: String(emp.employeeId),
+      // emp.id es el id real (Mongo) del empleado; emp.employeeId es el legajo, un numero
+      // distinto que no sirve para buscar sus Docs (que se guardan con el id real).
+      employeeId: emp.id,
       employee: emp as EmployeeDTO
     });
   }
@@ -201,7 +228,7 @@ export class AddAbsentDialog implements OnInit {
         type as AbsentType,
         startDate.toISOString(),
         endDate.toISOString(),
-        this.documentSelected()?.id || (this.data ? this.data.documentId : ''),
+        this.documentSelected()?.id || (this.data ? this.data.docId : ''),
         observations ?? '',
         justified ?? false
       );
@@ -218,7 +245,8 @@ export class AddAbsentDialog implements OnInit {
           }, 1500);
         },
         error: (err) => {
-          this.deleteDocument(); // BORRA EL DOCUMENTO DE DRIVE si hubo error guardando
+          // Solo se borra si el documento se adjunto en esta sesion (no uno preexistente de una edicion).
+          if (this.isNewlyAttachedDoc()) this.deleteDocument();
           this.uploadStatus.set(UploadStatus.ERROR);
           this.errorMessage.set(err?.error?.message || err?.message || 'Error al guardar la ausencia');
           setTimeout(() => {
@@ -231,7 +259,8 @@ export class AddAbsentDialog implements OnInit {
   }
 
   onCancel(): void {
-    if (this.documentSelected()) {
+    // Idem: solo se borra si se adjunto en esta sesion, nunca un documento que ya existia.
+    if (this.isNewlyAttachedDoc()) {
       this.deleteDocument();
     }
     this.dialogRef.close();

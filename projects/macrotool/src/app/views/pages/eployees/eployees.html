@@ -1,68 +1,95 @@
 <div class="header">
-    <flux-toolbar class="glass-tab" title="Empleados">
-    </flux-toolbar>
-    <div class="search-header">
-        <!-- <p class="search-title" [class.finded]="dataSource.data.length > 0">Buscar empleado</p>
-        <p class="search-description" [class.finded]="dataSource.data.length > 0">Ingrse algun dato para buscar
-            un empleado.</p> -->
-        <form class="search-input-container" (ngSubmit)="search()">
-            <input type="text" placeholder="Buscar" [formControl]="searchFormControl">
-        </form>
-    </div>
+  <flux-toolbar title="Empleados"> </flux-toolbar>
+  <div class="search-header">
+    <form class="search-input-container" (ngSubmit)="search()">
+      <input
+        type="text"
+        placeholder="Buscar"
+        [formControl]="searchFormControl"
+      />
+    </form>
+  </div>
 </div>
 
 <div class="search-content">
-
-
-    @if (findedEmployees().length > 0) {
+  @if (findedEmployees().length > 0) {
     <div class="table-container">
-        @for (emp of findedEmployees(); track emp.id) {
+      @for (emp of findedEmployees(); track emp.id) {
         <div class="emp-card" (click)="openEmployee(emp)">
-            <div class="emp-avatar">
-                {{ emp.name[0] }}
-            </div>
-            <br>
-            <div class="emp-info">
-                <span class="emp-name">{{ emp.name }}</span>
-                <span class="emp-document">{{ emp.documentNumber }}</span>
-            </div>
-            <br>
-            @if (emp.isOperational) {
+          <div class="emp-avatar">
+            {{ emp.name[0] }}
+          </div>
+          <br />
+          <div class="emp-info">
+            <span class="emp-name">{{ emp.name }}</span>
+            <span class="emp-document">{{ emp.documentNumber }}</span>
+          </div>
+          <br />
+          @if (emp.isOperational) {
             <div class="status-sign active">
-                <mat-icon>check</mat-icon>
-                <span>Operativo</span>
+              <mat-icon>check</mat-icon>
+              <span>Operativo</span>
             </div>
-            } @else {
+          } @else {
             <div class="status-sign not-active">
-                <mat-icon>close</mat-icon>
-                <span>Inactivo</span>
+              <mat-icon>close</mat-icon>
+              <span>Inactivo</span>
             </div>
-            }
+          }
         </div>
-        }
+      }
     </div>
-    }
+  }
 </div>
 
 <!-- Loading: Si la lista esta vacia, el input tiene valor y no hay mensaje de error -->
-@if (findedEmployees().length == 0 && searchFormControl.value != null && !formMsg()) {
-<mat-spinner />
+@if (
+  findedEmployees().length == 0 && searchFormControl.value != null && !formMsg()
+) {
+  <mat-spinner />
 }
 
 <!-- Modo default -->
 @if (findedEmployees().length == 0 && !searchFormControl.value) {
-<div class="info-state">
+  <div class="info-state">
     <p>Ingrese algun valor para buscar</p>
-    <img draggable="false" class="unstate" src="assets/pictures/undraw_personal-info_yzls.svg" alt="">
-</div>
+    <img
+      draggable="false"
+      class="unstate"
+      src="assets/pictures/undraw_personal-info_yzls.svg"
+      alt=""
+    />
+  </div>
+} @else if (formMsg()) {
+  <!-- Not Found -->
+  <div class="info-state">
+    <p>{{ formMsg() }}</p>
+    <img
+      draggable="false"
+      class="no-data"
+      src="assets/pictures/undraw_no-data_ig65.svg"
+      alt=""
+    />
+  </div>
 }
-@else if (formMsg()) {
-<!-- Not Found -->
-<div class="info-state">
-    <p>{{formMsg()}}</p>
-    <img draggable="false" class="no-data" src="assets/pictures/undraw_no-data_ig65.svg" alt="">
-</div>
+@if (draftCount() > 0) {
+  <button
+    matMiniFab
+    color="primary"
+    class="drafts-button"
+    (click)="openDraftsDialog()"
+    matTooltip="Borradores guardados"
+  >
+    <mat-icon>drafts</mat-icon>
+    <span class="drafts-badge">{{ draftCount() }}</span>
+  </button>
 }
-<button matFab color="primary" class="add-button" (click)="openAddEmployeeDialog()">
-    <mat-icon>add</mat-icon>
+
+<button
+  matFab
+  color="primary"
+  class="add-button"
+  (click)="openAddEmployeeDialog()"
+>
+  <mat-icon>add</mat-icon>
 </button>

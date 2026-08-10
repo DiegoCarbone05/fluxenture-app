@@ -7,6 +7,9 @@ export class Cd {
     emissionDate: string;
     employeeId: string;
     fileId: string;
+    originalFileId?: string;
+    /** Id del Doc (FluxDocs) que representa la carta original. Fuente de verdad para el merge de tracking. */
+    docId?: string;
     public tnt!: Tnt[];
     obs: string;
     trackingCompleted: boolean;

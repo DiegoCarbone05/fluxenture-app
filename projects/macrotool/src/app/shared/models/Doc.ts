@@ -7,17 +7,15 @@ export class Doc {
     driveFileId: string;
     uploadDate: Date;
     description?: string;
-    user?: string;
     audit?: AuditMetadata;
 
-    constructor(employeeId: string, type: EDocType, driveFileId: string, uploadDate: Date, id?: string, description?: string, user?: string) {
+    constructor(employeeId: string, type: EDocType, driveFileId: string, uploadDate: Date, id?: string, description?: string) {
         this.id = id;
         this.employeeId = employeeId;
         this.type = type;
         this.driveFileId = driveFileId;
         this.uploadDate = uploadDate;
         this.description = description;
-        this.user = user;
     }
 }
 

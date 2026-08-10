@@ -11,9 +11,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatStepperModule } from '@angular/material/stepper';
 import { CommonModule } from '@angular/common';
+import { EmployeeDraftService } from '../../../core/services/employee-draft.service';
 
 export interface AddEmployeeDialogData {
   employee?: Employee;
+  draftId?: string;
 }
 
 @Component({
@@ -36,7 +38,14 @@ export class AddEmployee implements OnInit {
   readonly isEditMode = !!this.employee;
   isMobile = computed(() => this.viewSvc.getIsMobile());
 
-  constructor(private viewSvc: ViewsService) {
+  /** Id del borrador que se esta completando, si el dialog se abrio desde uno. */
+  private currentDraftId = signal<string | undefined>(this.dialogData?.draftId);
+  readonly isDraftMode = !!this.dialogData?.draftId;
+
+  constructor(
+    private viewSvc: ViewsService,
+    private draftService: EmployeeDraftService,
+  ) {
 
   }
 
@@ -69,8 +78,6 @@ export class AddEmployee implements OnInit {
     employeeID: new FormControl<number | null>(null, Validators.required),
     sector: new FormControl<ESector>(ESector.ADMINISTRATION, Validators.required),
     isOperational: new FormControl(true),
-    entryDate: new FormControl(''),
-    leaveDate: new FormControl(''),
   });
 
   addressForm = new FormGroup({
@@ -98,6 +105,9 @@ export class AddEmployee implements OnInit {
   ngOnInit(): void {
     if (this.employee) {
       this.patchFormWithEmployee(this.employee);
+    } else if (this.dialogData?.draftId) {
+      const draft = this.draftService.getById(this.dialogData.draftId);
+      if (draft) this.form.patchValue(draft.formValue);
     }
   }
 
@@ -117,8 +127,6 @@ export class AddEmployee implements OnInit {
       employeeID: emp.employeeID,
       sector: emp.sector,
       isOperational: emp.isOperational,
-      entryDate: emp.entryDate ?? '',
-      leaveDate: emp.leaveDate ?? '',
     });
     this.addressForm.patchValue({
       adress: emp.adress ?? '',
@@ -167,9 +175,22 @@ export class AddEmployee implements OnInit {
       phone: contact.phone ?? undefined,
       cellPhone: contact.cellPhone ?? undefined,
       email: contact.email ?? '',
-      entryDate: work.entryDate ?? undefined,
-      leaveDate: work.leaveDate ?? undefined,
+      // Ya no se cargan a mano aca: se derivan del historial (alta/despido).
+      entryDate: this.employee?.entryDate,
+      leaveDate: this.employee?.leaveDate,
     });
+
+    // Si esto vino de un borrador, ya se completo y se va a guardar de verdad: se descarta.
+    const draftId = this.currentDraftId();
+    if (draftId) this.draftService.remove(draftId);
+
     this.dialogRef.close(employee);
+  }
+
+  // Guarda el form crudo (sin validar) como borrador local, para completarlo mas adelante.
+  saveDraft(): void {
+    const draft = this.draftService.save(this.currentDraftId(), this.form.getRawValue());
+    this.currentDraftId.set(draft.id);
+    this.dialogRef.close();
   }
 }

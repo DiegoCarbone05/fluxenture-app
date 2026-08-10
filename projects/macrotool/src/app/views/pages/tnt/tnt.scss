@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #f5f6fa;
+  // background: #ffffff;
   overflow: hidden;
 }
 
@@ -16,12 +16,32 @@
 
     mat-tab-header {
       font-family:
-        system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
-        "Open Sans", "Helvetica Neue", sans-serif;
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Oxygen,
+        Ubuntu,
+        Cantarell,
+        "Open Sans",
+        "Helvetica Neue",
+        sans-serif;
       font-weight: 700;
-      background-color: white;
+      background: var(--header-color) !important;
       border-bottom: 1px solid #e4e4e4;
+    }
+
+    .mdc-tab__text-label {
+      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: #555a64;
+    }
+
+    .mdc-tab--active .mdc-tab__text-label {
+      color: var(--primary, #0468d7);
     }
 
     .mat-mdc-tab-body-wrapper {
@@ -33,6 +53,40 @@
       height: 100%;
       overflow: hidden;
     }
+  }
+}
+
+// ── PAGINATOR ──────────────────────────────────────────────────────────────────
+:host ::ng-deep mat-paginator {
+  display: block;
+  background: #ffffff;
+  border: 1px solid #eeeeee;
+  border-radius: 12px;
+  margin-top: 8px;
+  overflow: hidden;
+
+  .mat-mdc-paginator-container {
+    min-height: 48px;
+    padding: 0 8px;
+    justify-content: center;
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
+  }
+
+  .mat-mdc-paginator-page-size-label,
+  .mat-mdc-paginator-range-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7a8090;
+  }
+
+  .mat-mdc-icon-button {
+    color: #5a6480;
   }
 }
 
@@ -62,6 +116,7 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  background-color: white;
 }
 
 // ── EMPTY STATE ────────────────────────────────────────────────────────────────
@@ -85,6 +140,35 @@
     font-weight: 500;
     color: #999;
     text-align: center;
+  }
+}
+
+// ── BARRA "NUEVAS ENTREGAS" ──────────────────────────────────────────────────
+.new-alert-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 14px;
+  margin: 12px 16px 0;
+  border-radius: 10px;
+  background-color: rgba(4, 104, 215, 0.08);
+  border: 1px solid rgba(4, 104, 215, 0.18);
+
+  .new-alert-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--primary, #0468d7);
+
+    .meta-icon {
+      color: var(--primary, #0468d7);
+    }
   }
 }
 
@@ -116,17 +200,25 @@
 
   background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #eef0f3;
+  border: 1px solid #eeeeee;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
   padding: 12px 8px 8px 14px;
   cursor: pointer;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 
   &.completed {
-    background-color: #fafbff;
+    background-color: #fafafa;
 
-    .cd-employee-name { color: #555; }
-    .cd-tracking      { color: #7a90b0; }
+    .cd-employee-name {
+      color: #555;
+    }
+    .cd-tracking {
+      color: #7a90b0;
+    }
   }
 
   &:hover {
@@ -135,13 +227,68 @@
     transform: translateY(-1px);
   }
 
-  .f-status   { grid-area: status; display: flex; align-items: center; padding-bottom: 5px; }
-  .f-employee { grid-area: name;   display: flex; flex-direction: column; gap: 1px; min-width: 0; padding-bottom: 1px; }
-  .f-tracking { grid-area: track;  display: flex; flex-direction: column; gap: 1px; min-width: 0; padding-bottom: 3px; }
-  .f-date     { grid-area: date;   display: flex; align-items: center; gap: 3px; justify-content: flex-end; padding-bottom: 5px; }
-  .f-obs      { grid-area: obs;    display: flex; flex-direction: column; gap: 1px; min-width: 0; align-self: center; }
-  .f-actions  { grid-area: acts;   display: flex; align-items: center; justify-content: flex-end; }
+  .f-status {
+    grid-area: status;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-bottom: 5px;
+    min-width: 0;
+  }
 
+  .new-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 50px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    background-color: rgba(4, 104, 215, 0.12);
+    color: var(--primary, #0468d7);
+    white-space: nowrap;
+  }
+  .f-employee {
+    grid-area: name;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    padding-bottom: 1px;
+  }
+  .f-tracking {
+    grid-area: track;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    padding-bottom: 3px;
+  }
+  .f-date {
+    grid-area: date;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    justify-content: flex-end;
+    padding-bottom: 5px;
+  }
+  .f-obs {
+    grid-area: obs;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    align-self: center;
+  }
+  .f-actions {
+    grid-area: acts;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+  }
   .mobile-label {
     font-size: 10px;
     color: #b0b5c0;
@@ -150,7 +297,6 @@
     font-weight: 700;
     line-height: 1;
   }
-
   .cd-employee-name {
     font-weight: 700;
     font-size: 15px;
@@ -159,7 +305,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
   .cd-tracking {
     font-size: 13px;
     color: #4a6fa5;
@@ -170,7 +315,6 @@
     text-overflow: ellipsis;
     letter-spacing: 0.3px;
   }
-
   .meta-icon {
     font-size: 14px;
     width: 14px;
@@ -178,14 +322,12 @@
     color: #9aa0ac;
     flex-shrink: 0;
   }
-
   .cd-date {
     font-size: 12px;
     color: #6c757d;
     font-weight: 600;
     white-space: nowrap;
   }
-
   .cd-obs {
     font-size: 13px;
     color: #6c757d;
@@ -197,22 +339,30 @@
 
 // ── RESPONSIVE (escritorio) ────────────────────────────────────────────────────
 @media screen and (min-width: 768px) {
+  .new-alert-bar {
+    max-width: 1200px;
+    width: 95%;
+    margin: 16px auto 0;
+  }
 
   .tnt-table-wrap {
     background: white;
     border-radius: 12px;
-    border: 1px solid #eaecf0;
+    border: 1px solid #eaeaea;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    margin: 16px;
+    max-width: 1200px;
+    width: 95%;
+    margin: auto;
+    margin-top: 16px;
     overflow: hidden;
   }
 
   .tnt-list-header {
+    background: white;
     display: grid;
-    grid-template-columns: 1fr 180px 90px 1fr 160px 88px;
+    grid-template-columns: 1fr 160px 90px 1fr 240px 92px;
     padding: 10px 16px;
-    background-color: #f7f8fc;
-    border-bottom: 2px solid #e0e4ed;
+    border: none;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -227,11 +377,11 @@
 
   .cd-card {
     grid-template-areas: "name track date obs status acts";
-    grid-template-columns: 1fr 180px 90px 1fr 160px 88px;
+    grid-template-columns: 1fr 160px 90px 1fr 240px 92px;
     grid-template-rows: auto;
     border-radius: 0;
     border: none;
-    border-bottom: 1px solid #f0f0f5;
+    border-bottom: 1px solid #f0f0f0;
     box-shadow: none;
     padding: 10px 16px;
     column-gap: 12px;
@@ -239,7 +389,9 @@
     align-items: center;
     transform: none !important;
 
-    &:last-child { border-bottom: none; }
+    &:last-child {
+      border-bottom: none;
+    }
 
     &:hover {
       background-color: #f8f9ff;
@@ -247,11 +399,28 @@
       box-shadow: none;
     }
 
-    .f-status  { padding: 0; }
-    .f-date    { justify-content: flex-start; }
-    .f-actions { justify-content: flex-end; }
+    .f-status {
+      padding: 0;
+    }
+    .f-date {
+      justify-content: flex-start;
+    }
+    .f-actions {
+      justify-content: flex-end;
+    }
 
-    .mobile-label       { display: none; }
-    .cd-employee-name   { font-size: 14px; }
+    .mobile-label {
+      display: none;
+    }
+    .cd-employee-name {
+      font-size: 14px;
+    }
+  }
+
+  mat-paginator {
+    border: none;
+    border-top: 1px solid #f0f0f0;
+    border-radius: 0;
+    margin-top: 0;
   }
 }

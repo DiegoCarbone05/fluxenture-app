@@ -1,27 +1,27 @@
-<flux-toolbar class="glass-tab" title="Documentos"
-  subTitle="{{ months[currentDate().month - 1] }} - {{ currentDate().year }}">
+<flux-toolbar
+  title="Documentos"
+  subTitle="{{ months[currentDate().month - 1] }} - {{ currentDate().year }}"
+>
   <button matIconButton (click)="openDatePickerDialog()">
     <mat-icon>calendar_today</mat-icon>
   </button>
 </flux-toolbar>
 
 <div class="docs-content">
-
   @if (isLoading()) {
     <div class="loading-wrapper">
       <mat-spinner diameter="44"></mat-spinner>
     </div>
-
   } @else if (docs().length === 0) {
     <div class="docs-empty">
       <mat-icon>folder_open</mat-icon>
-      <span>No hay documentos en {{ months[currentDate().month - 1] }} {{ currentDate().year }}.</span>
+      <span
+        >No hay documentos en {{ months[currentDate().month - 1] }}
+        {{ currentDate().year }}.</span
+      >
     </div>
-
   } @else {
-
     <div class="docs-table-wrap">
-
       <!-- Cabecera de columnas (solo escritorio) -->
       <div class="docs-list-header">
         <span>Tipo</span>
@@ -36,56 +36,83 @@
       <div class="docs-list">
         @for (doc of docs(); track doc.id) {
           <div class="doc-card">
-
             <!-- Tipo -->
             <div class="f-type">
-              <span class="doc-type-chip" [class]="'dtype-' + doc.type">{{ doc.type | docType }}</span>
+              <span class="doc-type-chip" [class]="'dtype-' + doc.type">{{
+                doc.type | docType
+              }}</span>
             </div>
 
             <!-- Empleado -->
             <div class="f-employee">
               <span class="mobile-label">Empleado</span>
-              <span class="doc-employee-name">{{ getEmployeeName(doc.employeeId) }}</span>
+              <span class="doc-employee-name">{{
+                getEmployeeName(doc.employeeId)
+              }}</span>
             </div>
 
             <!-- Descripción -->
             <div class="f-desc">
               <span class="mobile-label">Descripción</span>
-              <span class="doc-description">{{ doc.description || '—' }}</span>
+              <span class="doc-description">{{ doc.description || "—" }}</span>
             </div>
 
             <!-- Fecha -->
             <div class="f-date">
               <mat-icon class="meta-icon">event</mat-icon>
-              <span class="doc-date-text">{{ formatDate(doc.uploadDate) }}</span>
+              <span class="doc-date-text">{{
+                formatDate(doc.uploadDate)
+              }}</span>
             </div>
 
             <!-- Usuario -->
             <div class="f-user">
               <mat-icon class="meta-icon">person</mat-icon>
-              <span class="doc-user-text">{{ doc.user || '—' }}</span>
+              <span class="doc-user-text">{{ doc.audit?.createdBy || "—" }}</span>
             </div>
 
             <!-- Acciones -->
             <div class="f-actions">
-              <button mat-icon-button color="primary" (click)="editDoc(doc.id)" matTooltip="Editar">
+              @for (creator of creatorsFor(doc); track creator.id) {
+              <button
+                mat-icon-button
+                color="accent"
+                (click)="creator.create(doc)"
+                [matTooltip]="creator.label"
+              >
+                <mat-icon>{{ creator.icon }}</mat-icon>
+              </button>
+              }
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="editDoc(doc.id)"
+                matTooltip="Editar"
+              >
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="primary" (click)="openFile(doc.driveFileId)" matTooltip="Ver archivo">
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="openFile(doc)"
+                matTooltip="Ver archivo"
+              >
                 <mat-icon>visibility</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteDoc(doc)" matTooltip="Eliminar">
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="deleteDoc(doc)"
+                matTooltip="Eliminar"
+              >
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
-
           </div>
         }
       </div>
-
     </div>
   }
-
 </div>
 
 <button matFab color="primary" class="add-button" (click)="openDialog()">

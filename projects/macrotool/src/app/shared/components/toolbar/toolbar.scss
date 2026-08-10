@@ -6,6 +6,7 @@
   display: flex;
   justify-content: space-between;
   background: none;
+  background-color: var(--header-color);
 
   .toolbar-content {
     display: flex;
@@ -27,8 +28,6 @@
     }
   }
 
-
-
   .wrapper-content {
     display: flex;
     gap: 12px;
@@ -39,10 +38,7 @@
       align-items: center;
     }
   }
-
 }
-
-
 
 .mat-mdc-row:hover {
   background-color: #f0f0f0;

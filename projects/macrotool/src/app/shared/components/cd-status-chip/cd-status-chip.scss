@@ -1,19 +1,26 @@
+:host {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+}
+
 .status-chip-container {
     width: fit-content;
-    padding: 0 10px;
-    border-radius: 30px;
+    max-width: 100%;
+    min-width: 0;
+    padding: 4px 10px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     font-weight: 500;
     color: white;
     text-transform: uppercase;
-    overflow: hidden;
 
     span {
-        // max-width: 100;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        line-height: 1.25;
     }
 
     &.success {

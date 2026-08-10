@@ -19,6 +19,8 @@ import { DatepickerDialog } from '../../dialogs/datepicker-dialog/datepicker-dia
 import { MONTHS, YEARS } from '../../../shared/constants/general-constant';
 import { AppService } from '../../../core/services/app.service';
 import { UtilsService } from '../../../core/services/utils.service';
+import { FileViewerDialog } from '../../dialogs/file-viewer-dialog/file-viewer-dialog';
+import { DOC_RECORD_CREATORS, DocRecordCreator } from '../../../shared/services/doc-record-creator';
 
 @Component({
   selector: 'app-docs',
@@ -34,6 +36,7 @@ import { UtilsService } from '../../../core/services/utils.service';
 export class Docs implements OnInit {
 
   readonly dialog = inject(MatDialog);
+  readonly recordCreators = inject(DOC_RECORD_CREATORS);
 
   months = MONTHS;
   years = YEARS;
@@ -102,12 +105,19 @@ export class Docs implements OnInit {
     });
   }
 
-  openFile(docId: string): void {
-    this.utilsSvc.openFile(docId);
+  openFile(doc: Doc): void {
+    this.dialog.open(FileViewerDialog, {
+      panelClass: 'full-screen-dialog',
+      data: { driveFileId: doc.driveFileId, title: doc.description || this.utilsSvc.getDocFullName(doc.type) }
+    });
   }
 
   getEmployeeName(employeeId: string): string {
     return this.employeeService.getLocalEmployeeById(employeeId)?.name || '—';
+  }
+
+  creatorsFor(doc: Doc): DocRecordCreator[] {
+    return this.recordCreators.filter(c => c.isCompatible(doc));
   }
 
   openDialog(): void {
@@ -143,7 +153,10 @@ export class Docs implements OnInit {
         },
         error: (err) => {
           console.error('Error borrando doc', err);
-          this.snackBar.open('Error borrando documento', 'OK', { duration: 2000 });
+          const msg = err?.status === 409
+            ? 'Este documento esta en uso (ausencia u otro registro), no se puede eliminar'
+            : 'Error borrando documento';
+          this.snackBar.open(msg, 'OK', { duration: 3000 });
         }
       });
     });

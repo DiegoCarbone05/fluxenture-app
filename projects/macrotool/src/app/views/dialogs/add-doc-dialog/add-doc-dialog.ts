@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Inject, OnInit, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, ElementRef, HostListener, Inject, OnInit, signal, ViewChild } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe, CommonModule } from '@angular/common';
@@ -10,17 +10,19 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DragDropFileDirective } from '../../../shared/directives/drag-drop-file';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { map, Observable, startWith } from 'rxjs';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { Doc, EDocType } from '../../../shared/models/Doc';
+import { AuditMetadata } from '../../../shared/models/AuditMetadata';
+import { DocUsages } from '../../../shared/models/DocUsages';
 import { StorageService } from '../../../core/services/api/storage/storage.service';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
-import { AuthService } from '../../../core/services/api/auth/auth.service';
-import { DOC_TYPES } from '../../../shared/constants/typesValues.constant';
+import { DOC_TYPES, DOC_USAGE_MODULE_LABELS } from '../../../shared/constants/typesValues.constant';
 import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
+import { FileViewerDialog } from '../file-viewer-dialog/file-viewer-dialog';
 
 export enum UploadStatus {
   IDLE,
@@ -53,6 +55,20 @@ export class AddDocDialog implements OnInit, AfterViewInit {
   fluxDocUploadMsg = signal<string>('');
 
   deleteOrden = signal<boolean>(false);
+  /** Audit del Doc que se esta editando, para no perder createdAt/createdBy al actualizar. */
+  private existingAudit?: AuditMetadata;
+
+  /** Quien usa este Doc (solo tiene sentido en edicion, un Doc nuevo todavia no lo usa nadie). */
+  usages = signal<DocUsages | null>(null);
+  usageEntries = computed(() => {
+    const usages = this.usages();
+    if (!usages) return [];
+    return Object.entries(usages.byModule).map(([module, ids]) => ({
+      module,
+      label: DOC_USAGE_MODULE_LABELS[module] ?? module,
+      count: ids.length,
+    }));
+  });
 
   //Progress
   progress = signal<number>(0);
@@ -77,7 +93,7 @@ export class AddDocDialog implements OnInit, AfterViewInit {
     private dialogRef: MatDialogRef<AddDocDialog>,
     private storageService: StorageService,
     private docService: DocsService,
-    private authService: AuthService,
+    private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: any
 
   ) { }
@@ -106,6 +122,9 @@ export class AddDocDialog implements OnInit, AfterViewInit {
       if (this.data.editDocId) {
         console.log("EDIT MODE");
         this.editMode.set(true);
+        // En edicion ya existe un archivo cargado (currentFileID); solo es obligatorio si se reemplaza.
+        this.form.get('file')?.clearValidators();
+        this.form.get('file')?.updateValueAndValidity();
         this.docService.getDocById(this.data.editDocId).subscribe({
           next: (doc) => {
             const emp = this.data.employee || this.employeeService.getLocalEmployeeById(doc.employeeId); // Obtiene el empleado
@@ -117,10 +136,15 @@ export class AddDocDialog implements OnInit, AfterViewInit {
               description: doc.description,
             });
             this.currentFileID.set(doc.driveFileId); // Se carga el id del archivo de drive
+            this.existingAudit = doc.audit;
           },
           error: (err) => {
             console.error(err);
           }
+        });
+        this.docService.getDocUsages(this.data.editDocId).subscribe({
+          next: (usages) => this.usages.set(usages),
+          error: (err) => console.error('No se pudo cargar donde esta usado el documento', err)
         });
 
         return
@@ -260,6 +284,21 @@ export class AddDocDialog implements OnInit, AfterViewInit {
     }
   }
 
+  viewCurrentFile(): void {
+    const file = this.form.value.file;
+    if (this.currentFileID()) {
+      this.dialog.open(FileViewerDialog, {
+        panelClass: 'full-screen-dialog',
+        data: { driveFileId: this.currentFileID(), title: this.form.value.description || undefined }
+      });
+    } else if (file) {
+      this.dialog.open(FileViewerDialog, {
+        panelClass: 'full-screen-dialog',
+        data: { localFile: file, title: file.name }
+      });
+    }
+  }
+
   onDeleteFile() {
     this.form.patchValue({ file: null });
     this.form.get('file')?.markAsTouched();
@@ -277,77 +316,77 @@ export class AddDocDialog implements OnInit, AfterViewInit {
   }
 
   onSave(): void {
-    if (this.form.valid && this.uploadStatus() === UploadStatus.IDLE) {
-      this.startFakeProgress()
-      const { employeeId, type, description, file, date, employee } = this.form.getRawValue();
+    if (!this.form.valid || this.uploadStatus() !== UploadStatus.IDLE) return;
 
-      // Fallback en caso de que employeeSelected no se haya seteado (por carga externa o error en el flujo)
-      if (!this.employeeSelected && employee && typeof employee === 'object') {
-        this.employeeSelected = employee as EmployeeDTO;
-      }
+    const { employeeId, type, description, file, date, employee } = this.form.getRawValue();
 
-      if (!employeeId || !type || !file || !date || !this.employeeSelected) {
-        console.error('Faltan datos requeridos o el empleado no está seleccionado', { employeeId, type, file, date, employeeSelected: this.employeeSelected });
-        return;
-      }
-
-      console.log("SUBE EL ARCHIVO");
-
-      //SUBE EL ARCHIVO
-      this.storageService.uploadDoc(file, this.employeeSelected, type as EDocType).subscribe({
-        next: (fileId: any) => {
-          //CREA EL OBJETO DOC
-          console.log("CREA EL OBJETO DOC, " + this.employeeSelected);
-
-          const employeeObject = employee as unknown as EmployeeDTO;
-
-          const payload = new Doc(
-            employeeObject.id,
-            type as EDocType,
-            fileId.response,
-            date as Date,
-            undefined,
-            description!,
-            this.authService.getUserSignal()()?.username
-          );
-
-          //GUARDA EL DOC EN LA DB
-          console.log("GUARDA EN LA DB");
-          this.docService.saveDoc(payload).subscribe({
-            next: (doc) => {
-              this.uploadStatus.set(UploadStatus.SUCCESS);
-
-              if (this.tempFileID() !== '') {
-                this.storageService.deleteFile(this.tempFileID()).subscribe();
-              }
-
-              setTimeout(() => {
-                this.dialogRef.close(doc);
-              }, 1500);
-            },
-            error: (err) => {
-              this.uploadStatus.set(UploadStatus.ERROR);
-              this.errorMessage.set(err?.error.error ?? 'Error desconocido'); //Muestra el error del backend
-              this.storageService.deleteFile(fileId.response).subscribe();//Borra el archivo si falla al guardar el doc
-
-              setTimeout(() => {
-                this.uploadStatus.set(UploadStatus.IDLE);
-              }, 3000);
-            }
-          });
-
-
-          this.completeProgress()
-        },
-        error: (err) => {
-          this.uploadStatus.set(UploadStatus.ERROR);
-          this.errorMessage.set(err?.message ?? 'Error desconocido');
-          setTimeout(() => {
-            this.uploadStatus.set(UploadStatus.IDLE);
-          }, 3000);
-        }
-      });
+    // Fallback en caso de que employeeSelected no se haya seteado (por carga externa o error en el flujo)
+    if (!this.employeeSelected && employee && typeof employee === 'object') {
+      this.employeeSelected = employee as EmployeeDTO;
     }
+
+    const hasNewFile = !!file;
+    const keepingExistingFile = !hasNewFile && this.editMode() && !!this.currentFileID();
+
+    if (!employeeId || !type || !date || !this.employeeSelected || (!hasNewFile && !keepingExistingFile)) {
+      console.error('Faltan datos requeridos o el empleado no está seleccionado', { employeeId, type, file, date, employeeSelected: this.employeeSelected });
+      return;
+    }
+
+    this.startFakeProgress();
+    const employeeObject = employee as unknown as EmployeeDTO;
+    // En edicion, se manda el id existente para que el backend actualice ese Doc en vez de crear uno nuevo.
+    const docId = this.editMode() ? this.data?.editDocId : undefined;
+
+    if (keepingExistingFile) {
+      // Solo cambiaron metadatos (tipo/fecha/descripcion): no hace falta re-subir el archivo.
+      const payload = new Doc(employeeObject.id, type as EDocType, this.currentFileID(), date as Date, docId, description!);
+      payload.audit = this.existingAudit; // preserva createdAt/createdBy al actualizar
+      this.saveDocEntry(payload);
+      return;
+    }
+
+    this.storageService.uploadDoc(file!, this.employeeSelected, type as EDocType).subscribe({
+      next: (fileId: any) => {
+        const payload = new Doc(employeeObject.id, type as EDocType, fileId.response, date as Date, docId, description!);
+        payload.audit = this.existingAudit; // preserva createdAt/createdBy al actualizar (undefined si es alta nueva)
+        this.saveDocEntry(payload, fileId.response);
+      },
+      error: (err) => {
+        this.uploadStatus.set(UploadStatus.ERROR);
+        this.errorMessage.set(err?.message ?? 'Error desconocido');
+        setTimeout(() => this.uploadStatus.set(UploadStatus.IDLE), 3000);
+      }
+    });
+  }
+
+  private saveDocEntry(payload: Doc, uploadedFileId?: string): void {
+    this.docService.saveDoc(payload).subscribe({
+      next: (doc) => {
+        this.uploadStatus.set(UploadStatus.SUCCESS);
+
+        // Si se habia marcado un archivo viejo para reemplazo (onDeleteFile), se borra recien ahora que el guardado fue exitoso.
+        if (this.tempFileID() !== '') {
+          this.storageService.deleteFile(this.tempFileID()).subscribe();
+        }
+
+        setTimeout(() => {
+          this.dialogRef.close(doc);
+        }, 1500);
+      },
+      error: (err) => {
+        this.uploadStatus.set(UploadStatus.ERROR);
+        this.errorMessage.set(err?.error?.error ?? 'Error desconocido');
+        // Si se acababa de subir un archivo nuevo y el guardado del Doc fallo, se limpia el archivo huerfano.
+        if (uploadedFileId) this.storageService.deleteFile(uploadedFileId).subscribe();
+
+        setTimeout(() => {
+          this.uploadStatus.set(UploadStatus.IDLE);
+        }, 3000);
+      }
+    });
+
+    this.completeProgress();
   }
 
 

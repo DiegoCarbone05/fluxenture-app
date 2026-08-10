@@ -4,44 +4,60 @@
   (backClick)="goBack()"
   title="Carta Documento"
   [bgColor]="cd()?.trackingCompleted ? '#0ead6d' : 'var(--primary)'"
-  theme="dark">
-  <button matButton (click)="downloadFile()">
-    <mat-icon>file_download</mat-icon>
+  theme="dark"
+>
+  <button matButton [disabled]="downloadingFile()" (click)="downloadFile()">
+    <mat-icon [class.spin]="downloadingFile()">{{
+      downloadingFile() ? "sync" : "file_download"
+    }}</mat-icon>
     Descargar
   </button>
-  <button matButton (click)="exportPDF()">
-    <mat-icon>picture_as_pdf</mat-icon>
-    <strong>Exportar</strong>
-  </button>
+  <!-- <button
+    matButton
+    [disabled]="savingSnapshot()"
+    (click)="syncSnapshotToDrive()"
+    title="Vuelve a guardar el estado actual del seguimiento en Drive"
+  >
+    <mat-icon [class.spin]="savingSnapshot()">{{
+      savingSnapshot() ? "sync" : "cloud_upload"
+    }}</mat-icon>
+    <strong>Sincronizar</strong>
+  </button> -->
 </flux-toolbar>
 
 @if (cd()) {
-
   <!-- Hero (solo display web) -->
   <div class="cds-hero" [class.completed]="cd()?.trackingCompleted">
     <div class="content">
       <div class="status-chip">
-        <mat-icon>{{ cd()?.trackingCompleted ? 'check_circle' : 'local_shipping' }}</mat-icon>
-        <span>{{ cd()?.trackingCompleted ? 'Seguimiento completo' : 'En seguimiento' }}</span>
+        <mat-icon>{{
+          cd()?.trackingCompleted ? "check_circle" : "local_shipping"
+        }}</mat-icon>
+        <span>{{
+          cd()?.trackingCompleted ? "Seguimiento completo" : "En seguimiento"
+        }}</span>
       </div>
-      <span class="employee-name">{{ employee()?.name || 'Empleado no encontrado' }}</span>
+      <span class="employee-name">{{
+        employee()?.name || "Empleado no encontrado"
+      }}</span>
       <div class="cd-period">
         <mat-icon>tag</mat-icon>
         <span>{{ cd()?.trackingNumber }}</span>
         <span class="period-sep">·</span>
         <mat-icon>event</mat-icon>
-        <span>{{ cd()?.emissionDate | date:'dd/MM/yyyy' }}</span>
+        <span>{{ cd()?.emissionDate | date: "dd/MM/yyyy" }}</span>
       </div>
     </div>
   </div>
 
   <div class="container">
-
     <div class="card toggle-card">
       <div class="card-body">
-        <mat-checkbox color="primary"
+        <mat-checkbox
+          color="primary"
           (change)="changeTrackingCompleted($event)"
-          [checked]="cd()?.trackingCompleted">
+          [checked]="cd()?.trackingCompleted"
+        >
           Marcar seguimiento como completado
         </mat-checkbox>
       </div>
@@ -56,19 +72,25 @@
             <mat-icon class="spin">sync</mat-icon>
             Actualizando…
           </span>
+        } @else if (savingSnapshot()) {
+          <span class="updating">
+            <mat-icon class="spin">cloud_upload</mat-icon>
+            Guardando en Drive…
+          </span>
         }
       </div>
       <div class="card-body">
-
         <!-- Info del CD (visible en web y en PDF exportado) -->
         <div class="info-row">
           <div class="info-item">
             <span class="label">Empleado</span>
-            <span class="value">{{ employee()?.name || '—' }}</span>
+            <span class="value">{{ employee()?.name || "—" }}</span>
           </div>
           <div class="info-item">
             <span class="label">Nro. de seguimiento</span>
-            <span class="value tracking-number">{{ cd()?.trackingNumber }}</span>
+            <span class="value tracking-number">{{
+              cd()?.trackingNumber
+            }}</span>
           </div>
           <div class="info-item">
             <span class="label">Fecha de emisión</span>
@@ -92,11 +114,12 @@
           } @else if (tnts().length === 0) {
             <div class="tracking-msg">
               <mat-icon>search_off</mat-icon>
-              <span>Todavía no hay eventos de seguimiento para este número.</span>
+              <span
+                >Todavía no hay eventos de seguimiento para este número.</span
+              >
             </div>
           } @else {
             <table mat-table [dataSource]="tnts()" class="tracking-table">
-
               <ng-container matColumnDef="date">
                 <th mat-header-cell *matHeaderCellDef>Fecha</th>
                 <td mat-cell *matCellDef="let element">{{ element.date }}</td>
@@ -109,7 +132,9 @@
 
               <ng-container matColumnDef="historyData">
                 <th mat-header-cell *matHeaderCellDef>Historial</th>
-                <td mat-cell *matCellDef="let element">{{ element.history }}</td>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.history }}
+                </td>
               </ng-container>
 
               <ng-container matColumnDef="status">
@@ -122,12 +147,9 @@
             </table>
           }
         </div>
-
       </div>
     </div>
-
   </div>
-
 } @else {
   <div class="loading">
     <mat-icon class="loading-icon">hourglass_empty</mat-icon>

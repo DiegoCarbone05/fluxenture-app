@@ -1,0 +1,21 @@
+{
+  "name": "Fluxenture",
+  "short_name": "Fluxenture",
+  "description": "Herramientas para el seguimiento y gestión de documentos y envíos.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f8f8",
+  "theme_color": "#f5f5f5",
+  "icons": [
+    {
+      "src": "flux-logo-icon.png",
+      "sizes": "52x52",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.ico",
+      "sizes": "256x256",
+      "type": "image/x-icon"
+    }
+  ]
+}

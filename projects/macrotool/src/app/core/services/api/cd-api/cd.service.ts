@@ -42,12 +42,12 @@ export class CdService extends BaseApiService<Cd> {
     );
   }
 
-  exportCd(tnt: string, fileId: string) {
+  /** Sube a Drive una foto del estado actual del seguimiento, fusionada con la carta original. */
+  syncTrackingSnapshot(id: string, snapshotBase64: string) {
     const formData = new FormData();
-    formData.append('tnt', tnt);
-    formData.append('fileId', fileId);
+    formData.append('tnt', snapshotBase64);
 
-    return this.http.post<Cd>(this.endpoint + '/export', formData).pipe(
+    return this.http.post<void>(this.endpoint + '/' + id + '/export', formData).pipe(
       tap(() => this.refreshCds().subscribe())
     );
   }
@@ -71,7 +71,5 @@ export class CdService extends BaseApiService<Cd> {
   getCdsSignal() {
     return this.cds();
   }
-
-
 
 }

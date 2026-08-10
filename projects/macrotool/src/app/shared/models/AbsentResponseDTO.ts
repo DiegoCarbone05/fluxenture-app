@@ -3,7 +3,7 @@ export interface AbsentResponseDTO {
     employeeId: string;
     type: string;
     justified: boolean;
-    documentId: string;
+    docId: string;
     originalStartDate: string;
     originalEndDate: string;
     impactDaysInMonth: number;

@@ -10,10 +10,6 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class ViewsService {
 
-  private titlebarColor = signal<string>('#e6e6e6');
-  private titlebarTextColor = signal<string>('#000000');
-  private titlebarFloating = signal<boolean>(false);
-  private titlebarFullscreen = signal<boolean>(false);
   private isMobile = signal<boolean>(false);
   private openSidenavSource = new Subject<void>();
   openSidenav$ = this.openSidenavSource.asObservable();
@@ -81,38 +77,6 @@ export class ViewsService {
 
   public getIsMobile() {
     return this.isMobile();
-  }
-
-  public setTitlebarFloating(value: boolean) {
-    this.titlebarFloating.set(value);
-  }
-
-  public setTitlebarColor(value: string) {
-    this.titlebarColor.set(value);
-  }
-
-  public setTitlebarTextColor(value: string) {
-    this.titlebarTextColor.set(value);
-  }
-
-  public setTitlebarFullscreen(value: boolean) {
-    this.titlebarFullscreen.set(value);
-  }
-
-  public getTitlebarColor() {
-    return this.titlebarColor();
-  }
-
-  public getTitlebarTextColor() {
-    return this.titlebarTextColor();
-  }
-
-  public getTitlebarFullscreen() {
-    return this.titlebarFullscreen();
-  }
-
-  public getTitlebarFloating() {
-    return this.titlebarFloating();
   }
 
 }

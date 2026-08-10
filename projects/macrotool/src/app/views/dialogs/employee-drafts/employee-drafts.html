@@ -1,0 +1,39 @@
+<div class="container">
+  <div class="header">
+    <div class="wrap">
+      <h2>Borradores</h2>
+      <span>Empleados guardados localmente, pendientes de completar</span>
+    </div>
+    <button mat-icon-button (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="mat-typography">
+    @if (drafts().length === 0) {
+      <div class="empty-state">
+        <mat-icon>drafts</mat-icon>
+        <span>No hay borradores guardados.</span>
+      </div>
+    } @else {
+      <div class="draft-list">
+        @for (draft of drafts(); track draft.id) {
+          <div class="draft-card">
+            <div class="draft-info">
+              <span class="draft-name">{{ draftName(draft) }}</span>
+              <span class="draft-date">Editado {{ draft.updatedAt | date: 'dd/MM/yy HH:mm' }}</span>
+            </div>
+            <div class="draft-actions">
+              <button mat-icon-button color="warn" (click)="discardDraft(draft)" matTooltip="Descartar">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button mat-flat-button color="primary" (click)="continueDraft(draft)">
+                Continuar
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </mat-dialog-content>
+</div>

@@ -1,26 +1,14 @@
 {
   "name": "macrotools-app",
   "version": "1.0.0",
-  "description": "MacroTools - Desktop application for CD and employee management",
+  "description": "MacroTools - Web application for CD and employee management",
   "author": "MacroTools",
-  "main": "dist/electron/main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "electron": "electron .",
-    "electron-dev": "concurrently \"npm run start\" \"wait-on http://localhost:4200 && electron .\"",
-    "dev": "node dev.js",
-    "electron-build": "ng build macrotool --configuration=production --base-href ./ && npm run build-electron && electron-builder",
-    "electron-pack": "ng build macrotool --configuration=production --base-href ./ && npm run build-electron && electron-builder --dir",
-    "electron-win": "npm run electron-build -- --win",
-    "electron-mac": "npm run electron-build -- --mac",
-    "electron-linux": "npm run electron-build -- --linux",
-    "build-electron": "tsc -p electron/tsconfig.json",
-    "watch-electron": "tsc -p electron/tsconfig.json --watch",
-    "postinstall": "electron-builder install-app-deps"
+    "test": "ng test"
   },
   "prettier": {
     "overrides": [
@@ -56,17 +44,12 @@
     "@angular/compiler-cli": "^20.1.0",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^24.7.2",
-    "concurrently": "^9.2.1",
-    "electron": "^38.3.0",
-    "electron-builder": "^26.0.12",
-    "electron-is-dev": "^3.0.1",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.2",
-    "wait-on": "^9.0.1"
+    "typescript": "~5.8.2"
   }
 }

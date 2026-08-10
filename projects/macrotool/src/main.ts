@@ -6,6 +6,9 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
+import { DOC_RECORD_CREATORS } from './app/shared/services/doc-record-creator';
+import { AbsentDocRecordCreatorService } from './app/core/services/api/absents/absent-doc-record-creator.service';
+import { CdDocRecordCreatorService } from './app/core/services/api/cd-api/cd-doc-record-creator.service';
 
 bootstrapApplication(App, {
   providers: [
@@ -14,5 +17,9 @@ bootstrapApplication(App, {
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideRouter(APP_ROUTES, withComponentInputBinding()),
+    // Registro de "crear un registro a partir de un documento" (ver shared/services/doc-record-creator.ts).
+    // Sumar un modulo nuevo (Factura, SGI, EPP...) es agregar una linea aca, nada mas.
+    { provide: DOC_RECORD_CREATORS, useClass: AbsentDocRecordCreatorService, multi: true },
+    { provide: DOC_RECORD_CREATORS, useClass: CdDocRecordCreatorService, multi: true },
   ]
 }).catch(err => console.error(err));

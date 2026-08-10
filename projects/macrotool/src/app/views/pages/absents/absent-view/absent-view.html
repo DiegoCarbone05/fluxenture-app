@@ -85,7 +85,7 @@
             <h2>Documento Adjunto</h2>
         </div>
         <div class="card-body">
-            @if (absent()?.documentId) {
+            @if (absent()?.docId) {
             <div class="doc-attached">
                 <div class="doc-icon-wrap">
                     <mat-icon>description</mat-icon>
@@ -95,11 +95,11 @@
                     <span class="doc-meta">{{ absent()?.type | abstentType }} · {{ employee()?.name }}</span>
                 </div>
                 <div class="doc-actions">
-                    <button mat-stroked-button (click)="openFile(absent()?.documentId)">
+                    <button mat-stroked-button (click)="openFile(absent()?.docId)">
                         <mat-icon>open_in_new</mat-icon>
                         Abrir
                     </button>
-                    <button mat-flat-button color="primary" (click)="downloadFile(absent()?.documentId)">
+                    <button mat-flat-button color="primary" (click)="downloadFile(absent()?.docId)">
                         <mat-icon>file_download</mat-icon>
                         Descargar
                     </button>

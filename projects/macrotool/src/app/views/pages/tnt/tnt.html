@@ -5,7 +5,7 @@
   <!-- ── TAB: EN SEGUIMIENTO ──────────────────────────────────────────────── -->
   <mat-tab>
     <ng-template mat-tab-label>
-      En seguimiento
+      Pendientes
       @if (activeCds().length > 0) {
         <span class="tab-count active">{{ activeCds().length }}</span>
       }
@@ -28,7 +28,7 @@
             <span></span>
           </div>
           <div class="tnt-list">
-            @for (item of activeCds(); track item.id) {
+            @for (item of pagedActiveCds(); track item.id) {
               <div class="cd-card" (click)="openCdsViewer(item)">
 
                 <div class="f-status">
@@ -67,6 +67,14 @@
               </div>
             }
           </div>
+          <mat-paginator
+            [length]="activeCds().length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            [pageIndex]="activePageIndex()"
+            (page)="onActivePage($event)"
+            showFirstLastButtons>
+          </mat-paginator>
         </div>
       }
     </div>
@@ -75,7 +83,7 @@
   <!-- ── TAB: FINALIZADOS ─────────────────────────────────────────────────── -->
   <mat-tab>
     <ng-template mat-tab-label>
-      Finalizados
+      Entregadas
       @if (completedCds().length > 0) {
         <span class="tab-count">{{ completedCds().length }}</span>
       }
@@ -88,6 +96,18 @@
           <span>Aún no hay cartas marcadas como finalizadas.</span>
         </div>
       } @else {
+        @if (newDeliveredCount() > 0) {
+          <div class="new-alert-bar">
+            <span class="new-alert-text">
+              <mat-icon class="meta-icon">mark_email_unread</mat-icon>
+              {{ newDeliveredCount() }} {{ newDeliveredCount() === 1 ? 'nueva' : 'nuevas' }}
+            </span>
+            <button mat-button color="primary" (click)="markAllAsSeen()">
+              <mat-icon>done_all</mat-icon>
+              Marcar todas como vistas
+            </button>
+          </div>
+        }
         <div class="tnt-table-wrap">
           <div class="tnt-list-header">
             <span>Empleado</span>
@@ -98,11 +118,14 @@
             <span></span>
           </div>
           <div class="tnt-list">
-            @for (item of completedCds(); track item.id) {
+            @for (item of pagedCompletedCds(); track item.id) {
               <div class="cd-card completed" (click)="openCdsViewer(item)">
 
                 <div class="f-status">
                   <app-cd-status-chip [status]="item.tnt | tntStatusPipe | async"></app-cd-status-chip>
+                  @if (isNewlyDelivered(item)) {
+                    <span class="new-badge">Nuevo</span>
+                  }
                 </div>
 
                 <div class="f-employee">
@@ -137,6 +160,14 @@
               </div>
             }
           </div>
+          <mat-paginator
+            [length]="completedCds().length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            [pageIndex]="completedPageIndex()"
+            (page)="onCompletedPage($event)"
+            showFirstLastButtons>
+          </mat-paginator>
         </div>
       }
     </div>

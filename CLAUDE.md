@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**MacroTools / Fluxenture** is an Angular 20 web application (optionally wrapped in Electron 38) for HR and logistics management. It integrates with a Spring Boot 3 backend and Google Drive for file storage. Primary deployment target is `fluxenture.web.app`.
+**MacroTools / Fluxenture** is an Angular 20 web application for HR and logistics management. It integrates with a Spring Boot 3 backend and Google Drive for file storage. Deployment target is `fluxenture.web.app`.
 
 ## Commands
 
@@ -20,22 +20,14 @@ npm test           # Karma + Jasmine unit tests
 ng test --include="**/path/to/component.spec.ts"
 ```
 
-### Electron (optional desktop wrapper)
-```bash
-npm run dev             # Angular dev server + Electron together (via dev.js)
-npm run electron-build  # Full Electron production build (ng build + tsc + electron-builder)
-npm run electron-pack   # Package without installer (for local testing)
-```
-
 ## Architecture
 
-Angular source lives entirely in `projects/macrotool/src/app/` and is organized into four top-level directories:
+Angular source lives entirely in `projects/macrotool/src/app/` and is organized into three top-level directories:
 
 ```
 core/       – Guards, interceptors, and all API/business services
 shared/     – Reusable standalone components, pipes, directives, models, constants
 views/      – Feature pages, auth screens, dialogs, and ViewsService
-electron/   – Optional Electron main process (TypeScript, compiled to dist/electron/)
 ```
 
 ### Bootstrap
@@ -92,6 +84,5 @@ Stateful services cache data in a `signal<T[]>()` and expose it via a typed `Sig
 - **Schematics caveat:** [angular.json](angular.json) still sets `standalone: false` for the component/directive/pipe schematics. This is **stale and contradicts the actual code** — when running `ng generate`, pass `--standalone` (or update the schematic defaults) and then add the generated symbol to the consumer's `imports: []`.
 - **Zoneless change detection:** The app uses `provideZonelessChangeDetection()`. Prefer Signals; `setTimeout`/`setInterval` callbacks do not auto-trigger CD — use `signal.set()`, `ChangeDetectorRef.markForCheck()`, or `afterNextRender()`.
 - **Router input binding:** `withComponentInputBinding()` is enabled — route params, query params, and `data` can be received via `@Input()` on the routed component instead of subscribing to `ActivatedRoute`.
-- **Electron detection:** `AppService.isElectron` is a signal set at startup by sniffing `navigator.userAgent` for `"electron"`. Use it to conditionally render desktop-only UI (e.g. the custom `Titlebar`).
 - **ViewsService:** Cross-cutting UI service. Use `viewsSvc.prompt()` for confirmation dialogs and `viewsSvc.openSidenav()` / `viewsSvc.getIsMobile()` for layout control.
 - **Google Drive files:** Open via `ViewsService.openDriveFile(docId)`, which resolves a `Doc` entity to its `driveFileId` before opening the Drive URL.

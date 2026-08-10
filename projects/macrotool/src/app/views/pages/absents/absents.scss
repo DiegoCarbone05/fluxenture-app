@@ -1,14 +1,9 @@
-:host {
-  background-color: #f5f6fa;
-}
-
 :host ::ng-deep {
   mat-tab-group {
     display: grid;
     grid-template-rows: auto 1fr;
-    height: calc(100% - 64px);
-    overflow: auto;
-    background-color: #f5f6fa;
+    height: 100%;
+    overflow: hidden;
 
     mat-tab-header {
       font-family:
@@ -24,14 +19,39 @@
         "Helvetica Neue",
         sans-serif;
       font-weight: 700;
-      background-color: white;
+      background: var(--header-color) !important;
       border-bottom: 1px solid #e4e4e4;
+    }
+
+    .mdc-tab__text-label {
+      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: #555a64;
+    }
+
+    .mdc-tab--active .mdc-tab__text-label {
+      color: var(--primary, #0468d7);
     }
 
     .mat-mdc-tab-body-wrapper {
       height: 100%;
+      overflow: hidden;
+    }
+
+    .mat-mdc-tab-body-content {
+      height: 100%;
+      overflow: hidden;
     }
   }
+}
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #ffffff;
+  overflow: hidden;
 }
 
 // ── CALENDAR ──────────────────────────────────────────────────────────────────
@@ -47,14 +67,14 @@
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     width: 100%;
-    background-color: #f7f8fc;
-    border-bottom: 2px solid #e0e4ed;
+    background-color: #f7f7f7;
+    border-bottom: 2px solid #e4e4e4;
 
     .day-of-week {
       display: flex;
       justify-content: center;
       align-items: center;
-      border-right: 1px solid #e0e4ed;
+      border-right: 1px solid #e4e4e4;
       height: 40px;
       font-weight: 700;
       font-size: 11px;
@@ -110,7 +130,9 @@
           font-weight: 600;
           color: #555;
           margin: 4px auto 3px;
-          transition: background-color 0.2s ease, color 0.2s ease;
+          transition:
+            background-color 0.2s ease,
+            color 0.2s ease;
           flex-shrink: 0;
         }
 
@@ -123,7 +145,7 @@
         }
 
         &.empty-day {
-          background-color: #f9fafc !important;
+          background-color: #f9f9f9 !important;
           pointer-events: none;
 
           &:hover {
@@ -240,12 +262,18 @@
 
 // ── ABSENT LIST ───────────────────────────────────────────────────────────────
 .absent-list {
+  height: 100%;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 12px 16px;
   padding-bottom: 100px;
   touch-action: pan-y;
+  max-width: 1200px;
+  width: 95%;
+  margin: auto;
+  box-sizing: border-box;
 
   .absent-list-empty {
     display: flex;
@@ -274,11 +302,14 @@
     justify-content: space-between;
     background: #ffffff;
     border-radius: 12px;
-    border: 1px solid #eef0f3;
+    border: 1px solid #eeeeee;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
     padding: 12px 6px 12px 14px;
     cursor: pointer;
-    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    transition:
+      box-shadow 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
     gap: 4px;
     touch-action: pan-y;
 
@@ -336,6 +367,20 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+
+      .novedad-type-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 12px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.25px;
+        background-color: #ebebeb;
+        color: #828282;
+        white-space: nowrap;
       }
 
       .absent-date-info {
@@ -402,13 +447,15 @@
 .stat-card {
   background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #eef0f3;
+  border: 1px solid #eeeeee;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
   padding: 14px 16px 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 
   &:hover {
     box-shadow: 0 4px 16px rgba(4, 104, 215, 0.08);
@@ -454,7 +501,7 @@
   flex-shrink: 0;
   font-size: 12px;
   font-weight: 700;
-  background-color: #f0f0f5;
+  background-color: #f0f0f0;
   color: #555;
   border-radius: 50px;
   padding: 3px 12px;
@@ -522,10 +569,9 @@
 
 // ── RESPONSIVE ────────────────────────────────────────────────────────────────
 @media screen and (min-width: 768px) {
-
   .stats-list {
     padding: 16px 24px 100px;
-    max-width: 860px;
+    max-width: 1200px;
     margin: 0 auto;
     width: 100%;
   }

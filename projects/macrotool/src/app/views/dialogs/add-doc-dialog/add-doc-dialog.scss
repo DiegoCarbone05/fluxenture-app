@@ -270,6 +270,39 @@ form {
   }
 }
 
+.usages-section {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .usages-label {
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.6);
+
+    &.free {
+      color: rgba(0, 0, 0, 0.4);
+      font-style: italic;
+    }
+  }
+
+  .usage-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .usage-chip {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background-color: #eaf3fc;
+    color: var(--primary);
+  }
+}
+
 mat-dialog-actions {
   position: sticky;
   bottom: 0;

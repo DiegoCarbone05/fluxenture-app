@@ -6,7 +6,7 @@ export class Absent {
     type: AbsentType;           // VACATIONS, MEDICAL, LICENSE, UNJUSTIFIED
     startDate: string;
     endDate: string;
-    documentId: string;    // Google Drive File ID
+    docId: string;    // Id de un Doc (FluxDocs), no un id de Drive directo
     observations: string;
     justified: boolean;
     audit?: AuditMetadata;
@@ -16,7 +16,7 @@ export class Absent {
         type: AbsentType,
         startDate: string,
         endDate: string,
-        documentId: string,
+        docId: string,
         observations: string,
         justified: boolean
     ) {
@@ -24,7 +24,7 @@ export class Absent {
         this.type = type;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.documentId = documentId;
+        this.docId = docId;
         this.observations = observations;
         this.justified = justified;
     }

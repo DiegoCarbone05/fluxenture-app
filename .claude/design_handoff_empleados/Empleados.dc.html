@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+<style>
+  body { margin: 0; padding: 0; font-family: "Plus Jakarta Sans", sans-serif; background-color: #ffffff; color: #333333; line-height: 1.5; font-size: 16px; text-rendering: optimizeLegibility; }
+  a { color: #0468d7; text-decoration: none; }
+  a:hover { color: rgb(5, 87, 180); }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</helmet>
+
+<div style="display:flex; flex-direction:column; gap:40px; padding:40px; background:#ffffff; box-sizing:border-box; align-items:flex-start">
+
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; align-items:baseline; gap:10px; font-family:'Plus Jakarta Sans',sans-serif">
+      <span style="font-size:13px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; color:#1a1a2e">Empleados — escritorio</span>
+      <span style="font-size:12px; color:#9aa0ac; font-weight:600">1440 × 900 · /main/app-pages/eployees</span>
+    </div>
+
+    <!-- ── ESCRITORIO ──────────────────────────────────────────────────────── -->
+    <div data-screen-label="Empleados escritorio" style="position:relative; width:1440px; height:900px; overflow:hidden; border:1px solid #e4e4e4; border-radius:4px; background-image:url('assets/pictures/login_background.webp'); background-position:center; background-repeat:no-repeat; background-size:cover">
+
+      <div style="position:absolute; inset:0; display:flex; background-color:rgba(245,245,245,0)">
+
+        <!-- mat-drawer (mode=side, opened) -->
+        <div style="width:300px; min-width:200px; max-width:300px; height:100%; background:transparent; flex-shrink:0">
+          <div style="height:100%; display:flex; flex-direction:column; padding:20px 16px; box-sizing:border-box; background-color:#e7e7e7a8; backdrop-filter:blur(20px) saturate(2); -webkit-backdrop-filter:blur(20px) saturate(2); overflow-y:auto; box-shadow:inset -1px 0 0 rgba(0,0,0,0.096)">
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 8px 28px">
+              <img src="assets/flux-logo-icon.png" alt="logo" style="width:32px; height:32px; border-radius:8px; object-fit:contain" />
+              <span style="font-size:21px; font-weight:700; color:#222227">Fluxenture</span>
+            </div>
+            <nav style="display:flex; flex-direction:column; gap:6px">
+              <a href="#" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; color:#35353c; text-decoration:none; font-size:15px; font-weight:500; position:relative" style-hover="background-color:rgba(0,0,0,0.05)">
+                <span style="font-family:'Material Symbols Outlined'; font-size:22px; width:22px; height:22px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">track_changes</span>
+                <span>Track &amp; Trace</span>
+              </a>
+              <a href="#" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; background-color:#0468d7; color:#ffffff; text-decoration:none; font-size:15px; font-weight:600; position:relative">
+                <span style="content:''; position:absolute; left:0; width:4px; height:24px; background-color:#0468d7; border-radius:10px"></span>
+                <span style="font-family:'Material Symbols Outlined'; font-size:22px; width:22px; height:22px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">people</span>
+                <span>Empleados</span>
+              </a>
+              <a href="#" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; color:#35353c; text-decoration:none; font-size:15px; font-weight:500" style-hover="background-color:rgba(0,0,0,0.05)">
+                <span style="font-family:'Material Symbols Outlined'; font-size:22px; width:22px; height:22px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">event_busy</span>
+                <span>Ausencias</span>
+              </a>
+              <a href="#" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; color:#35353c; text-decoration:none; font-size:15px; font-weight:500" style-hover="background-color:rgba(0,0,0,0.05)">
+                <span style="font-family:'Material Symbols Outlined'; font-size:22px; width:22px; height:22px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">description</span>
+                <span>Documentos</span>
+              </a>
+              <a href="#" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; color:#35353c; text-decoration:none; font-size:15px; font-weight:500" style-hover="background-color:rgba(0,0,0,0.05)">
+                <span style="font-family:'Material Symbols Outlined'; font-size:22px; width:22px; height:22px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">falling</span>
+                <span>SGI</span>
+              </a>
+            </nav>
+          </div>
+        </div>
+
+        <!-- mat-drawer-content -->
+        <div style="position:relative; flex:1; height:100%; min-width:0; display:flex; flex-direction:column; background-color:#ffffff; overflow:hidden">
+
+          <!-- .header (sticky) -->
+          <div style="width:100%; display:flex; flex-direction:column; box-sizing:border-box; background:#f5f5f5; backdrop-filter:blur(20px) saturate(2); -webkit-backdrop-filter:blur(20px) saturate(2); padding-bottom:20px; flex-shrink:0; z-index:2">
+
+            <!-- flux-toolbar -->
+            <div style="display:flex; justify-content:space-between; align-items:center; height:64px; padding:0 16px; box-sizing:border-box; background-color:#f5f5f5; color:black; font-family:Roboto, sans-serif; font-size:20px; font-weight:500">
+              <div style="display:flex; gap:12px; align-items:center">
+                <div style="display:flex; flex-direction:column">
+                  <span style="font-weight:700">Empleados</span>
+                </div>
+              </div>
+              <div style="display:flex; gap:12px; align-items:center">
+                <button style="display:flex; align-items:center; gap:8px; height:36px; padding:0 16px; border:none; border-radius:55px; background:transparent; color:black; font-family:Roboto, sans-serif; font-size:14px; font-weight:500; letter-spacing:0.0892857143em; cursor:pointer" style-hover="background-color:rgba(0,0,0,0.04)">
+                  <span style="font-family:'Material Symbols Outlined'; font-size:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">account_circle</span>
+                  <span>Hola,&nbsp;<strong>{{ userName }}</strong></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- .search-header -->
+            <div style="width:100%; display:flex; flex-direction:column; gap:10px; padding:16px; box-sizing:border-box">
+              <form style="width:90%; max-width:800px; margin:0 auto; display:flex; gap:12px">
+                <input type="text" placeholder="Buscar" value="{{ searchTerm }}" style="width:100%; padding:10px 20px; height:25px; box-sizing:content-box; background-color:rgba(0,0,0,0.062); font-family:'Plus Jakarta Sans',sans-serif; font-size:1.1rem; border:none; outline:none; border-radius:10px; color:#333" />
+              </form>
+            </div>
+          </div>
+
+          <!-- .search-content -->
+          <div style="position:relative; flex:1; min-height:0; overflow:auto">
+            <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex; flex-direction:column; gap:10px; width:100%; box-sizing:border-box">
+                <div style="width:100%; margin:0 auto; padding:16px; box-sizing:border-box; gap:12px; display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr))">
+                  <sc-for list="{{ employees }}" as="emp" hint-placeholder-count="8">
+                    <div style="width:100%; padding:16px; border-radius:12px; background-color:#fafafa; cursor:pointer; box-sizing:border-box; animation:fade-in 0.3s ease-in-out" style-hover="background-color:#f5f5f5">
+                      <div style="width:40px; height:40px; border-radius:50%; background-color:#0468d7; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-weight:600">{{ emp.initial }}</div>
+                      <br />
+                      <div style="display:flex; flex-direction:column; gap:4px">
+                        <span style="font-size:1.1rem; font-weight:600">{{ emp.name }}</span>
+                        <span style="font-size:0.9rem; color:#666666">{{ emp.documentNumber }}</span>
+                      </div>
+                      <br />
+                      <sc-if value="{{ emp.isOperational }}" hint-placeholder-val="{{ true }}">
+                        <div style="width:fit-content; padding:0 10px; border-radius:30px; display:flex; align-items:center; font-weight:bold; justify-content:center; text-transform:uppercase; color:#11734b; background-color:#d4edbc">
+                          <span style="font-family:'Material Symbols Outlined'; font-size:24px; width:24px; height:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">check</span>
+                          <span>Operativo</span>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ emp.isNotOperational }}">
+                        <div style="width:fit-content; padding:0 10px; border-radius:30px; display:flex; align-items:center; font-weight:bold; justify-content:center; text-transform:uppercase; color:#b10202; background-color:#ffcfc9">
+                          <span style="font-family:'Material Symbols Outlined'; font-size:24px; width:24px; height:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">close</span>
+                          <span>Inactivo</span>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isDefault }}">
+              <div style="width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; box-sizing:border-box; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); animation:fade-in 0.3s ease-in-out">
+                <p style="text-align:center; color:#666666; font-size:1.3rem; margin:0">Ingrese algun valor para buscar</p>
+                <img draggable="false" src="assets/pictures/undraw_personal-info_yzls.svg" alt="" style="width:50%; max-width:600px" />
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isNotFound }}">
+              <div style="width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; box-sizing:border-box; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); animation:fade-in 0.3s ease-in-out">
+                <p style="text-align:center; color:#666666; font-size:1.3rem; margin:0">No se encontraron empleados con la búsqueda</p>
+                <img draggable="false" src="assets/pictures/undraw_no-data_ig65.svg" alt="" style="width:50%; max-width:300px" />
+              </div>
+            </sc-if>
+          </div>
+
+          <!-- .drafts-button (matMiniFab) -->
+          <sc-if value="{{ hasDrafts }}" hint-placeholder-val="{{ true }}">
+            <button style="position:absolute; bottom:92px; right:26px; z-index:10; width:40px; height:40px; padding:0; border:none; border-radius:55px; background-color:#0468d7; color:#ffffff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 3px 5px -1px rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12)">
+              <span style="font-family:'Material Symbols Outlined'; font-size:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">drafts</span>
+              <span style="position:absolute; top:-4px; right:-4px; min-width:18px; height:18px; padding:0 4px; display:flex; align-items:center; justify-content:center; border-radius:50px; font-family:'Plus Jakarta Sans',sans-serif; font-size:10px; font-weight:700; color:white; background-color:#d1002d; box-sizing:border-box">{{ draftCount }}</span>
+            </button>
+          </sc-if>
+
+          <!-- .add-button (matFab) -->
+          <button style="position:absolute; bottom:20px; right:20px; z-index:10; width:56px; height:56px; padding:0; border:none; border-radius:55px; background-color:#0468d7; color:#ffffff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 3px 5px -1px rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12)">
+            <span style="font-family:'Material Symbols Outlined'; font-size:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">add</span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MÓVIL ─────────────────────────────────────────────────────────────── -->
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; align-items:baseline; gap:10px; font-family:'Plus Jakarta Sans',sans-serif">
+      <span style="font-size:13px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; color:#1a1a2e">Empleados — móvil</span>
+      <span style="font-size:12px; color:#9aa0ac; font-weight:600">390 × 844 · drawer mode=over, cerrado</span>
+    </div>
+
+    <div data-screen-label="Empleados móvil" style="position:relative; width:390px; height:844px; overflow:hidden; border:1px solid #e4e4e4; border-radius:4px; background-color:#ffffff; display:flex; flex-direction:column">
+
+      <!-- .header (sticky) -->
+      <div style="width:100%; display:flex; flex-direction:column; box-sizing:border-box; background:#f5f5f5; backdrop-filter:blur(20px) saturate(2); -webkit-backdrop-filter:blur(20px) saturate(2); padding-bottom:20px; flex-shrink:0; z-index:2">
+        <div style="display:flex; justify-content:space-between; align-items:center; height:56px; padding:0 4px 0 4px; box-sizing:border-box; background-color:#f5f5f5; color:black; font-family:Roboto, sans-serif; font-size:20px; font-weight:500">
+          <div style="display:flex; gap:12px; align-items:center">
+            <button style="width:48px; height:48px; padding:0; border:none; border-radius:55px; background:transparent; color:black; display:flex; align-items:center; justify-content:center; cursor:pointer" style-hover="background-color:rgba(0,0,0,0.04)">
+              <span style="font-family:'Material Symbols Outlined'; font-size:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">menu</span>
+            </button>
+            <div style="display:flex; flex-direction:column">
+              <span style="font-weight:700">Empleados</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center">
+            <button style="width:48px; height:48px; padding:0; border:none; border-radius:55px; background:transparent; color:black; display:flex; align-items:center; justify-content:center; cursor:pointer" style-hover="background-color:rgba(0,0,0,0.04)">
+              <span style="font-family:'Material Symbols Outlined'; font-size:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">account_circle</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="width:100%; display:flex; flex-direction:column; gap:10px; padding:16px; box-sizing:border-box">
+          <form style="width:90%; max-width:800px; margin:0 auto; display:flex; gap:12px">
+            <input type="text" placeholder="Buscar" value="{{ searchTerm }}" style="width:100%; padding:10px 20px; height:25px; box-sizing:content-box; background-color:rgba(0,0,0,0.062); font-family:'Plus Jakarta Sans',sans-serif; font-size:1.1rem; border:none; outline:none; border-radius:10px; color:#333" />
+          </form>
+        </div>
+      </div>
+
+      <div style="position:relative; flex:1; min-height:0; overflow:auto">
+        <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:10px; width:100%; box-sizing:border-box">
+            <div style="width:100%; margin:0 auto; padding:16px; box-sizing:border-box; gap:12px; display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr))">
+              <sc-for list="{{ employees }}" as="emp" hint-placeholder-count="4">
+                <div style="width:100%; padding:16px; border-radius:12px; background-color:#fafafa; cursor:pointer; box-sizing:border-box; animation:fade-in 0.3s ease-in-out">
+                  <div style="width:40px; height:40px; border-radius:50%; background-color:#0468d7; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-weight:600">{{ emp.initial }}</div>
+                  <br />
+                  <div style="display:flex; flex-direction:column; gap:4px">
+                    <span style="font-size:1.1rem; font-weight:600">{{ emp.name }}</span>
+                    <span style="font-size:0.9rem; color:#666666">{{ emp.documentNumber }}</span>
+                  </div>
+                  <br />
+                  <sc-if value="{{ emp.isOperational }}" hint-placeholder-val="{{ true }}">
+                    <div style="width:fit-content; padding:0 10px; border-radius:30px; display:flex; align-items:center; font-weight:bold; justify-content:center; text-transform:uppercase; color:#11734b; background-color:#d4edbc">
+                      <span style="font-family:'Material Symbols Outlined'; font-size:24px; width:24px; height:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">check</span>
+                      <span>Operativo</span>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ emp.isNotOperational }}">
+                    <div style="width:fit-content; padding:0 10px; border-radius:30px; display:flex; align-items:center; font-weight:bold; justify-content:center; text-transform:uppercase; color:#b10202; background-color:#ffcfc9">
+                      <span style="font-family:'Material Symbols Outlined'; font-size:24px; width:24px; height:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">close</span>
+                      <span>Inactivo</span>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDefault }}">
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; box-sizing:border-box; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); animation:fade-in 0.3s ease-in-out">
+            <p style="text-align:center; color:#666666; font-size:1.3rem; margin:0">Ingrese algun valor para buscar</p>
+            <img draggable="false" src="assets/pictures/undraw_personal-info_yzls.svg" alt="" style="width:50%; max-width:600px" />
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isNotFound }}">
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; box-sizing:border-box; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); animation:fade-in 0.3s ease-in-out">
+            <p style="text-align:center; color:#666666; font-size:1.3rem; margin:0">No se encontraron empleados con la búsqueda</p>
+            <img draggable="false" src="assets/pictures/undraw_no-data_ig65.svg" alt="" style="width:50%; max-width:300px" />
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ hasDrafts }}" hint-placeholder-val="{{ true }}">
+        <button style="position:absolute; bottom:92px; right:26px; z-index:10; width:40px; height:40px; padding:0; border:none; border-radius:55px; background-color:#0468d7; color:#ffffff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 3px 5px -1px rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12)">
+          <span style="font-family:'Material Symbols Outlined'; font-size:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">drafts</span>
+          <span style="position:absolute; top:-4px; right:-4px; min-width:18px; height:18px; padding:0 4px; display:flex; align-items:center; justify-content:center; border-radius:50px; font-family:'Plus Jakarta Sans',sans-serif; font-size:10px; font-weight:700; color:white; background-color:#d1002d; box-sizing:border-box">{{ draftCount }}</span>
+      </button>
+      </sc-if>
+
+      <button style="position:absolute; bottom:20px; right:20px; z-index:10; width:56px; height:56px; padding:0; border:none; border-radius:55px; background-color:#0468d7; color:#ffffff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 3px 5px -1px rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12)">
+        <span style="font-family:'Material Symbols Outlined'; font-size:24px; line-height:1; font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24">add</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;resultados&quot;,&quot;sin busqueda&quot;,&quot;sin resultados&quot;],&quot;default&quot;:&quot;resultados&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Estado de la vista&quot;},&quot;resultCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:1,&quot;max&quot;:8,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Estado de la vista&quot;},&quot;searchTerm&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;a&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Estado de la vista&quot;},&quot;draftCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2,&quot;min&quot;:0,&quot;max&quot;:9,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Estado de la vista&quot;},&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;jsanchez&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Toolbar&quot;}}">
+const EMPLOYEES = [
+  { name: "ACOSTA MARIANO EZEQUIEL", documentNumber: "34.812.905", isOperational: true },
+  { name: "BENITEZ CARLA SOLEDAD", documentNumber: "29.447.118", isOperational: true },
+  { name: "CABRERA JOSE LUIS", documentNumber: "22.905.331", isOperational: false },
+  { name: "DOMINGUEZ RAMON ALBERTO", documentNumber: "31.226.874", isOperational: true },
+  { name: "ESPINOZA VALERIA NOEMI", documentNumber: "38.019.562", isOperational: true },
+  { name: "FERNANDEZ HUGO DANIEL", documentNumber: "27.663.402", isOperational: false },
+  { name: "GIMENEZ LUCAS MARTIN", documentNumber: "40.551.287", isOperational: true },
+  { name: "HERRERA SILVINA BEATRIZ", documentNumber: "25.108.743", isOperational: true },
+];
+
+class Component extends DCLogic {
+  renderVals() {
+    const state = this.props.state ?? "resultados";
+    const count = this.props.resultCount ?? 8;
+    const draftCount = this.props.draftCount ?? 2;
+    const employees = EMPLOYEES.slice(0, Math.max(1, Math.min(count, EMPLOYEES.length))).map((e, i) => ({
+      id: i,
+      name: e.name,
+      documentNumber: e.documentNumber,
+      initial: e.name[0],
+      isOperational: e.isOperational,
+      isNotOperational: !e.isOperational,
+    }));
+
+    return {
+      employees,
+      hasResults: state === "resultados",
+      isDefault: state === "sin busqueda",
+      isNotFound: state === "sin resultados",
+      searchTerm: state === "sin busqueda" ? "" : (this.props.searchTerm ?? "a"),
+      userName: this.props.userName ?? "jsanchez",
+      draftCount,
+      hasDrafts: draftCount > 0,
+    };
+  }
+}
+
+</script>
+</body>
+</html>
