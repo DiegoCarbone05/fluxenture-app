@@ -1,160 +1,43 @@
+// Track & Trace — mismo lenguaje visual que Empleados/Ausencias/Documentos v3.
+// El grueso vive en shared/components/. Acá solo queda lo especifico de esta
+// pagina: las columnas de la tabla, la barra de "nuevas entregas" y el badge.
+
 :host {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  // background: #ffffff;
-  overflow: hidden;
-}
-
-// ── TAB GROUP ─────────────────────────────────────────────────────────────────
-:host ::ng-deep {
-  mat-tab-group {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    height: 100%;
-    overflow: hidden;
-
-    mat-tab-header {
-      font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Oxygen,
-        Ubuntu,
-        Cantarell,
-        "Open Sans",
-        "Helvetica Neue",
-        sans-serif;
-      font-weight: 700;
-      background: var(--header-color) !important;
-      border-bottom: 1px solid #e4e4e4;
-    }
-
-    .mdc-tab__text-label {
-      text-transform: uppercase;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-      color: #555a64;
-    }
-
-    .mdc-tab--active .mdc-tab__text-label {
-      color: var(--primary, #0468d7);
-    }
-
-    .mat-mdc-tab-body-wrapper {
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .mat-mdc-tab-body-content {
-      height: 100%;
-      overflow: hidden;
-    }
-  }
-}
-
-// ── PAGINATOR ──────────────────────────────────────────────────────────────────
-:host ::ng-deep mat-paginator {
   display: block;
-  background: #ffffff;
-  border: 1px solid #eeeeee;
-  border-radius: 12px;
-  margin-top: 8px;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-
-  .mat-mdc-paginator-container {
-    min-height: 48px;
-    padding: 0 8px;
-    justify-content: center;
-    font-family:
-      system-ui,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      Roboto,
-      sans-serif;
-  }
-
-  .mat-mdc-paginator-page-size-label,
-  .mat-mdc-paginator-range-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #7a8090;
-  }
-
-  .mat-mdc-icon-button {
-    color: #5a6480;
-  }
+  background-color: #f8f8f8;
 }
 
-// ── TAB COUNTER BADGE ─────────────────────────────────────────────────────────
-.tab-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 50px;
-  font-size: 11px;
-  font-weight: 700;
-  margin-left: 6px;
-  background-color: #e8ecf5;
-  color: #5a6480;
+// ══ ESCRITORIO ═══════════════════════════════════════════════════════════════
 
-  &.active {
-    background-color: rgba(4, 104, 215, 0.12);
-    color: var(--primary, #0468d7);
-  }
-}
-
-// ── CONTENT SCROLL WRAPPER ────────────────────────────────────────────────────
-.tnt-content {
+.desk {
   height: 100%;
   overflow-y: auto;
-  overflow-x: hidden;
-  background-color: white;
+  box-sizing: border-box;
+  padding: 28px 32px 40px;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
-// ── EMPTY STATE ────────────────────────────────────────────────────────────────
-.tnt-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding: 80px 24px;
-
-  mat-icon {
-    font-size: 64px;
-    width: 64px;
-    height: 64px;
-    color: #d8dce6;
-  }
-
-  span {
-    font-size: 15px;
-    font-weight: 500;
-    color: #999;
-    text-align: center;
-  }
+.table-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  animation: fade-in 0.3s ease-in-out;
 }
 
-// ── BARRA "NUEVAS ENTREGAS" ──────────────────────────────────────────────────
+// ── Barra "nuevas entregas" ──────────────────────────────────────────────────
 .new-alert-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 8px 14px;
+  padding: 10px 16px;
   margin: 12px 16px 0;
   border-radius: 10px;
   background-color: rgba(4, 104, 215, 0.08);
-  border: 1px solid rgba(4, 104, 215, 0.18);
 
   .new-alert-text {
     display: flex;
@@ -166,261 +49,193 @@
     letter-spacing: 0.3px;
     color: var(--primary, #0468d7);
 
-    .meta-icon {
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
       color: var(--primary, #0468d7);
     }
   }
 }
 
-// ── HEADER DESKTOP ─────────────────────────────────────────────────────────────
-.tnt-list-header {
-  display: none;
+.new-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background-color: rgba(4, 104, 215, 0.12);
+  color: var(--primary, #0468d7);
+  white-space: nowrap;
 }
 
-// ── LISTA MOBILE ───────────────────────────────────────────────────────────────
-.tnt-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px 16px 100px;
-}
+// ── Grilla de tabla ──────────────────────────────────────────────────────────
 
-// ── TARJETA CD (mobile-first) ──────────────────────────────────────────────────
-.cd-card {
+.table-head,
+.table-row {
   display: grid;
-  grid-template-areas:
-    "status date"
-    "name   name"
-    "track  track"
-    "obs    acts";
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto auto auto;
-  column-gap: 8px;
-  row-gap: 3px;
+  column-gap: 12px;
+  padding: 10px 16px;
+}
 
-  background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #eeeeee;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-  padding: 12px 8px 8px 14px;
-  cursor: pointer;
+.cols-tnt {
+  grid-template-columns: 1.4fr 160px 90px 1.3fr 220px 92px;
+}
 
-  transition:
-    box-shadow 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
+.table-head {
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #7a8090;
 
-  &.completed {
-    background-color: #fafafa;
-
-    .cd-employee-name {
-      color: #555;
-    }
-    .cd-tracking {
-      color: #7a90b0;
-    }
+  .align-right {
+    text-align: right;
   }
+}
+
+.table-row {
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 
   &:hover {
-    box-shadow: 0 4px 18px rgba(4, 104, 215, 0.09);
-    border-color: rgba(4, 104, 215, 0.22);
-    transform: translateY(-1px);
+    background-color: #f7f8fa;
   }
+}
 
-  .f-status {
-    grid-area: status;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding-bottom: 5px;
-    min-width: 0;
-  }
+.cell-tracking {
+  min-width: 0;
 
-  .new-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 9px;
-    border-radius: 50px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    background-color: rgba(4, 104, 215, 0.12);
-    color: var(--primary, #0468d7);
-    white-space: nowrap;
-  }
-  .f-employee {
-    grid-area: name;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    min-width: 0;
-    padding-bottom: 1px;
-  }
-  .f-tracking {
-    grid-area: track;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    min-width: 0;
-    padding-bottom: 3px;
-  }
-  .f-date {
-    grid-area: date;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    justify-content: flex-end;
-    padding-bottom: 5px;
-  }
-  .f-obs {
-    grid-area: obs;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    min-width: 0;
-    align-self: center;
-  }
-  .f-actions {
-    grid-area: acts;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-shrink: 0;
-  }
-  .mobile-label {
-    font-size: 10px;
-    color: #b0b5c0;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    font-weight: 700;
-    line-height: 1;
-  }
-  .cd-employee-name {
-    font-weight: 700;
-    font-size: 15px;
-    color: #1a1a2e;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .cd-tracking {
-    font-size: 13px;
-    color: #4a6fa5;
-    font-weight: 600;
+  span {
     font-family: monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a6fa5;
+    letter-spacing: 0.3px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    letter-spacing: 0.3px;
   }
-  .meta-icon {
+}
+
+.cell-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+
+  mat-icon {
     font-size: 14px;
     width: 14px;
     height: 14px;
     color: #9aa0ac;
     flex-shrink: 0;
   }
-  .cd-date {
+
+  span {
     font-size: 12px;
-    color: #6c757d;
     font-weight: 600;
-    white-space: nowrap;
-  }
-  .cd-obs {
-    font-size: 13px;
     color: #6c757d;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 }
 
-// ── RESPONSIVE (escritorio) ────────────────────────────────────────────────────
-@media screen and (min-width: 768px) {
+.cell-desc {
+  font-size: 13px;
+  color: #6c757d;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell-progress {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+// ══ MOVIL · Material 3 ═══════════════════════════════════════════════════════
+
+.m3 {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  font-family: Roboto, system-ui, sans-serif;
+}
+
+.m3-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 96px;
+
   .new-alert-bar {
-    max-width: 1200px;
-    width: 95%;
-    margin: 16px auto 0;
+    margin: 8px 16px 0;
+  }
+}
+
+.m3-subheader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 6px;
+
+  .m3-results {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    color: var(--primary, #0468d7);
   }
 
-  .tnt-table-wrap {
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #eaeaea;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    max-width: 1200px;
-    width: 95%;
-    margin: auto;
-    margin-top: 16px;
-    overflow: hidden;
-  }
-
-  .tnt-list-header {
-    background: white;
-    display: grid;
-    grid-template-columns: 1fr 160px 90px 1fr 240px 92px;
-    padding: 10px 16px;
-    border: none;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #7a8090;
-  }
-
-  .tnt-list {
-    padding: 0;
-    gap: 0;
-  }
-
-  .cd-card {
-    grid-template-areas: "name track date obs status acts";
-    grid-template-columns: 1fr 160px 90px 1fr 240px 92px;
-    grid-template-rows: auto;
-    border-radius: 0;
-    border: none;
-    border-bottom: 1px solid #f0f0f0;
-    box-shadow: none;
-    padding: 10px 16px;
-    column-gap: 12px;
-    row-gap: 0;
+  .m3-sort {
+    display: flex;
     align-items: center;
-    transform: none !important;
+    gap: 8px;
+    height: 32px;
+    padding: 0 12px 0 10px;
+    border: none;
+    outline: none;
+    border-radius: 8px !important;
+    background: transparent;
+    color: #49454f;
+    font-family: Roboto, system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    cursor: pointer;
+    box-shadow: none;
 
-    &:last-child {
-      border-bottom: none;
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
     }
 
     &:hover {
-      background-color: #f8f9ff;
-      border-color: transparent;
-      box-shadow: none;
-    }
-
-    .f-status {
-      padding: 0;
-    }
-    .f-date {
-      justify-content: flex-start;
-    }
-    .f-actions {
-      justify-content: flex-end;
-    }
-
-    .mobile-label {
-      display: none;
-    }
-    .cd-employee-name {
-      font-size: 14px;
+      background-color: rgba(0, 0, 0, 0.06);
     }
   }
+}
 
-  mat-paginator {
-    border: none;
-    border-top: 1px solid #f0f0f0;
-    border-radius: 0;
-    margin-top: 0;
-  }
+// Trailing de cada m3-list-item: badge + estado arriba, acciones abajo.
+.m3-trailing {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: 140px;
 }

@@ -1,0 +1,14 @@
+<div class="stat-top">
+  <span class="stat-label">{{ stat.label }}</span>
+  <div class="stat-icon" [style.background]="stat.iconBg" [style.color]="stat.iconFg">
+    <mat-icon>{{ stat.icon }}</mat-icon>
+  </div>
+</div>
+<span class="stat-value">{{ stat.value }}</span>
+<div class="stat-note">
+  @if (stat.noteIcon) {
+    <mat-icon class="note-icon" [style.color]="stat.noteFg">{{ stat.noteIcon }}</mat-icon>
+  }
+  <span class="stat-delta" [style.color]="stat.noteFg">{{ stat.note }}</span>
+  <span class="stat-note-text">{{ stat.noteText }}</span>
+</div>

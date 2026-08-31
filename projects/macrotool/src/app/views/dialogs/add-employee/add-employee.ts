@@ -12,6 +12,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatStepperModule } from '@angular/material/stepper';
 import { CommonModule } from '@angular/common';
 import { EmployeeDraftService } from '../../../core/services/employee-draft.service';
+import { EMPLOYEE_SECTOR } from '../../../shared/constants/typesValues.constant';
+import { WorkServicesService } from '../../../core/services/api/work-services/work-services.service';
 
 export interface AddEmployeeDialogData {
   employee?: Employee;
@@ -45,6 +47,7 @@ export class AddEmployee implements OnInit {
   constructor(
     private viewSvc: ViewsService,
     private draftService: EmployeeDraftService,
+    private workServicesSvc: WorkServicesService,
   ) {
 
   }
@@ -55,13 +58,43 @@ export class AddEmployee implements OnInit {
     { value: EGender.OTHER, label: 'Otro' },
   ];
   readonly civilStatusOptions = Object.values(ECivilStatus);
-  readonly sectorOptions: { value: ESector; label: string }[] = [
-    { value: ESector.DESMALEZADO, label: 'Desmalezado' },
-    { value: ESector.CLEANING_OPERATOR, label: 'Operador de limpieza' },
-    { value: ESector.ADMINISTRATION, label: 'Administración' },
-  ];
+  // Mismo listado que usa la tabla de Empleados (EMPLOYEE_SECTOR), para que la
+  // etiqueta de cada sector sea igual en todos lados.
+  readonly sectorOptions = EMPLOYEE_SECTOR;
+
+  /**
+   * Algunos empleados tienen en el backend un valor de sector que ya no esta
+   * en `sectorOptions` (datos viejos, cargados antes de que existiera este
+   * enum). La tabla lo muestra igual como texto crudo (ver EmpSectorPipePipe),
+   * pero el <mat-select> solo puede mostrar una seleccion si esa opcion
+   * existe: sin esto, el campo aparecia vacio y guardar cualquier otro cambio
+   * terminaba borrando el sector real del empleado.
+   */
+  /** Solo los vigentes: un servicio archivado no se ofrece para asignar. */
+  get serviceOptions() {
+    return this.workServicesSvc.getActiveServices();
+  }
+
+  /**
+   * Mismo caso que extraSectorOption: si el empleado tiene un servicio archivado
+   * (o que todavia no esta en la lista), la opcion se agrega igual para que el
+   * <mat-select> pueda mostrarlo y guardar no se lo borre.
+   */
+  get extraServiceOption(): string | null {
+    const current = this.employee?.service;
+    if (!current) return null;
+    return this.serviceOptions.some((s) => s.name === current) ? null : current;
+  }
+
+  get extraSectorOption(): { value: ESector; label: string } | null {
+    const current = this.employee?.sector;
+    if (!current) return null;
+    if (this.sectorOptions.some((opt) => opt.value === current)) return null;
+    return { value: current, label: `${current} (valor no reconocido)` };
+  }
 
   identificationForm = new FormGroup({
+    surname: new FormControl('', Validators.required),
     name: new FormControl('', Validators.required),
     cuil: new FormControl<number | null>(null, Validators.required),
     documentNumber: new FormControl(''),
@@ -77,6 +110,8 @@ export class AddEmployee implements OnInit {
   workForm = new FormGroup({
     employeeID: new FormControl<number | null>(null, Validators.required),
     sector: new FormControl<ESector>(ESector.ADMINISTRATION, Validators.required),
+    // Texto libre por ahora: la lista administrable de servicios todavia no existe.
+    service: new FormControl(''),
     isOperational: new FormControl(true),
   });
 
@@ -113,6 +148,7 @@ export class AddEmployee implements OnInit {
 
   private patchFormWithEmployee(emp: Employee): void {
     this.identificationForm.patchValue({
+      surname: emp.surname ?? '',
       name: emp.name,
       cuil: emp.cuil,
       documentNumber: emp.documentNumber,
@@ -126,6 +162,7 @@ export class AddEmployee implements OnInit {
     this.workForm.patchValue({
       employeeID: emp.employeeID,
       sector: emp.sector,
+      service: emp.service ?? '',
       isOperational: emp.isOperational,
     });
     this.addressForm.patchValue({
@@ -157,10 +194,12 @@ export class AddEmployee implements OnInit {
     const employee = new Employee({
       ...(this.employee?.id && { id: this.employee.id }),
       name: identification.name ?? '',
+      surname: identification.surname ?? '',
       cuil: identification.cuil ?? 0,
       employeeID: work.employeeID ?? 0,
       isOperational: work.isOperational ?? true,
-      sector: (work.sector != null ? Number(work.sector) : ESector.ADMINISTRATION) as ESector,
+      sector: work.sector ?? ESector.ADMINISTRATION,
+      service: work.service?.trim() || undefined,
       documentType: undefined,
       documentNumber: identification.documentNumber ?? '',
       birthDate: personal.birthDate ?? '',

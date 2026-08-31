@@ -4,6 +4,7 @@ import { BaseApiService } from '../../base-api.service';
 import { Doc, EDocType } from '../../../../shared/models/Doc';
 import { EmployeeService } from '../employees/employee.service';
 import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
+import { fullNameOf } from '../../../../shared/models/Employee';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +29,10 @@ export class StorageService extends BaseApiService<string> {
   uploadDoc(file: File, employee: EmployeeDTO, docType: EDocType) {
     const formData = new FormData();
 
-    const folderPath = `lpo/[${employee.employeeId}] ${employee.name}`
+    // Se usa el nombre completo (APELLIDO NOMBRES) y no employee.name: despues del
+    // split, name son solo los nombres de pila, y armar la ruta con eso apuntaria a
+    // una carpeta distinta de la que el empleado ya tiene creada en Drive.
+    const folderPath = `lpo/[${employee.employeeId}] ${fullNameOf(employee)}`
 
     formData.append('file', file, file.name);
     formData.append('folderPath', folderPath);

@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="header">
+    <div class="wrap">
+      <h2>Dar de alta una cuenta</h2>
+      <span>Habilitá una cuenta de Servaltek para que pueda entrar a Fluxenture</span>
+    </div>
+
+    <button mat-icon-button (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSave()">
+    <mat-dialog-content class="mat-typography">
+      <div class="form-container">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Correo de Servaltek</mat-label>
+          <input matInput type="email" formControlName="mail" placeholder="nombre@servaltek.com" />
+          @if (form.controls.mail.invalid && form.controls.mail.touched) {
+            <mat-error>Ingresá un correo válido.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Rango</mat-label>
+          <mat-select formControlName="role">
+            @for (role of roles; track role) {
+              <mat-option [value]="role">{{ role }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (errorMessage()) {
+          <p class="error-text">{{ errorMessage() }}</p>
+        }
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+      <button color="primary" mat-flat-button type="submit" class="dialog-btn submit-btn" [disabled]="form.invalid || saving()">
+        @if (saving()) {
+          <mat-spinner diameter="18"></mat-spinner>
+        } @else {
+          <span>Dar de alta</span>
+        }
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

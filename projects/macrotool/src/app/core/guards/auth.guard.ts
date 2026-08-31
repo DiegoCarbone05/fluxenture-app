@@ -1,27 +1,41 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { AuthGuardData, createAuthGuard } from 'keycloak-angular';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../services/api/auth/auth.service';
-import { map, take } from 'rxjs/operators';
 
-export const authGuard: CanActivateFn = (route, state) => {
-
+const isAccessAllowed = async (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot,
+  authData: AuthGuardData
+) => {
+  const { authenticated, keycloak } = authData;
   const router = inject(Router);
-  const authService = inject(AuthService);
 
-  return authService.verifySession().pipe(
-    take(1),
-    map(isValid => {
-      if (!isValid) {
-        router.navigate(['/login']);
-        return false;
-      }
-      // If valid and user is on auth area (e.g. splash), redirect to main/tnt to avoid loop
-      const url = state.url.replace(/^\//, '');
-      if (!url.startsWith('main')) {
-        router.navigate(['/main', 'app-pages', 'tnt']);
-        return false;
-      }
-      return true; // If valid and user is on main area, allow access
-    })
-  );
+  if (!authenticated) {
+    // No autenticado: redirige al login centralizado de Keycloak.
+    await keycloak.login({ redirectUri: window.location.origin + '/main/app-pages/tnt' });
+    return false;
+  }
+
+  // Autenticado en Keycloak != autorizado en Fluxenture: el backend rechaza con 403
+  // si el email no tiene un User dado de alta (ver FluxentureAccountFilter).
+  try {
+    await firstValueFrom(inject(AuthService).getUser());
+  } catch (err) {
+    if (err instanceof HttpErrorResponse && err.status === 403) {
+      return router.parseUrl('/no-autorizado');
+    }
+    throw err;
+  }
+
+  // Si esta autorizado y esta en el area de auth (splash), lo mandamos a main para evitar loops.
+  const url = state.url.replace(/^\//, '');
+  if (!url.startsWith('main')) {
+    return router.parseUrl('/main/app-pages/tnt');
+  }
+  return true;
 };
+
+export const authGuard: CanActivateFn = createAuthGuard<CanActivateFn>(isAccessAllowed);

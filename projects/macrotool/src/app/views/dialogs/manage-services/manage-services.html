@@ -1,0 +1,80 @@
+<div class="container">
+  <div class="header">
+    <div class="wrap">
+      <h2>Servicios</h2>
+      <span>Los objetivos o clientes a los que se asignan los empleados</span>
+    </div>
+    <button mat-icon-button (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="add-row">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nuevo servicio</mat-label>
+      <input matInput [formControl]="newName" placeholder="Ej: AZOPARDO ARCA"
+             (keyup.enter)="add()" />
+    </mat-form-field>
+    <button mat-flat-button color="primary" (click)="add()"
+            [disabled]="newName.invalid || saving()">
+      <mat-icon>add</mat-icon>
+      Agregar
+    </button>
+  </div>
+
+  <mat-dialog-content class="mat-typography">
+    @if (services().length === 0) {
+      <div class="empty-state">
+        <mat-icon>badge</mat-icon>
+        <span>Todavía no hay servicios cargados.</span>
+        <button mat-stroked-button color="primary" (click)="seed()" [disabled]="saving()">
+          Armar la lista con los que ya usan los empleados
+        </button>
+      </div>
+    } @else {
+      <div class="service-list">
+        @for (service of services(); track service.id) {
+          <div class="service-row" [class.archived]="!service.active">
+            @if (editingId() === service.id) {
+              <mat-form-field appearance="outline" class="edit-field">
+                <input matInput [formControl]="editName"
+                       (keyup.enter)="confirmEdit(service)"
+                       (keyup.escape)="cancelEdit()" />
+              </mat-form-field>
+              <button mat-icon-button color="primary" matTooltip="Guardar"
+                      (click)="confirmEdit(service)" [disabled]="editName.invalid || saving()">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Cancelar" (click)="cancelEdit()">
+                <mat-icon>close</mat-icon>
+              </button>
+            } @else {
+              <div class="service-info">
+                <span class="service-name">{{ service.name }}</span>
+                <span class="service-meta">
+                  {{ employeesIn(service) }}
+                  {{ employeesIn(service) === 1 ? 'empleado' : 'empleados' }}
+                  @if (!service.active) { · archivado }
+                </span>
+              </div>
+              <button mat-icon-button matTooltip="Renombrar"
+                      (click)="startEdit(service)" [disabled]="saving()">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button
+                      [matTooltip]="service.active ? 'Archivar' : 'Reactivar'"
+                      (click)="toggleActive(service)" [disabled]="saving()">
+                <mat-icon>{{ service.active ? 'archive' : 'unarchive' }}</mat-icon>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <span class="count-note">{{ activeCount() }} activos de {{ services().length }}</span>
+    <button mat-button (click)="closeDialog()">Cerrar</button>
+  </mat-dialog-actions>
+</div>

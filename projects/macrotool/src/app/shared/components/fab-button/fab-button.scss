@@ -1,0 +1,76 @@
+// FAB M3: cuadrado con radio 16px. El `!important` le gana a
+// `button { border-radius: 55px !important }` de styles.scss.
+:host {
+  position: fixed;
+  right: 16px;
+  bottom: 120px;
+  z-index: 10;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: none;
+  outline: none;
+  border-radius: 16px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: none;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    font-variation-settings:
+      "FILL" 0,
+      "wght" 400,
+      "GRAD" 0,
+      "opsz" 24;
+  }
+
+  &.primary {
+    background-color: var(--primary, #0468d7);
+    color: #ffffff;
+
+    &:hover {
+      background-color: var(--primary-hover, rgb(5, 87, 180));
+    }
+  }
+
+  &.accent {
+    bottom: 188px;
+    right: 24px;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(4, 104, 215, 0.14);
+    color: var(--primary, #0468d7);
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background-color: rgba(4, 104, 215, 0.22);
+    }
+  }
+
+  ::ng-deep [fabBadge] {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #ffffff;
+    background-color: var(--warn, #d1002d);
+    box-sizing: border-box;
+  }
+}

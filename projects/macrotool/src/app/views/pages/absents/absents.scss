@@ -1,515 +1,166 @@
-:host ::ng-deep {
-  mat-tab-group {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    height: 100%;
-    overflow: hidden;
+// Ausencias — mismo lenguaje visual que Empleados v3.
+// El grueso vive en shared/components/. Acá solo queda lo especifico de esta
+// pagina: la tira de pestañas, las columnas de cada tabla y el calendario.
 
-    mat-tab-header {
-      font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Oxygen,
-        Ubuntu,
-        Cantarell,
-        "Open Sans",
-        "Helvetica Neue",
-        sans-serif;
-      font-weight: 700;
-      background: var(--header-color) !important;
-      border-bottom: 1px solid #e4e4e4;
-    }
-
-    .mdc-tab__text-label {
-      text-transform: uppercase;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-      color: #555a64;
-    }
-
-    .mdc-tab--active .mdc-tab__text-label {
-      color: var(--primary, #0468d7);
-    }
-
-    .mat-mdc-tab-body-wrapper {
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .mat-mdc-tab-body-content {
-      height: 100%;
-      overflow: hidden;
-    }
-  }
-}
 :host {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: #ffffff;
-  overflow: hidden;
-}
-
-// ── CALENDAR ──────────────────────────────────────────────────────────────────
-.absent-calendar {
+  display: block;
   width: 100%;
-  height: calc(100% - 1px);
-  display: grid;
-  grid-template-rows: auto 1fr;
-  overflow: auto;
-  border-top: 1px solid #e4e4e4;
-
-  .days {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    width: 100%;
-    background-color: #f7f7f7;
-    border-bottom: 2px solid #e4e4e4;
-
-    .day-of-week {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-right: 1px solid #e4e4e4;
-      height: 40px;
-      font-weight: 700;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #606878;
-
-      &.weekend {
-        color: #b04040;
-        background-color: rgba(176, 64, 64, 0.05);
-      }
-
-      &:last-child {
-        border-right: none;
-      }
-    }
-  }
-
-  .calendar {
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr;
-
-    .week {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      grid-template-rows: repeat(5, 1fr);
-      height: 100%;
-
-      .day {
-        border-right: 1px solid #e4e4e4;
-        border-bottom: 1px solid #e4e4e4;
-        height: calc(100% - 1px);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-width: 0;
-        overflow: hidden;
-        transition: all 0.2s ease-in-out;
-        outline: 3px solid transparent;
-        border-radius: 8px;
-        padding-top: 4px;
-
-        .day-number {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 26px;
-          height: 26px;
-          border-radius: 50%;
-          font-size: 12px;
-          font-weight: 600;
-          color: #555;
-          margin: 4px auto 3px;
-          transition:
-            background-color 0.2s ease,
-            color 0.2s ease;
-          flex-shrink: 0;
-        }
-
-        &.today {
-          .day-number {
-            background-color: var(--primary);
-            color: white;
-            box-shadow: 0 2px 8px rgba(4, 104, 215, 0.35);
-          }
-        }
-
-        &.empty-day {
-          background-color: #f9f9f9 !important;
-          pointer-events: none;
-
-          &:hover {
-            transform: none;
-            box-shadow: none;
-            outline: none;
-          }
-        }
-
-        .absent {
-          width: 100%;
-          padding: 0 5px;
-          box-sizing: border-box;
-          height: fit-content;
-          font-size: 10px;
-          background-color: #3da8ff2d;
-          color: #126bb4;
-          font-weight: 700;
-          text-overflow: clip;
-          overflow: hidden;
-          white-space: nowrap;
-          cursor: pointer;
-          transition: all 0.3s ease-in-out;
-
-          &.highlight {
-            background-color: var(--primary) !important;
-            color: #ffffff !important;
-            transition: all 0.3s ease-in-out;
-          }
-
-          &.unselected {
-            background-color: #e6e6e6 !important;
-            color: #00000054 !important;
-            transition: all 0.3s ease-in-out;
-          }
-
-          &.absent-VACATIONS {
-            background-color: #d2f0e4;
-            color: #0ead6d;
-          }
-
-          &.absent-MEDICAL {
-            background-color: #ecf2fd;
-            color: #3d7dc7;
-          }
-
-          &.absent-LICENSE {
-            background-color: #d2eff0;
-            color: #0ea8ad;
-          }
-
-          &.absent-SUSPENSION {
-            background-color: #f3e597;
-            color: #655814;
-          }
-
-          &.absent-FT {
-            background-color: #f0d2d2;
-            color: #ad0e0e;
-          }
-
-          &.absent-DT {
-            background-color: #f0d2d2;
-            color: #ad0e0e;
-          }
-
-          &.absent-DG {
-            background-color: #ebebeb;
-            color: #828282;
-          }
-
-          &.absent-PG {
-            background-color: #ebebeb;
-            color: #828282;
-          }
-
-          &.absent-DESPIDO {
-            background-color: #313131;
-            color: #ffffff;
-          }
-
-          &.absent-RENUNCIA {
-            background-color: white;
-            border: 1px solid #313131;
-            color: #313131;
-          }
-
-          &.absent-FERIADO {
-            background-color: #d89a64;
-            color: #603d35;
-          }
-        }
-
-        &:nth-child(7n + 1) {
-          background-color: rgba(176, 64, 64, 0.022);
-        }
-
-        &:nth-child(7n) {
-          background-color: rgba(176, 64, 64, 0.022);
-          border-right: none;
-        }
-
-        &:hover {
-          background-color: white;
-          transition: all 0.3s cubic-bezier(0.02, 0.61, 0.17, 1.01);
-          outline: 3px solid var(--primary);
-          transform: translateY(-5px);
-          box-shadow: 0 20px 30px rgba(0, 0, 0, 0.233);
-        }
-      }
-    }
-  }
+  height: 100%;
+  overflow: hidden;
+  background-color: #f8f8f8;
 }
 
-// ── ABSENT LIST ───────────────────────────────────────────────────────────────
-.absent-list {
+// ══ ESCRITORIO ═══════════════════════════════════════════════════════════════
+
+.desk {
   height: 100%;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px 16px;
-  padding-bottom: 100px;
-  touch-action: pan-y;
-  max-width: 1200px;
-  width: 95%;
-  margin: auto;
   box-sizing: border-box;
-
-  .absent-list-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 60px 0;
-    color: #888;
-
-    mat-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
-      color: #4caf50;
-    }
-
-    span {
-      font-size: 15px;
-    }
-  }
-
-  .absent-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #eeeeee;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    padding: 12px 6px 12px 14px;
-    cursor: pointer;
-    transition:
-      box-shadow 0.2s ease,
-      border-color 0.2s ease,
-      transform 0.2s ease;
-    gap: 4px;
-    touch-action: pan-y;
-
-    &:hover {
-      box-shadow: 0 4px 18px rgba(4, 104, 215, 0.1);
-      border-color: rgba(4, 104, 215, 0.25);
-      transform: translateY(-1px);
-    }
-
-    .absent-card-body {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      flex: 1;
-      min-width: 0;
-
-      .absent-card-meta {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex-wrap: wrap;
-      }
-
-      .absent-justified-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 3px;
-        font-size: 11px;
-        font-weight: 600;
-        padding: 2px 8px 2px 4px;
-        border-radius: 50px;
-        white-space: nowrap;
-
-        mat-icon {
-          font-size: 13px;
-          width: 13px;
-          height: 13px;
-        }
-
-        &.justified {
-          background-color: #d2f0e4;
-          color: #0ead6d;
-        }
-
-        &.unjustified {
-          background-color: #f0d2d2;
-          color: #ad0e0e;
-        }
-      }
-
-      .absent-employee-name {
-        font-weight: 700;
-        font-size: 16px;
-        color: #1a1a2e;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .novedad-type-chip {
-        display: inline-flex;
-        align-items: center;
-        padding: 3px 12px;
-        border-radius: 50px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.25px;
-        background-color: #ebebeb;
-        color: #828282;
-        white-space: nowrap;
-      }
-
-      .absent-date-info {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        color: #6c757d;
-        font-size: 12px;
-
-        mat-icon {
-          font-size: 14px;
-          width: 14px;
-          height: 14px;
-        }
-      }
-    }
-
-    .absent-card-actions {
-      display: flex;
-      flex-shrink: 0;
-    }
-  }
+  padding: 28px 32px 40px;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
-// ── STATS ─────────────────────────────────────────────────────────────────────
-.stats-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+.table-card {
+  background-color: #ffffff;
+  border-radius: 12px;
   overflow: hidden;
+  animation: fade-in 0.3s ease-in-out;
 }
 
-.stats-empty {
+.loading-wrapper {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 60px 0;
-  color: #888;
+  padding: 80px 0;
+}
+
+// ── Grillas de tabla ─────────────────────────────────────────────────────────
+
+.table-head,
+.table-row {
+  display: grid;
+  column-gap: 12px;
+  padding: 10px 16px;
+}
+
+.cols-absents {
+  grid-template-columns: 1.6fr 150px 1.1fr 80px 150px 120px;
+}
+
+.cols-novedades {
+  grid-template-columns: 1.5fr 140px 1.5fr 120px 120px;
+}
+
+.cols-stats {
+  grid-template-columns: 1.5fr 110px 2.2fr;
+}
+
+.table-head {
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #7a8090;
+
+  .align-right {
+    text-align: right;
+  }
+}
+
+.table-row {
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #f7f8fa;
+  }
+}
+
+.cols-absents.table-row {
+  cursor: pointer;
+}
+
+.cell-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
 
   mat-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: #4caf50;
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #9aa0ac;
+    flex-shrink: 0;
   }
 
   span {
-    font-size: 15px;
-  }
-}
-
-.stats-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 14px 16px 100px;
-}
-
-// ── STAT CARD ─────────────────────────────────────────────────────────────────
-.stat-card {
-  background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #eeeeee;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-  padding: 14px 16px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  transition:
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-
-  &:hover {
-    box-shadow: 0 4px 16px rgba(4, 104, 215, 0.08);
-    border-color: rgba(4, 104, 215, 0.2);
-  }
-}
-
-.stat-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.stat-employee-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-
-  .stat-emp-id {
-    flex-shrink: 0;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--primary, #0468d7);
-    background-color: rgba(4, 104, 215, 0.1);
-    border-radius: 50px;
-    padding: 2px 9px;
-    letter-spacing: 0.3px;
-  }
-
-  .stat-emp-name {
-    font-size: 15px;
-    font-weight: 700;
-    color: #1a1a2e;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 }
 
-.stat-total-badge {
+.cell-days {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+
+  .days-value {
+    font-size: 15px;
+    font-weight: 800;
+    color: #1a1a2e;
+  }
+
+  .days-unit {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9aa0ac;
+  }
+}
+
+.cell-desc {
+  font-size: 13px;
+  color: #35353c;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.novedad-type-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background-color: #f1f1f1;
+  color: #5a6480;
+  white-space: nowrap;
+}
+
+.total-badge {
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
+  padding: 3px 12px;
+  border-radius: 50px;
+  background-color: #f1f1f1;
+  color: #5a6480;
   font-size: 12px;
   font-weight: 700;
-  background-color: #f0f0f0;
-  color: #555;
-  border-radius: 50px;
-  padding: 3px 12px;
   white-space: nowrap;
 
   &.warn {
-    background-color: #f0d2d2;
-    color: #ad0e0e;
+    background-color: #ffcfc9;
+    color: #b10202;
   }
 }
 
@@ -520,95 +171,342 @@
 }
 
 .stat-tag {
-  font-size: 12px;
-  font-weight: 500;
-  color: #555;
-  background-color: #efefef;
+  font-size: 11px;
+  font-weight: 600;
+  color: #5a6480;
+  background-color: #f1f1f1;
   border-radius: 50px;
-  padding: 3px 11px;
+  padding: 2px 10px;
+  white-space: nowrap;
 
   strong {
     font-weight: 800;
   }
 
   &.justified {
-    background-color: #f6d4d3;
-    color: #b34140;
+    background-color: #d4edbc;
+    color: #11734b;
   }
   &.unjustified {
-    background-color: #d7e4fa;
-    color: #25539c;
+    background-color: #ffcfc9;
+    color: #b10202;
   }
   &.suspension {
-    background-color: #feede0;
-    color: #9c6b43;
+    background-color: #f3e597;
+    color: #655814;
   }
   &.total-injust {
-    background-color: #fce4e4;
-    color: #c0392b;
-    outline: 1px solid rgba(192, 57, 43, 0.35);
+    background-color: #ffcfc9;
+    color: #b10202;
   }
   &.license {
-    background-color: #e3ecd2;
-    color: #59673f;
+    background-color: #d2eff0;
+    color: #0ea8ad;
   }
   &.ft {
-    background-color: #ffffa1;
-    color: #777701;
-    outline: 1px solid #77770166;
+    background-color: #f0d2d2;
+    color: #ad0e0e;
+  }
+  &.dt {
+    background-color: #d2e0f0;
+    color: #0e4ead;
   }
   &.art {
     background-color: #f0eee5;
     color: #877a31;
   }
   &.vacations {
-    background-color: #d2ffc9;
-    color: #2d6310;
+    background-color: #d2f0e4;
+    color: #0ead6d;
   }
 }
 
-// ── RESPONSIVE ────────────────────────────────────────────────────────────────
-@media screen and (min-width: 768px) {
-  .stats-list {
-    padding: 16px 24px 100px;
-    max-width: 1200px;
-    margin: 0 auto;
+// ── Calendario ───────────────────────────────────────────────────────────────
+
+.absent-calendar {
+  width: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border-top: 1px solid #f0f0f0;
+
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     width: 100%;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #f0f0f0;
+
+    .day-of-week {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 36px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #7a8090;
+
+      &.weekend {
+        color: #b10202;
+      }
+    }
   }
 
-  .absent-calendar {
-    .calendar {
-      .week {
-        .day {
-          gap: 4px;
+  .calendar {
+    display: grid;
+    grid-template-columns: 1fr;
 
-          .absent {
-            width: 90%;
-            border-radius: 50px;
-            padding: 0 10px;
-            font-size: 12px;
-            text-overflow: ellipsis;
+    .week {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-auto-rows: minmax(104px, auto);
+
+      .day {
+        border-right: 1px solid #f0f0f0;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        min-width: 0;
+        overflow: hidden;
+        padding: 4px 0 6px;
+        box-sizing: border-box;
+        transition: background-color 0.15s ease;
+
+        &:nth-child(7n) {
+          border-right: none;
+        }
+
+        .day-number {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          font-size: 12px;
+          font-weight: 600;
+          color: #6c757d;
+          margin: 2px auto 3px;
+          flex-shrink: 0;
+        }
+
+        &.today .day-number {
+          background-color: var(--primary, #0468d7);
+          color: #ffffff;
+        }
+
+        &.empty-day {
+          background-color: #fbfbfd;
+          pointer-events: none;
+        }
+
+        &:hover:not(.empty-day) {
+          background-color: #f7f8fa;
+        }
+
+        .absent {
+          width: 90%;
+          padding: 1px 10px;
+          box-sizing: border-box;
+          border-radius: 50px;
+          font-size: 11px;
+          font-weight: 700;
+          background-color: rgba(4, 104, 215, 0.1);
+          color: var(--primary, #0468d7);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          cursor: pointer;
+          transition:
+            background-color 0.2s ease,
+            color 0.2s ease;
+
+          &.highlight {
+            background-color: var(--primary, #0468d7) !important;
+            color: #ffffff !important;
+          }
+
+          &.unselected {
+            background-color: #f1f1f1 !important;
+            color: #b0b5c0 !important;
+          }
+
+          &.absent-VACATIONS {
+            background-color: #d2f0e4;
+            color: #0ead6d;
+          }
+          &.absent-MEDICAL_CERTIFICATE {
+            background-color: #ecf2fd;
+            color: #3d7dc7;
+          }
+          &.absent-LICENSE {
+            background-color: #d2eff0;
+            color: #0ea8ad;
+          }
+          &.absent-SUSPENSION {
+            background-color: #f3e597;
+            color: #655814;
+          }
+          &.absent-FT,
+          &.absent-DT {
+            background-color: #f0d2d2;
+            color: #ad0e0e;
+          }
+          &.absent-DG,
+          &.absent-PG {
+            background-color: #ebebeb;
+            color: #828282;
+          }
+          &.absent-DESPIDO {
+            background-color: #313131;
+            color: #ffffff;
+          }
+          &.absent-RENUNCIA {
+            background-color: #f1f1f1;
+            color: #313131;
+          }
+          &.absent-FERIADO {
+            background-color: #d89a64;
+            color: #603d35;
+          }
+          &.absent-ART {
+            background-color: #f0eee5;
+            color: #877a31;
           }
         }
       }
     }
   }
+}
 
-  .absent-list {
-    padding: 12px 50px;
+// ══ MOVIL · Material 3 ═══════════════════════════════════════════════════════
 
-    .absent-card {
-      padding: 14px 10px 14px 18px;
+.m3 {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  font-family: Roboto, system-ui, sans-serif;
+}
 
-      .absent-card-body {
-        .absent-employee-name {
-          font-size: 18px;
-        }
+.m3-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 96px;
+}
 
-        .absent-date-info {
-          font-size: 13px;
-        }
-      }
+.m3-subheader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 6px;
+
+  .m3-results {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    color: var(--primary, #0468d7);
+    white-space: nowrap;
+  }
+
+  .m3-subheader-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .m3-sort {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 10px;
+    border: none;
+    outline: none;
+    border-radius: 8px !important;
+    background: transparent;
+    color: #49454f;
+    font-family: Roboto, system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: none;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
     }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.06);
+    }
+  }
+}
+
+flux-m3-list-item {
+  .m3-status {
+    flex-shrink: 0;
+  }
+
+  flux-row-actions {
+    flex-shrink: 0;
+  }
+
+  .stat-tags {
+    margin-top: 2px;
+  }
+
+  .total-badge {
+    flex-shrink: 0;
+  }
+}
+
+// El calendario en telefono necesita celdas mas bajas y chips mas chicos.
+.m3 .absent-calendar {
+  border-top: none;
+
+  .calendar .week {
+    grid-auto-rows: minmax(76px, auto);
+
+    .day .absent {
+      width: 96%;
+      padding: 0 5px;
+      border-radius: 4px;
+      font-size: 9px;
+    }
+
+    .day .day-number {
+      width: 22px;
+      height: 22px;
+      font-size: 11px;
+      margin: 2px auto;
+    }
+  }
+}
+
+// Trigger del filtro de tipos. Es un <button> y no un <select> porque el filtro es
+// multiple, pero conserva el look del .flux-select del resto de la toolbar.
+.flux-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #5a6480;
   }
 }

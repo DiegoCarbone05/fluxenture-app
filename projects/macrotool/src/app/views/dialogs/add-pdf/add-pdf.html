@@ -25,9 +25,18 @@
         </mat-form-field>
 
         <div class="row">
+          <mat-form-field appearance="outline" class="product-field">
+            <mat-label>Prefijo</mat-label>
+            <mat-select formControlName="cdProduct">
+              <mat-select-trigger>{{ form.value.cdProduct }}</mat-select-trigger>
+              @for (product of products; track product.value) {
+                <mat-option [value]="product.value">{{ product.label }} — {{ product.desc }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Numero de CD</mat-label>
-            <input matInput formControlName="cdNumber" />
+            <mat-label>Numero de seguimiento</mat-label>
+            <input matInput formControlName="cdNumber" (paste)="onTrackingNumberPaste($event)" />
           </mat-form-field>
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Fecha de emisión</mat-label>

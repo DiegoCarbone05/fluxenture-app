@@ -1,0 +1,8 @@
+<div class="m3-item-avatar">{{ initials }}</div>
+<div class="m3-item-text">
+  <span class="m3-headline">{{ headline }}</span>
+  @for (line of support; track $index) {
+    <span class="m3-support">{{ line }}</span>
+  }
+</div>
+<ng-content></ng-content>

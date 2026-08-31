@@ -24,6 +24,7 @@ import { ABSENT_TYPES, DOC_TYPES } from '../../../shared/constants/typesValues.c
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
 import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
+import { fullNameOf } from '../../../shared/models/Employee';
 
 export enum UploadStatus {
   IDLE,
@@ -125,7 +126,7 @@ export class AddAbsentDialog implements OnInit {
         if (!value || value === '') return employees;
         const search = value.toString().toLowerCase();
         return employees.filter(emp =>
-          emp.name.toLowerCase().includes(search) ||
+          fullNameOf(emp).toLowerCase().includes(search) ||
           String(emp.employeeId).toLowerCase().includes(search)
         );
       })

@@ -1,4 +1,4 @@
-import { afterNextRender, Component, ElementRef, inject, Injector, signal, ViewChild } from '@angular/core';
+import { afterNextRender, Component, computed, ElementRef, inject, Injector, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatTableModule } from '@angular/material/table';
@@ -8,13 +8,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Toolbar } from '../../../../shared/components/toolbar/toolbar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Cd } from '../../../../shared/models/Cd.model';
+import { Cd, parseTrackingCode, trackingCodeOf } from '../../../../shared/models/Cd.model';
 import html2Canvas from 'html2canvas';
 import { Tnt } from '../../../../shared/models/Tnt.model';
 import { CdService } from '../../../../core/services/api/cd-api/cd.service';
 import { EmployeeService } from '../../../../core/services/api/employees/employee.service';
 import { StorageService } from '../../../../core/services/api/storage/storage.service';
 import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
+import { fullNameOf } from '../../../../shared/models/Employee';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -32,7 +33,9 @@ export class CdsViewer {
   @ViewChild('imprZone', { static: false }) imprZone!: ElementRef;
 
   cd = signal<Cd | null>(null);
+  trackingCode = computed(() => trackingCodeOf(this.cd()));
   employee = signal<EmployeeDTO | null>(null)
+  employeeName = computed(() => fullNameOf(this.employee()));
   tnts = signal<Tnt[]>([]);
   loadingTracking = signal(false);
   trackingError = signal<string | null>(null);
@@ -69,10 +72,14 @@ export class CdsViewer {
   ) {
     this.route.params.subscribe((params) => {
 
-      //Obtiene el Numero de seguimiento desde el params url
-      const trackingNumber = Number(params['id']);
+      //El param es el codigo completo ("CD123456789"). Los links viejos traen
+      //solo el numero: parseTrackingCode devuelve el prefijo por defecto y la
+      //busqueda cae en la primera coincidencia, como antes.
+      const { product, trackingNumber } = parseTrackingCode(params['id']);
+      const hasProduct = /[A-Za-z]/.test(String(params['id'] ?? ''));
+
       //Obtiene la CD del numero de seguimiento
-      const cd = this.cdService.getLocalCdByTrackingNumber(trackingNumber)
+      const cd = this.cdService.getLocalCdByTrackingNumber(trackingNumber, hasProduct ? product : undefined)
 
       if (cd) {
         this.loadCd(cd);
@@ -81,7 +88,7 @@ export class CdsViewer {
 
       //Entrada directa por URL (F5): el cache todavia no esta poblado
       this.cdService.refreshCds().subscribe(() => {
-        const fetched = this.cdService.getLocalCdByTrackingNumber(trackingNumber);
+        const fetched = this.cdService.getLocalCdByTrackingNumber(trackingNumber, hasProduct ? product : undefined);
         if (fetched) this.loadCd(fetched);
       });
     });
@@ -157,7 +164,10 @@ export class CdsViewer {
     this.savingSnapshot.set(true);
     try {
       const imgData = await this.generarPdfDesdeHtml();
-      await firstValueFrom(this.cdService.syncTrackingSnapshot(cd.id, imgData));
+      const updated = await firstValueFrom(this.cdService.syncTrackingSnapshot(cd.id, imgData));
+      // El backend puede haberle creado a la CD su propio PDF de salida para no pisar la carta
+      // original: se adopta el fileId nuevo o la descarga seguiria apuntando al archivo viejo.
+      if (updated) this.cd.set(updated);
     } catch (err) {
       console.error('Error subiendo el seguimiento a Drive:', err);
     } finally {
@@ -167,8 +177,7 @@ export class CdsViewer {
 
   async downloadFile() {
     const cd = this.cd();
-    const fileId = cd?.fileId;
-    if (!cd || !fileId) return;
+    if (!cd?.fileId) return;
 
     this.downloadingFile.set(true);
 
@@ -178,13 +187,16 @@ export class CdsViewer {
     // servir una copia vieja si el auto-sync de refreshTracking no llego a correr.
     await this.syncSnapshotToDrive();
 
+    // Se lee despues del sync: si era la primera sincronizacion, la CD estrena fileId propio.
+    const fileId = this.cd()?.fileId ?? cd.fileId;
+
     this.storageService.downloadFile(fileId).subscribe({
       next: (res) => {
         const blob = new Blob([res], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${this.cd()?.trackingNumber} - ${this.employee()?.name}.pdf`;
+        link.download = `${this.trackingCode()} - ${this.employeeName()}.pdf`;
         link.click();
         URL.revokeObjectURL(url);
         this.downloadingFile.set(false);

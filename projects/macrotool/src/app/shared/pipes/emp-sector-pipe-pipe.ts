@@ -14,12 +14,7 @@ export class EmpSectorPipePipe implements PipeTransform {
   transform(sector: ESector | undefined, ...args: unknown[]): string {
     if (!sector) return '';
 
-    const sectorFound = this.employeeSector.find((s) => {
-      console.log(s.value);
-      console.log(sector);
-      return s.value === sector
-    });
-    console.log(sectorFound);
+    const sectorFound = this.employeeSector.find((s) => s.value === sector);
     return sectorFound ? sectorFound.label : sector.toString();
   }
 

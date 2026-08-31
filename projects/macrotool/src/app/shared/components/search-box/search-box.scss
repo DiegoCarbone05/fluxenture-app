@@ -1,0 +1,37 @@
+:host {
+  flex: 1;
+  min-width: 0;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 14px;
+  background-color: rgba(0, 0, 0, 0.045);
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-family: "Plus Jakarta Sans", sans-serif;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: #7a8090;
+    flex-shrink: 0;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 14px;
+    color: #333333;
+
+    &::placeholder {
+      color: #9aa0ac;
+    }
+  }
+}

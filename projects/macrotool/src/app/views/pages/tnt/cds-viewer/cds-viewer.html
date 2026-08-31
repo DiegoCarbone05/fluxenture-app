@@ -1,6 +1,5 @@
 <flux-toolbar
   [backButton]="true"
-  [menuButton]="false"
   (backClick)="goBack()"
   title="Carta Documento"
   [bgColor]="cd()?.trackingCompleted ? '#0ead6d' : 'var(--primary)'"
@@ -38,11 +37,11 @@
         }}</span>
       </div>
       <span class="employee-name">{{
-        employee()?.name || "Empleado no encontrado"
+        employeeName() || "Empleado no encontrado"
       }}</span>
       <div class="cd-period">
         <mat-icon>tag</mat-icon>
-        <span>{{ cd()?.trackingNumber }}</span>
+        <span>{{ trackingCode() }}</span>
         <span class="period-sep">·</span>
         <mat-icon>event</mat-icon>
         <span>{{ cd()?.emissionDate | date: "dd/MM/yyyy" }}</span>
@@ -84,13 +83,11 @@
         <div class="info-row">
           <div class="info-item">
             <span class="label">Empleado</span>
-            <span class="value">{{ employee()?.name || "—" }}</span>
+            <span class="value">{{ employeeName() || "—" }}</span>
           </div>
           <div class="info-item">
             <span class="label">Nro. de seguimiento</span>
-            <span class="value tracking-number">{{
-              cd()?.trackingNumber
-            }}</span>
+            <span class="value tracking-number">{{ trackingCode() }}</span>
           </div>
           <div class="info-item">
             <span class="label">Fecha de emisión</span>

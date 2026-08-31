@@ -1,0 +1,50 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 64px 24px;
+  animation: fade-in 0.3s ease-in-out;
+  font-family: "Plus Jakarta Sans", sans-serif;
+
+  img {
+    width: 180px;
+    margin-bottom: 4px;
+  }
+
+  .empty-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+
+  .empty-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #999999;
+    text-align: center;
+  }
+
+  &.compact {
+    padding: 48px 32px;
+    gap: 8px;
+
+    img {
+      width: 160px;
+      margin-bottom: 8px;
+    }
+
+    .empty-title {
+      font-weight: 500;
+      letter-spacing: 0.15px;
+      color: #1d1b20;
+    }
+
+    .empty-text {
+      font-weight: 400;
+      color: #49454f;
+      letter-spacing: 0.25px;
+    }
+  }
+}

@@ -1,10 +1,17 @@
 <mat-drawer-container class="example-container">
-    <mat-drawer mode="side" #sideNav [mode]="isMobile() ? 'over' : 'side'" [opened]="!isMobile()">
-        <flux-navbar title="Track And Trace"></flux-navbar>
+    <!-- El drawer lateral es solo de escritorio: en telefono navega flux-bottom-nav. -->
+    @if (!isMobile()) {
+    <mat-drawer #sideNav mode="side" [opened]="true">
+        <flux-navbar></flux-navbar>
     </mat-drawer>
+    }
     <mat-drawer-content class="app-content">
         <div class="route-container" [@routeAnimations]="getRouteAnimationData()" [@.disabled]="isMobile()">
             <router-outlet></router-outlet>
         </div>
     </mat-drawer-content>
 </mat-drawer-container>
+
+@if (isMobile()) {
+<flux-bottom-nav />
+}

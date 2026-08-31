@@ -1,0 +1,79 @@
+:host {
+  display: block;
+  flex-shrink: 0;
+  padding: 8px 16px 12px;
+  font-family: Roboto, system-ui, sans-serif;
+}
+
+.m3-search {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 56px;
+  padding: 0 4px;
+  background-color: #f0f2f5;
+  border-radius: 28px;
+  box-sizing: border-box;
+}
+
+.m3-search-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 24px;
+  color: #49454f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    font-variation-settings:
+      "FILL" 0,
+      "wght" 400,
+      "GRAD" 0,
+      "opsz" 24;
+  }
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: #1d1b20;
+
+  &::placeholder {
+    color: #49454f;
+  }
+}
+
+// El consumidor le pone class="m3-avatar" al elemento proyectado (normalmente
+// el boton con [matMenuTriggerFor] del usuario).
+::ng-deep .m3-search .m3-avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  margin-right: 8px;
+  padding: 0;
+  border: none;
+  outline: none;
+  border-radius: 20px !important;
+  background-color: var(--primary, #0468d7);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Roboto, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: none;
+}

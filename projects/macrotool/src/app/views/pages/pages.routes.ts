@@ -44,6 +44,11 @@ export const PAGES_ROUTES: Routes = [
         path: 'sgi',
         loadComponent: () => import('./sgi/sgi').then(c => c.Sgi),
         data: { animation: 'Sgi' }
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./users/users').then(c => c.Users),
+        data: { animation: 'Users' }
       }
     ]
   }

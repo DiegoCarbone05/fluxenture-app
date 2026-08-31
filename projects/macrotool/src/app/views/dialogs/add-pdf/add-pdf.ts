@@ -6,14 +6,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { CdService } from '../../../core/services/api/cd-api/cd.service';
-import { Employee } from '../../../shared/models/Employee';
+import { Employee, fullNameOf } from '../../../shared/models/Employee';
 import { User } from '../../../shared/models/User';
 import { map, Observable, startWith } from 'rxjs';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
-import { Cd } from '../../../shared/models/Cd.model';
+import { Cd, DEFAULT_TRACKING_PRODUCT, TRACKING_PRODUCTS, parseTrackingCode, trackingProductOf } from '../../../shared/models/Cd.model';
 import { Doc, EDocType } from '../../../shared/models/Doc';
 import { SelectDocDialog } from '../select-doc-dialog/select-doc-dialog';
 import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
@@ -24,7 +25,7 @@ import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
   imports: [
     CommonModule, AsyncPipe, ReactiveFormsModule, MatDialogModule,
     MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule,
-    MatSnackBarModule,
+    MatSelectModule, MatSnackBarModule,
   ],
   templateUrl: './add-pdf.html',
   styleUrl: './add-pdf.scss',
@@ -34,8 +35,11 @@ export class AddPdf {
   /** O bien un Cd completo (edicion, viene con id), o { presetDoc: Doc } (alta nueva con documento ya elegido). */
   readonly data = inject<any>(MAT_DIALOG_DATA, { optional: true });
 
+  readonly products = TRACKING_PRODUCTS;
+
   form = new FormGroup({
     cdEmployee: new FormControl('', Validators.required),
+    cdProduct: new FormControl(DEFAULT_TRACKING_PRODUCT, Validators.required),
     cdNumber: new FormControl('', Validators.required),
     obs: new FormControl('', Validators.required),
     emissionDate: new FormControl('', Validators.required),
@@ -60,6 +64,7 @@ export class AddPdf {
       // Editando un CD existente (this.data es un Cd completo)
       this.form.patchValue({
         cdEmployee: this.data.employeeId,
+        cdProduct: trackingProductOf(this.data),
         cdNumber: String(this.data.trackingNumber),
         obs: this.data.obs,
         emissionDate: this.data.emissionDate,
@@ -83,7 +88,7 @@ export class AddPdf {
           return employees;
         }
         const search = typeof value === 'string' ? value : this.displayFn(value);
-        return employees.filter((employee) => employee.name.toLowerCase().includes(search.toLowerCase()));
+        return employees.filter((employee) => fullNameOf(employee).toLowerCase().includes(search.toLowerCase()));
       }),
     );
   }
@@ -92,14 +97,30 @@ export class AddPdf {
   displayFn = (employeeOrId: Employee | string | number): string => {
     if (employeeOrId == null || employeeOrId === '') return '';
     if (typeof employeeOrId === 'object' && 'name' in employeeOrId) {
-      return employeeOrId.name;
+      return fullNameOf(employeeOrId);
     }
     const employees = this.employeeService.getEmployeesSignal()();
     const found = employees.find((e: any) => e.id === employeeOrId || String(e.employeeID) === String(employeeOrId));
     this.employeeSelected = found ?? null;
-    return found ? found.name : '';
+    return found ? fullNameOf(found) : '';
   };
 
+
+  /**
+   * El numero suele venir copiado del sitio de Correo con el prefijo pegado
+   * ("CD123456789"): se separa solo para no obligar a borrarlo a mano.
+   */
+  onTrackingNumberPaste(event: ClipboardEvent) {
+    const pasted = event.clipboardData?.getData('text') ?? '';
+    if (!/[A-Za-z]/.test(pasted)) return;
+
+    event.preventDefault();
+    const { product, trackingNumber } = parseTrackingCode(pasted);
+    this.form.patchValue({
+      cdProduct: this.products.some((p) => p.value === product) ? product : DEFAULT_TRACKING_PRODUCT,
+      cdNumber: Number.isNaN(trackingNumber) ? '' : String(trackingNumber),
+    });
+  }
 
   onDatePaste(event: ClipboardEvent) {
     event.preventDefault();
@@ -203,6 +224,7 @@ export class AddPdf {
     if (this.data?.id) {
       // Editing existing CD
       this.data.trackingNumber = Number(input.cdNumber);
+      this.data.product = input.cdProduct || DEFAULT_TRACKING_PRODUCT;
       this.data.emissionDate = input.emissionDate || '';
       this.data.employeeId = input.cdEmployee || '';
       this.data.fileId = this.pdId() || this.data.fileId;
@@ -222,7 +244,8 @@ export class AddPdf {
         input.cdEmployee || '',
         this.pdId(),
         input.obs || '',
-        false
+        false,
+        input.cdProduct || DEFAULT_TRACKING_PRODUCT
       )
       cd.docId = this.selectedDoc()?.id;
 

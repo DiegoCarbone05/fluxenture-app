@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(Select-String -Pattern \"docs\" -Context 2)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npx ng *)",
+      "Bash(ls -1 \"f:/servisub/proyecto-macrotools/macrotools-app\" && echo \"--- parent ---\" && ls -1 \"f:/servisub/proyecto-macrotools\")",
+      "Read(//f/servisub/proyecto-macrotools/**)",
+      "Read(//f//**)"
+    ]
+  }
+}

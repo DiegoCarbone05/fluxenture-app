@@ -1,95 +1,155 @@
-<div class="header">
-  <flux-toolbar title="Empleados"> </flux-toolbar>
-  <div class="search-header">
-    <form class="search-input-container" (ngSubmit)="search()">
-      <input
-        type="text"
-        placeholder="Buscar"
-        [formControl]="searchFormControl"
-      />
-    </form>
+@if (!isMobile()) {
+<!-- ══ ESCRITORIO ═══════════════════════════════════════════════════════════ -->
+<div class="desk">
+  <flux-page-header title="Empleados" [subtitle]="subtitle()">
+    @if (draftCount() > 0) {
+    <button fluxPillBtn variant="neutral" icon="drafts" class="drafts-chip" matTooltip="Borradores guardados"
+      (click)="openDraftsDialog()">
+      <span>Borradores</span>
+      <span class="drafts-badge">{{ draftCount() }}</span>
+    </button>
+    }
+    <button fluxPillBtn variant="primary" icon="add" (click)="openAddEmployeeDialog()">
+      <span>Nuevo empleado</span>
+    </button>
+  </flux-page-header>
+
+  <flux-stats-grid [stats]="stats()" />
+
+  <!-- Tarjeta-tabla -->
+  <div class="table-card">
+    <flux-table-toolbar>
+      <div toolbarStart>
+        <flux-search-box [control]="searchFormControl" placeholder="Buscar por nombre, legajo o teléfono" />
+        <select class="flux-select" [value]="sector()" (change)="setSector($any($event.target).value)">
+          <option value="todos">Sector: todos</option>
+          @for (item of sectors; track item.value) {
+          <option [value]="item.value">{{ item.label }}</option>
+          }
+        </select>
+        <select class="flux-select" [value]="service()" (change)="setService($any($event.target).value)">
+          <option value="todos">Servicio: todos</option>
+          <option value="sin">Sin asignar</option>
+          @for (item of serviceOptions(); track item.id) {
+          <option [value]="item.name">{{ item.name }}</option>
+          }
+        </select>
+        <select class="flux-select" [value]="status()" (change)="setStatus($any($event.target).value)">
+          <option value="todos">Estado: todos</option>
+          <option value="operativos">Operativo</option>
+          <option value="inactivos">Inactivo</option>
+        </select>
+      </div>
+      <div toolbarEnd>
+        <button fluxPillBtn variant="neutral" icon="badge" (click)="openServicesDialog()">
+          <span>Servicios</span>
+        </button>
+        <button fluxPillBtn variant="neutral" icon="swap_vert" (click)="toggleSort()">
+          <span>{{ sortLabel() }}</span>
+        </button>
+        <button fluxPillBtn variant="accent" icon="download" (click)="exportCsv()">
+          <span>Exportar</span>
+        </button>
+      </div>
+    </flux-table-toolbar>
+
+    <div class="table-head cols-employees">
+      <span>Empleado y sector</span>
+      <span>Servicio</span>
+      <span>Contacto</span>
+      <span>Ingreso</span>
+      <span>Estado</span>
+      <span class="align-right">Acciones</span>
+    </div>
+
+    @for (row of paged(); track row.id) {
+    <div class="table-row cols-employees" (click)="openEmployee(row)">
+      <flux-employee-cell [initials]="row.initials" [name]="row.name" [legajo]="row.legajo" [sector]="row.sector" />
+
+      <div class="cell-service">{{ row.service }}</div>
+
+      <div class="cell-contact">
+        <span class="contact-email">{{ row.email }}</span>
+        <span class="contact-phone">{{ row.phone }}</span>
+      </div>
+
+      <div class="cell-date">
+        <mat-icon>event</mat-icon>
+        <span>{{ row.entryDate }}</span>
+      </div>
+
+      <div>
+        <flux-status-chip [active]="row.isOperational" activeLabel="Operativo" inactiveLabel="Inactivo" />
+      </div>
+
+      <flux-row-actions>
+        <button fluxIconBtn variant="view" icon="visibility" matTooltip="Ver legajo"
+          (click)="viewEmployee($event, row)"></button>
+        <button fluxIconBtn variant="edit" icon="edit" matTooltip="Editar" (click)="editEmployee($event, row)"></button>
+        <button fluxIconBtn variant="delete" icon="delete" matTooltip="Eliminar"
+          (click)="deleteEmployee($event, row)"></button>
+      </flux-row-actions>
+    </div>
+    }
+
+    @if (filtered().length === 0) {
+    <flux-empty-state title="Sin resultados" text="Probá con otro nombre, sector o estado." />
+    }
+
+    <flux-pager [currentPage]="currentPage()" [totalPages]="totalPages()" [pageNumbers]="pageNumbers()"
+      [rangeLabel]="rangeLabel()" (pageChange)="goToPage($event)" />
   </div>
 </div>
+} @else {
+<!-- ══ MOVIL · Material 3 ═══════════════════════════════════════════════════ -->
+<div class="m3">
+  <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar empleados">
+    <button class="m3-avatar" [matMenuTriggerFor]="userMenu">{{ userInitials() }}</button>
+  </flux-m3-search-bar>
 
-<div class="search-content">
-  @if (findedEmployees().length > 0) {
-    <div class="table-container">
-      @for (emp of findedEmployees(); track emp.id) {
-        <div class="emp-card" (click)="openEmployee(emp)">
-          <div class="emp-avatar">
-            {{ emp.name[0] }}
-          </div>
-          <br />
-          <div class="emp-info">
-            <span class="emp-name">{{ emp.name }}</span>
-            <span class="emp-document">{{ emp.documentNumber }}</span>
-          </div>
-          <br />
-          @if (emp.isOperational) {
-            <div class="status-sign active">
-              <mat-icon>check</mat-icon>
-              <span>Operativo</span>
-            </div>
-          } @else {
-            <div class="status-sign not-active">
-              <mat-icon>close</mat-icon>
-              <span>Inactivo</span>
-            </div>
-          }
-        </div>
-      }
+  <flux-filter-chips [chips]="chips" [selected]="status()" (selectedChange)="setStatus($event)" />
+
+  <div class="m3-scroll">
+    <flux-m3-stats-row [stats]="stats()" />
+
+    <div class="m3-subheader">
+      <span class="m3-results">{{ resultsLabel() }}</span>
+      <button class="m3-sort" (click)="toggleSort()">
+        <mat-icon class="mat-icon-weight-regular">swap_vert</mat-icon>
+        <span>{{ sortLabel() }}</span>
+      </button>
     </div>
+
+    @for (row of filtered(); track row.id) {
+    <flux-m3-list-item [initials]="row.initials" [headline]="row.nameTitle"
+      [support]="[row.legajo + ' · ' + (row.sector | empSectorPipe), row.phone]" (itemClick)="openEmployee(row)">
+      <flux-status-chip class="m3-status" [active]="row.isOperational" activeLabel="Operativo"
+        inactiveLabel="Inactivo" />
+    </flux-m3-list-item>
+    }
+
+    @if (filtered().length === 0) {
+    <flux-empty-state size="compact" title="Sin resultados" text="Probá con otro nombre, sector o estado." />
+    }
+  </div>
+
+  <button fluxFab variant="primary" icon="add" (click)="openAddEmployeeDialog()"></button>
+
+  @if (draftCount() > 0) {
+  <button fluxFab variant="accent" icon="drafts" matTooltip="Borradores guardados" (click)="openDraftsDialog()">
+    <span fabBadge>{{ draftCount() }}</span>
+  </button>
   }
 </div>
-
-<!-- Loading: Si la lista esta vacia, el input tiene valor y no hay mensaje de error -->
-@if (
-  findedEmployees().length == 0 && searchFormControl.value != null && !formMsg()
-) {
-  <mat-spinner />
 }
 
-<!-- Modo default -->
-@if (findedEmployees().length == 0 && !searchFormControl.value) {
-  <div class="info-state">
-    <p>Ingrese algun valor para buscar</p>
-    <img
-      draggable="false"
-      class="unstate"
-      src="assets/pictures/undraw_personal-info_yzls.svg"
-      alt=""
-    />
-  </div>
-} @else if (formMsg()) {
-  <!-- Not Found -->
-  <div class="info-state">
-    <p>{{ formMsg() }}</p>
-    <img
-      draggable="false"
-      class="no-data"
-      src="assets/pictures/undraw_no-data_ig65.svg"
-      alt=""
-    />
-  </div>
-}
-@if (draftCount() > 0) {
-  <button
-    matMiniFab
-    color="primary"
-    class="drafts-button"
-    (click)="openDraftsDialog()"
-    matTooltip="Borradores guardados"
-  >
-    <mat-icon>drafts</mat-icon>
-    <span class="drafts-badge">{{ draftCount() }}</span>
+<mat-menu #userMenu="matMenu">
+  <button mat-menu-item routerLink="/main/app-pages/users">
+    <mat-icon>account_circle</mat-icon>
+    <span>Mi cuenta</span>
   </button>
-}
-
-<button
-  matFab
-  color="primary"
-  class="add-button"
-  (click)="openAddEmployeeDialog()"
->
-  <mat-icon>add</mat-icon>
-</button>
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    <span>Cerrar sesión</span>
+  </button>
+</mat-menu>

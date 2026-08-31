@@ -41,6 +41,11 @@ form {
     flex: 1 1 180px;
     min-width: 0;
   }
+
+  // El prefijo son dos letras: no tiene que competir por ancho con el numero.
+  .product-field {
+    flex: 0 1 110px;
+  }
 }
 
 .full-width {

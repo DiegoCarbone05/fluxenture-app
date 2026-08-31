@@ -1,180 +1,154 @@
-<flux-toolbar title="Track & Trace" class="glass-tab"></flux-toolbar>
+@if (!isMobile()) {
+<!-- ══ ESCRITORIO ═══════════════════════════════════════════════════════════ -->
+<div class="desk">
+  <flux-page-header title="Track & Trace" [subtitle]="subtitle()">
+    <button fluxPillBtn variant="primary" icon="add" (click)="loadPDF()">
+      <span>Nueva CD</span>
+    </button>
+  </flux-page-header>
 
-<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+  <div class="table-card">
+    <flux-tab-strip [tabs]="tabs()" [selected]="tab()" (selectedChange)="setTab($event)" />
 
-  <!-- ── TAB: EN SEGUIMIENTO ──────────────────────────────────────────────── -->
-  <mat-tab>
-    <ng-template mat-tab-label>
-      Pendientes
-      @if (activeCds().length > 0) {
-        <span class="tab-count active">{{ activeCds().length }}</span>
-      }
-    </ng-template>
-
-    <div class="tnt-content">
-      @if (activeCds().length === 0) {
-        <div class="tnt-empty">
-          <mat-icon>check_circle</mat-icon>
-          <span>No hay cartas en seguimiento activo.</span>
-        </div>
-      } @else {
-        <div class="tnt-table-wrap">
-          <div class="tnt-list-header">
-            <span>Empleado</span>
-            <span>Nro. Seguimiento</span>
-            <span>Fecha</span>
-            <span>Observación</span>
-            <span>Progreso</span>
-            <span></span>
-          </div>
-          <div class="tnt-list">
-            @for (item of pagedActiveCds(); track item.id) {
-              <div class="cd-card" (click)="openCdsViewer(item)">
-
-                <div class="f-status">
-                  <app-cd-status-chip [status]="item.tnt | tntStatusPipe | async"></app-cd-status-chip>
-                </div>
-
-                <div class="f-employee">
-                  <span class="mobile-label">Empleado</span>
-                  <span class="cd-employee-name">{{ returnEmployeeName(item.employeeId) }}</span>
-                </div>
-
-                <div class="f-tracking">
-                  <span class="mobile-label">Nro. Seguimiento</span>
-                  <span class="cd-tracking">{{ item.trackingNumber }}</span>
-                </div>
-
-                <div class="f-date">
-                  <mat-icon class="meta-icon">event</mat-icon>
-                  <span class="cd-date">{{ item.emissionDate | date: 'dd/MM/yy' }}</span>
-                </div>
-
-                <div class="f-obs">
-                  <span class="mobile-label">Observación</span>
-                  <span class="cd-obs">{{ item.obs || '—' }}</span>
-                </div>
-
-                <div class="f-actions" (click)="$event.stopPropagation()">
-                  <button mat-icon-button color="primary" (click)="editCd(item)">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-icon-button color="warn" (click)="deleteCd(item)">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-
-              </div>
-            }
-          </div>
-          <mat-paginator
-            [length]="activeCds().length"
-            [pageSize]="pageSize"
-            [pageSizeOptions]="pageSizeOptions"
-            [pageIndex]="activePageIndex()"
-            (page)="onActivePage($event)"
-            showFirstLastButtons>
-          </mat-paginator>
-        </div>
-      }
+    @if (tab() === "completed" && newDeliveredCount() > 0) {
+    <div class="new-alert-bar">
+      <span class="new-alert-text">
+        <mat-icon>mark_email_unread</mat-icon>
+        {{ newDeliveredCount() }} {{ newDeliveredCount() === 1 ? "nueva" : "nuevas" }}
+      </span>
+      <button fluxPillBtn variant="neutral" icon="done_all" (click)="markAllAsSeen()">
+        <span>Marcar todas como vistas</span>
+      </button>
     </div>
-  </mat-tab>
+    }
 
-  <!-- ── TAB: FINALIZADOS ─────────────────────────────────────────────────── -->
-  <mat-tab>
-    <ng-template mat-tab-label>
-      Entregadas
-      @if (completedCds().length > 0) {
-        <span class="tab-count">{{ completedCds().length }}</span>
-      }
-    </ng-template>
+    <flux-table-toolbar>
+      <div toolbarStart>
+        <flux-search-box [control]="searchFormControl" placeholder="Buscar por empleado, seguimiento u observación" />
+      </div>
+      <div toolbarEnd>
+        <button fluxPillBtn variant="neutral" icon="swap_vert" (click)="toggleSort()">
+          <span>{{ sortLabel() }}</span>
+        </button>
+        <button fluxPillBtn variant="accent" icon="download" (click)="exportCsv()">
+          <span>Exportar</span>
+        </button>
+      </div>
+    </flux-table-toolbar>
 
-    <div class="tnt-content">
-      @if (completedCds().length === 0) {
-        <div class="tnt-empty">
-          <mat-icon>local_post_office</mat-icon>
-          <span>Aún no hay cartas marcadas como finalizadas.</span>
-        </div>
-      } @else {
-        @if (newDeliveredCount() > 0) {
-          <div class="new-alert-bar">
-            <span class="new-alert-text">
-              <mat-icon class="meta-icon">mark_email_unread</mat-icon>
-              {{ newDeliveredCount() }} {{ newDeliveredCount() === 1 ? 'nueva' : 'nuevas' }}
-            </span>
-            <button mat-button color="primary" (click)="markAllAsSeen()">
-              <mat-icon>done_all</mat-icon>
-              Marcar todas como vistas
-            </button>
-          </div>
+    <div class="table-head cols-tnt">
+      <span>Empleado</span>
+      <span>Nro. Seguimiento</span>
+      <span>Fecha</span>
+      <span>Observación</span>
+      <span>Progreso</span>
+      <span class="align-right">Acciones</span>
+    </div>
+
+    @for (row of pagedRows(); track row.id) {
+    <div class="table-row cols-tnt" (click)="openCdsViewer(row.raw)">
+      <flux-employee-cell [initials]="row.employeeInitials" [name]="row.employeeName" [legajo]="row.employeeLegajo"
+        [sector]="row.employeeSector" />
+
+      <div class="cell-tracking">
+        <span>{{ row.trackingCode }}</span>
+      </div>
+
+      <div class="cell-date">
+        <mat-icon>event</mat-icon>
+        <span>{{ row.raw.emissionDate | date: "dd/MM/yy" }}</span>
+      </div>
+
+      <div class="cell-desc">{{ row.obs }}</div>
+
+      <div class="cell-progress">
+        <app-cd-status-chip [status]="row.raw.tnt | tntStatusPipe | async"></app-cd-status-chip>
+        @if (row.isNew) {
+        <span class="new-badge">Nuevo</span>
         }
-        <div class="tnt-table-wrap">
-          <div class="tnt-list-header">
-            <span>Empleado</span>
-            <span>Nro. Seguimiento</span>
-            <span>Fecha</span>
-            <span>Observación</span>
-            <span>Progreso</span>
-            <span></span>
-          </div>
-          <div class="tnt-list">
-            @for (item of pagedCompletedCds(); track item.id) {
-              <div class="cd-card completed" (click)="openCdsViewer(item)">
+      </div>
 
-                <div class="f-status">
-                  <app-cd-status-chip [status]="item.tnt | tntStatusPipe | async"></app-cd-status-chip>
-                  @if (isNewlyDelivered(item)) {
-                    <span class="new-badge">Nuevo</span>
-                  }
-                </div>
-
-                <div class="f-employee">
-                  <span class="mobile-label">Empleado</span>
-                  <span class="cd-employee-name">{{ returnEmployeeName(item.employeeId) }}</span>
-                </div>
-
-                <div class="f-tracking">
-                  <span class="mobile-label">Nro. Seguimiento</span>
-                  <span class="cd-tracking">{{ item.trackingNumber }}</span>
-                </div>
-
-                <div class="f-date">
-                  <mat-icon class="meta-icon">event</mat-icon>
-                  <span class="cd-date">{{ item.emissionDate | date: 'dd/MM/yy' }}</span>
-                </div>
-
-                <div class="f-obs">
-                  <span class="mobile-label">Observación</span>
-                  <span class="cd-obs">{{ item.obs || '—' }}</span>
-                </div>
-
-                <div class="f-actions" (click)="$event.stopPropagation()">
-                  <button mat-icon-button color="primary" (click)="editCd(item)">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-icon-button color="warn" (click)="deleteCd(item)">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-
-              </div>
-            }
-          </div>
-          <mat-paginator
-            [length]="completedCds().length"
-            [pageSize]="pageSize"
-            [pageSizeOptions]="pageSizeOptions"
-            [pageIndex]="completedPageIndex()"
-            (page)="onCompletedPage($event)"
-            showFirstLastButtons>
-          </mat-paginator>
-        </div>
-      }
+      <flux-row-actions>
+        <button fluxIconBtn variant="edit" icon="edit" matTooltip="Editar" (click)="editCd(row.raw, $event)"></button>
+        <button fluxIconBtn variant="delete" icon="delete" matTooltip="Eliminar"
+          (click)="deleteCd(row.raw, $event)"></button>
+      </flux-row-actions>
     </div>
-  </mat-tab>
+    }
 
-</mat-tab-group>
+    @if (pagedRows().length === 0) {
+    <flux-empty-state title="Sin envíos"
+      [text]="tab() === 'active' ? 'No hay cartas en seguimiento activo.' : 'Aún no hay cartas marcadas como finalizadas.'" />
+    }
 
-<button matFab color="primary" class="add-button" (click)="loadPDF()">
-  <mat-icon>add</mat-icon>
-</button>
+    <flux-pager [currentPage]="currentPage()" [totalPages]="totalPages()" [pageNumbers]="pageNumbers()"
+      [rangeLabel]="rangeLabel()" (pageChange)="goToPage($event)" />
+  </div>
+</div>
+} @else {
+<!-- ══ MÓVIL · Material 3 ═══════════════════════════════════════════════════ -->
+<div class="m3">
+  <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar envíos">
+    <button class="m3-avatar" [matMenuTriggerFor]="userMenu">{{ userInitials() }}</button>
+  </flux-m3-search-bar>
+
+  <flux-m3-tab-strip [tabs]="tabs()" [selected]="tab()" (selectedChange)="setTab($event)" />
+
+  <div class="m3-scroll">
+    @if (tab() === "completed" && newDeliveredCount() > 0) {
+    <div class="new-alert-bar">
+      <span class="new-alert-text">
+        <mat-icon>mark_email_unread</mat-icon>
+        {{ newDeliveredCount() }} {{ newDeliveredCount() === 1 ? "nueva" : "nuevas" }}
+      </span>
+      <button fluxPillBtn variant="neutral" icon="done_all" (click)="markAllAsSeen()">
+        <span>Marcar vistas</span>
+      </button>
+    </div>
+    }
+
+    <div class="m3-subheader">
+      <span class="m3-results">{{ resultsLabel() }}</span>
+      <button class="m3-sort" (click)="toggleSort()">
+        <mat-icon class="mat-icon-weight-regular">swap_vert</mat-icon>
+        <span>{{ sortLabel() }}</span>
+      </button>
+    </div>
+
+    @for (row of activeRows(); track row.id) {
+    <flux-m3-list-item [initials]="row.employeeInitials" [headline]="row.employeeNameTitle"
+      [support]="[row.trackingCode, row.obs]" (itemClick)="openCdsViewer(row.raw)">
+      <div class="m3-trailing">
+        @if (row.isNew) {
+        <span class="new-badge">Nuevo</span>
+        }
+        <app-cd-status-chip [status]="row.raw.tnt | tntStatusPipe | async"></app-cd-status-chip>
+        <flux-row-actions>
+          <button fluxIconBtn variant="edit" icon="edit" matTooltip="Editar" (click)="editCd(row.raw, $event)"></button>
+          <button fluxIconBtn variant="delete" icon="delete" matTooltip="Eliminar"
+            (click)="deleteCd(row.raw, $event)"></button>
+        </flux-row-actions>
+      </div>
+    </flux-m3-list-item>
+    }
+
+    @if (activeRows().length === 0) {
+    <flux-empty-state size="compact" title="Sin envíos"
+      [text]="tab() === 'active' ? 'No hay cartas en seguimiento activo.' : 'Aún no hay cartas marcadas como finalizadas.'" />
+    }
+  </div>
+
+  <button fluxFab variant="primary" icon="add" (click)="loadPDF()"></button>
+</div>
+}
+
+<mat-menu #userMenu="matMenu">
+  <button mat-menu-item routerLink="/main/app-pages/users">
+    <mat-icon>account_circle</mat-icon>
+    <span>Mi cuenta</span>
+  </button>
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    <span>Cerrar sesión</span>
+  </button>
+</mat-menu>

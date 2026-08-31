@@ -7,6 +7,7 @@
     "ng": "ng",
     "start": "ng serve --open",
     "build": "ng build",
+    "deploy": "ng build --configuration production && firebase deploy",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -34,6 +35,8 @@
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.14.0",
     "jspdf": "^3.0.4",
+    "keycloak-angular": "^20.1.0",
+    "keycloak-js": "^26.2.4",
     "pdf-lib": "^1.17.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"

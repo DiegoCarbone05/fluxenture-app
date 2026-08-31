@@ -48,7 +48,7 @@
             <mat-icon>attach_file</mat-icon>
             <div class="text-container">
               <label>Agregar documento</label>
-              <small>Adjunte el respaldo del evento</small>
+              <small>{{ docRequired() ? "Adjunte el respaldo del evento" : "Adjunte el respaldo del evento (opcional)" }}</small>
             </div>
           </div>
           }

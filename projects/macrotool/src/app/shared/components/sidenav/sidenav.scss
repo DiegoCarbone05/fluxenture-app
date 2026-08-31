@@ -10,10 +10,7 @@
   padding: 20px 16px;
   box-sizing: border-box;
   background-color: #ffffff;
-  backdrop-filter: blur(20px) saturate(2);
-  -webkit-backdrop-filter: blur(20px) saturate(2);
   overflow-y: auto;
-  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.096);
 }
 
 .brand {
@@ -47,7 +44,7 @@
   align-items: center;
   gap: 12px;
   padding: 11px 14px;
-  border-radius: 12px;
+  border-radius: 50px;
   color: #35353c;
   text-decoration: none;
   font-size: 15px;
@@ -69,40 +66,12 @@
   }
 
   &.active {
-    background-color: #f1f1f1;
-    color: #292929;
+    background-color: var(--primary, #0468d7);
+    color: #ffffff;
     font-weight: 600;
 
-    &::before {
-      content: "";
-      width: 4px;
-      height: 24px;
-      background-color: var(--primary);
-      border-radius: 10px;
-      z-index: 10px;
-      position: absolute;
-      left: 0;
-    }
-
     &:hover {
-      background-color: #e9e9e9;
-    }
-  }
-}
-
-@media (min-width: 940px) {
-  .sidenav {
-    background-color: #e7e7e7a8;
-  }
-
-  .nav-item {
-    &.active {
       background-color: var(--primary, #0468d7);
-      color: #ffffff;
-
-      &:hover {
-        background-color: var(--primary, #0468d7);
-      }
     }
   }
 }

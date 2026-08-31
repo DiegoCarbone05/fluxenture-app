@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal , computed} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { EmployeeHistoryService } from '../../../../core/services/api/employee-history/employee-history.service';
 import { EmployeeHistory } from '../../../../shared/models/EmployeeHistory.model';
@@ -21,6 +21,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DocTypePipe } from '../../../../shared/pipes/doc-type-pipe';
 import { EmpSectorPipePipe } from '../../../../shared/pipes/emp-sector-pipe-pipe';
 import { Toolbar } from '../../../../shared/components/toolbar/toolbar';
+import { fullNameOf } from '../../../../shared/models/Employee';
 
 @Component({
   selector: 'app-emp-view',
@@ -36,6 +37,7 @@ export class EmpView {
 
   employeeHistory = signal<EmployeeHistory[]>([]);
   employee = signal<Employee | null>(null);
+  employeeName = computed(() => fullNameOf(this.employee()));
   docs = signal<Doc[]>([]);
   employeeHistoryTypes = EMPLOYEE_HISTORY_TYPES;
   employeeSector = EMPLOYEE_SECTOR;
@@ -114,6 +116,12 @@ export class EmpView {
     dialog.afterClosed().subscribe((result: EmployeeHistory | undefined) => {
       if (result) {
         this.employeeHistory.update((history) => [...history, result]);
+        // Un Alta/Baja puede haber actualizado entryDate/leaveDate/isOperational
+        // del lado del backend (ver SaveEmployeeHistoryUseCase): se refresca el
+        // empleado para que esta vista y la tabla de Empleados lo reflejen ya.
+        this.employeeService.refreshOne(result.employeeId).subscribe((employee) => {
+          this.employee.set(employee);
+        });
       }
     });
   }

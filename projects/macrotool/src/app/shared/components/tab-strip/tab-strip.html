@@ -1,0 +1,12 @@
+@for (tab of tabs; track tab.key) {
+  <button
+    class="tab-btn"
+    [class.active]="selected === tab.key"
+    (click)="selectedChange.emit(tab.key)"
+  >
+    {{ tab.label }}
+    @if (tab.badge) {
+      <span class="tab-badge">{{ tab.badge }}</span>
+    }
+  </button>
+}

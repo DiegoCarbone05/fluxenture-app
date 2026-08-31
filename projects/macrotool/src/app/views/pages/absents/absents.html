@@ -1,140 +1,194 @@
-<flux-toolbar
-  title="Ausencias"
-  subTitle="{{ months[currentDate().month - 1] }} - {{ currentDate().year }}"
->
-  <button matIconButton (click)="openDatePickerDialog()">
-    <mat-icon>calendar_today</mat-icon>
-  </button>
-</flux-toolbar>
+@if (!isMobile()) {
+<!-- ══ ESCRITORIO ═══════════════════════════════════════════════════════════ -->
+<div class="desk">
+  <flux-page-header title="Ausencias" [subtitle]="subtitle()">
+    <button fluxPillBtn variant="neutral" icon="calendar_today" (click)="openDatePickerDialog()">
+      <span>{{ monthLabel() }}</span>
+    </button>
+    @if (tab() === "novedades") {
+    <button fluxPillBtn variant="primary" icon="upload_file" (click)="uploadNovedad()">
+      <span>Cargar novedad</span>
+    </button>
+    } @else {
+    <button fluxPillBtn variant="primary" icon="add" (click)="openAddAbsentDialog()">
+      <span>Nueva ausencia</span>
+    </button>
+    }
+  </flux-page-header>
 
-<mat-tab-group
-  mat-stretch-tabs="false"
-  mat-align-tabs="start"
-  [selectedIndex]="activeTabIndex()"
-  (selectedIndexChange)="activeTabIndex.set($event)"
->
-  <mat-tab label="NOVEDADES">
-    <div class="absent-list">
-      @if (novedades().length === 0) {
-        <div class="absent-list-empty">
-          <mat-icon>inbox</mat-icon>
-          <span>No hay novedades pendientes de procesar.</span>
-        </div>
-      }
-      @for (n of novedades(); track n.id) {
-        <div class="absent-card">
-          <div class="absent-card-body">
-            <div class="absent-card-meta">
-              <span class="novedad-type-chip">{{ n.doc.type | docType }}</span>
-            </div>
-            <span class="absent-employee-name">{{
-              getEmployeeName(n.doc.employeeId)
-            }}</span>
-            @if (n.doc.description) {
-              <span class="absent-employee-name">{{ n.doc.description }}</span>
-            }
-            <div class="absent-date-info">
-              <mat-icon>event</mat-icon>
-              <span>{{ n.doc.uploadDate | date: "dd/MM/yyyy" }}</span>
-            </div>
-          </div>
-          <div class="absent-card-actions">
-            <button
-              mat-icon-button
-              (click)="viewNovedadFile(n.doc, $event)"
-              matTooltip="Ver archivo"
-            >
-              <mat-icon>visibility</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              color="primary"
-              (click)="convertToAbsent(n, $event)"
-              matTooltip="Convertir en Ausencia"
-            >
-              <mat-icon>event_busy</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              color="warn"
-              (click)="discardNovedad(n, $event)"
-              matTooltip="Descartar"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-  </mat-tab>
-  <mat-tab label="AUSENCIAS">
-    <div class="absent-list">
-      @if (absentOfMonth().length === 0) {
-        <div class="absent-list-empty">
-          <mat-icon>event_available</mat-icon>
-          <span
-            >Sin ausencias en {{ months[currentDate().month - 1] }}
-            {{ currentDate().year }}</span
-          >
-        </div>
-      }
-      @for (item of absentOfMonth(); track item.id) {
-        <div class="absent-card" (click)="openAbsent(item.id)">
-          <div class="absent-card-body">
-            <div class="absent-card-meta">
-              <span class="absent-type-chip" [class]="'chip-' + item.type">{{
-                item.type | abstentType
-              }}</span>
-              <span
-                class="absent-justified-badge"
-                [class.justified]="item.justified"
-                [class.unjustified]="!item.justified"
-              >
-                <mat-icon>{{
-                  item.justified ? "check_circle" : "cancel"
-                }}</mat-icon>
-                {{ item.justified ? "Justificada" : "Sin justificar" }}
-              </span>
-            </div>
-            <span class="absent-employee-name">{{
-              getEmployeeName(item.employeeId)
-            }}</span>
-            <div class="absent-date-info">
-              <mat-icon>event</mat-icon>
-              <span
-                >{{ item.originalStartDate }} → {{ item.originalEndDate }}</span
-              >
-            </div>
-          </div>
-          <div class="absent-card-actions">
-            <button
-              mat-icon-button
-              (click)="openFile(item.docId, $event)"
-              [disabled]="!item.docId"
-            >
-              <mat-icon>description</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              color="primary"
-              (click)="onEditAbsent(item, $event)"
-            >
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              color="warn"
-              (click)="onDeleteAbsent(item.id, $event)"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-  </mat-tab>
+  <flux-stats-grid [stats]="stats()" />
 
-  <mat-tab label="CALENDARIO">
+  <!-- Tarjeta con pestañas + tabla -->
+  <div class="table-card">
+    <flux-tab-strip [tabs]="tabs()" [selected]="tab()" (selectedChange)="setTab($event)" />
+
+    @if (isLoading()) {
+    <div class="loading-wrapper"><mat-spinner diameter="36" /></div>
+    } @else {
+    @switch (tab()) {
+    <!-- ── AUSENCIAS ────────────────────────────────────────────────── -->
+    @case ("absents") {
+    <flux-table-toolbar>
+      <div toolbarStart>
+        <flux-search-box [control]="searchFormControl" placeholder="Buscar por empleado o legajo" />
+        <button class="flux-select flux-select-trigger" [matMenuTriggerFor]="typeMenu">
+          <span>{{ typeFilterLabel() }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <!-- stopPropagation: sin eso el panel se cierra en el primer click y no se
+             podria marcar mas de un tipo por vez. -->
+        <mat-menu #typeMenu="matMenu">
+          <button mat-menu-item (click)="clearTypes(); $event.stopPropagation()">
+            <mat-icon>{{
+              typeFilters().length === 0 ? "check_box" : "check_box_outline_blank"
+              }}</mat-icon>
+            <span>Todos</span>
+          </button>
+          @for (type of absentTypes; track type.value) {
+          <button mat-menu-item (click)="toggleType(type.value); $event.stopPropagation()">
+            <mat-icon>{{
+              isTypeSelected(type.value) ? "check_box" : "check_box_outline_blank"
+              }}</mat-icon>
+            <span>{{ type.label }}</span>
+          </button>
+          }
+        </mat-menu>
+        <select class="flux-select" [value]="status()" (change)="setStatus($any($event.target).value)">
+          <option value="todos">Estado: todos</option>
+          <option value="justificadas">Justificada</option>
+          <option value="injustificadas">Sin justificar</option>
+        </select>
+      </div>
+      <div toolbarEnd>
+        <button fluxPillBtn variant="neutral" icon="swap_vert" (click)="toggleSort()">
+          <span>{{ sortLabel() }}</span>
+        </button>
+        <button fluxPillBtn variant="accent" icon="download" (click)="exportCsv()">
+          <span>Exportar CSV</span>
+        </button>
+        <button fluxPillBtn variant="accent" icon="folder_zip" [disabled]="isExportingFiles()"
+          (click)="exportFiles()">
+          <span>{{ isExportingFiles() ? "Generando ZIP…" : "Exportar archivos" }}</span>
+        </button>
+      </div>
+    </flux-table-toolbar>
+
+    <div class="table-head cols-absents">
+      <span>Empleado</span>
+      <span>Tipo</span>
+      <span>Período</span>
+      <span>Días</span>
+      <span>Estado</span>
+      <span class="align-right">Acciones</span>
+    </div>
+
+    @for (row of pagedAbsents(); track row.id) {
+    <div class="table-row cols-absents" (click)="openAbsent(row.id)">
+      <flux-employee-cell [initials]="row.initials" [name]="row.name" [legajo]="row.legajo" [sector]="row.sector" />
+
+      <div>
+        <span class="absent-type-chip" [class]="'chip-' + row.type">{{
+          row.type | abstentType
+          }}</span>
+      </div>
+
+      <div class="cell-date">
+        <mat-icon>event</mat-icon>
+        <span>{{ row.period }}</span>
+      </div>
+
+      <div class="cell-days">
+        <span class="days-value">{{ row.days }}</span>
+        <span class="days-unit">{{
+          row.days === 1 ? "día" : "días"
+          }}</span>
+      </div>
+
+      <div>
+        <flux-status-chip [active]="row.justified" activeLabel="Justificada" inactiveLabel="Sin justificar" />
+      </div>
+
+      <flux-row-actions>
+        <button fluxIconBtn variant="view" icon="description" matTooltip="Ver documento" [disabled]="!row.docId"
+          (click)="openFile(row.docId, $event)"></button>
+        <button fluxIconBtn variant="edit" icon="edit" matTooltip="Editar" (click)="onEditAbsent(row, $event)"></button>
+        <button fluxIconBtn variant="delete" icon="delete" matTooltip="Eliminar"
+          (click)="onDeleteAbsent(row, $event)"></button>
+      </flux-row-actions>
+    </div>
+    }
+
+    @if (filteredAbsents().length === 0) {
+    <flux-empty-state title="Sin ausencias" [text]="
+                  'No hay ausencias que coincidan en ' + monthLabel() + '.'
+                " />
+    }
+
+    <ng-container *ngTemplateOutlet="pager"></ng-container>
+    }
+
+    <!-- ── NOVEDADES ────────────────────────────────────────────────── -->
+    @case ("novedades") {
+    <flux-table-toolbar>
+      <div toolbarStart>
+        <flux-search-box [control]="searchFormControl" placeholder="Buscar por empleado, legajo o descripción" />
+      </div>
+      <div toolbarEnd>
+        <button fluxPillBtn variant="neutral" icon="swap_vert" (click)="toggleSort()">
+          <span>{{ sortLabel() }}</span>
+        </button>
+        <button fluxPillBtn variant="accent" icon="download" (click)="exportCsv()">
+          <span>Exportar</span>
+        </button>
+      </div>
+    </flux-table-toolbar>
+
+    <div class="table-head cols-novedades">
+      <span>Empleado</span>
+      <span>Documento</span>
+      <span>Descripción</span>
+      <span>Fecha</span>
+      <span class="align-right">Acciones</span>
+    </div>
+
+    @for (row of pagedNovedades(); track row.id) {
+    <div class="table-row cols-novedades">
+      <flux-employee-cell [initials]="row.initials" [name]="row.name" [legajo]="row.legajo" [sector]="row.sector" />
+
+      <div>
+        <span class="novedad-type-chip">{{
+          row.doc.type | docType
+          }}</span>
+      </div>
+
+      <div class="cell-desc">{{ row.description }}</div>
+
+      <div class="cell-date">
+        <mat-icon>event</mat-icon>
+        <span>{{ row.uploadDate }}</span>
+      </div>
+
+      <flux-row-actions>
+        <button fluxIconBtn variant="view" icon="visibility" matTooltip="Ver archivo"
+          (click)="viewNovedadFile(row.doc, $event)"></button>
+        <button fluxIconBtn variant="edit" icon="event_busy" matTooltip="Convertir en ausencia"
+          (click)="convertToAbsent(row, $event)"></button>
+        <button fluxIconBtn variant="delete" icon="delete" matTooltip="Descartar"
+          (click)="discardNovedad(row, $event)"></button>
+      </flux-row-actions>
+    </div>
+    }
+
+    @if (filteredNovedades().length === 0) {
+    <flux-empty-state title="Sin novedades pendientes"
+      text="Los documentos que cargues aparecen acá hasta convertirlos." />
+    }
+
+    <ng-container *ngTemplateOutlet="pager"></ng-container>
+    }
+
+    <!-- ── CALENDARIO ───────────────────────────────────────────────── -->
+    @case ("calendar") {
     <div class="absent-calendar">
       <div class="days">
         <div class="day-of-week weekend">Dom</div>
@@ -148,83 +202,228 @@
       <div class="calendar">
         <div class="week">
           @for (day of daysOfMonth(); track $index) {
-            <div
-              class="day"
-              [class.today]="day.isToday"
-              [class.empty-day]="!day.day"
-            >
-              @if (day.day) {
-                <span class="day-number">{{ day.day }}</span>
-              }
-              @if (day.absences?.length) {
-                @for (item of day.absences; track item.id) {
-                  <div
-                    (dblclick)="openAbsent(item.id)"
-                    (mouseover)="onAbsentClick(item.id)"
-                    (mouseleave)="onAbsentLeave(item.id)"
-                    [attr.absent-id]="item.id"
-                    class="absent"
-                    [class]="'absent-' + item.type"
-                  >
-                    {{ getEmployeeName(item.employeeId) }}
-                  </div>
-                }
-              }
+          <div class="day" [class.today]="day.isToday" [class.empty-day]="!day.day">
+            @if (day.day) {
+            <span class="day-number">{{ day.day }}</span>
+            }
+            @for (item of day.absences; track item.id) {
+            <div (dblclick)="openAbsent(item.id)" (mouseover)="onAbsentClick(item.id)"
+              (mouseleave)="onAbsentLeave(item.id)" [attr.absent-id]="item.id" class="absent"
+              [class]="'absent-' + item.type">
+              {{ getEmployeeName(item.employeeId) }}
             </div>
+            }
+          </div>
           }
         </div>
       </div>
     </div>
-  </mat-tab>
+    }
 
-  <mat-tab label="ESTADISTICAS">
-    <div class="stats-container">
-      @if (employeeStats().length === 0) {
-        <div class="stats-empty">
-          <mat-icon>check_circle</mat-icon>
-          <span
-            >Sin ausencias en {{ months[currentDate().month - 1] }}
-            {{ currentDate().year }}</span
-          >
-        </div>
-      } @else {
-        <div class="stats-list">
-          @for (row of employeeStats(); track row.employeeId) {
-            <div class="stat-card">
-              <div class="stat-card-header">
-                <div class="stat-employee-info">
-                  <span class="stat-emp-id">{{
-                    getEmployeeId(row.employeeId)
-                  }}</span>
-                  <span class="stat-emp-name">{{
-                    getEmployeeName(row.employeeId)
-                  }}</span>
-                </div>
-                <span class="stat-total-badge" [class.warn]="row.total >= 5">
-                  {{ row.total }} {{ row.total === 1 ? "día" : "días" }}
-                </span>
-              </div>
-              <div class="stat-tags">
-                @for (tag of getStatTags(row); track tag.label) {
-                  <span class="stat-tag" [class]="tag.class">
-                    {{ tag.label }} <strong>{{ tag.value }}</strong>
-                  </span>
-                }
-              </div>
+    <!-- ── ESTADÍSTICAS ─────────────────────────────────────────────── -->
+    @case ("stats") {
+    <flux-table-toolbar>
+      <div toolbarStart>
+        <flux-search-box [control]="searchFormControl" placeholder="Buscar por empleado o legajo" />
+      </div>
+      <div toolbarEnd>
+        <button fluxPillBtn variant="accent" icon="download" (click)="exportCsv()">
+          <span>Exportar</span>
+        </button>
+      </div>
+    </flux-table-toolbar>
+
+    <div class="table-head cols-stats">
+      <span>Empleado</span>
+      <span>Total</span>
+      <span>Desglose</span>
+    </div>
+
+    @for (row of pagedStats(); track row.employeeId) {
+    <div class="table-row cols-stats">
+      <flux-employee-cell [initials]="row.initials" [name]="row.name" [legajo]="row.legajo" [sector]="row.sector" />
+
+      <div>
+        <span class="total-badge" [class.warn]="row.stat.total >= 5">
+          {{ row.stat.total }}
+          {{ row.stat.total === 1 ? "día" : "días" }}
+        </span>
+      </div>
+
+      <div class="stat-tags">
+        @for (tag of row.tags; track tag.label) {
+        <span class="stat-tag" [class]="tag.class">
+          {{ tag.label }} <strong>{{ tag.value }}</strong>
+        </span>
+        }
+      </div>
+    </div>
+    }
+
+    @if (filteredStats().length === 0) {
+    <flux-empty-state title="Sin datos" [text]="'No hay ausencias registradas en ' + monthLabel() + '.'" />
+    }
+
+    <ng-container *ngTemplateOutlet="pager"></ng-container>
+    }
+    }
+    }
+  </div>
+</div>
+
+<!-- Pie de paginación, compartido por las tres tablas -->
+<ng-template #pager>
+  <flux-pager [currentPage]="currentPage()" [totalPages]="totalPages()" [pageNumbers]="pageNumbers()"
+    [rangeLabel]="rangeLabel()" (pageChange)="goToPage($event)" />
+</ng-template>
+} @else {
+<!-- ══ MÓVIL · Material 3 ═══════════════════════════════════════════════════ -->
+<div class="m3">
+  <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar en ausencias">
+    <button class="m3-avatar" [matMenuTriggerFor]="userMenu">
+      {{ userInitials() }}
+    </button>
+  </flux-m3-search-bar>
+
+  <!-- Primary tabs M3 -->
+  <flux-m3-tab-strip [tabs]="tabs()" [selected]="tab()" (selectedChange)="setTab($event)" />
+  <br />
+
+  @if (tab() === "absents") {
+  <flux-filter-chips [chips]="statusChips" [selected]="status()" (selectedChange)="setStatus($event)" />
+  }
+
+  <div class="m3-scroll">
+    @if (isLoading()) {
+    <div class="loading-wrapper"><mat-spinner diameter="36" /></div>
+    } @else {
+    <flux-m3-stats-row [stats]="stats()" />
+
+    <div class="m3-subheader">
+      <span class="m3-results">{{ resultsLabel() }}</span>
+      <div class="m3-subheader-actions">
+        <button class="m3-sort" (click)="openDatePickerDialog()">
+          <mat-icon class="mat-icon-weight-regular">calendar_today</mat-icon>
+          <span>{{ monthLabel() }}</span>
+        </button>
+        @if (tab() !== "calendar" && tab() !== "stats") {
+        <button class="m3-sort" (click)="toggleSort()">
+          <mat-icon class="mat-icon-weight-regular">swap_vert</mat-icon>
+          <span>{{ sortLabel() }}</span>
+        </button>
+        }
+      </div>
+    </div>
+
+    @switch (tab()) {
+    @case ("absents") {
+    @for (row of filteredAbsents(); track row.id) {
+    <flux-m3-list-item [initials]="row.initials" [headline]="row.nameTitle" [support]="[
+                  (row.type | abstentType) +
+                    ' · ' +
+                    row.days +
+                    (row.days === 1 ? ' día' : ' días'),
+                  row.period,
+                ]" (itemClick)="openAbsent(row.id)">
+      <flux-status-chip class="m3-status" [active]="row.justified" activeLabel="Justif." inactiveLabel="Sin just." />
+    </flux-m3-list-item>
+    }
+    @if (filteredAbsents().length === 0) {
+    <flux-empty-state size="compact" title="Sin ausencias" [text]="
+                  'No hay ausencias que coincidan en ' + monthLabel() + '.'
+                " />
+    }
+    }
+
+    @case ("novedades") {
+    @for (row of filteredNovedades(); track row.id) {
+    <flux-m3-list-item [initials]="row.initials" [headline]="row.nameTitle" [support]="[
+                  (row.doc.type | docType) + ' · ' + row.uploadDate,
+                  row.description,
+                ]" (itemClick)="viewNovedadFile(row.doc)">
+      <flux-row-actions>
+        <button fluxIconBtn variant="edit" icon="event_busy" matTooltip="Convertir en ausencia"
+          (click)="convertToAbsent(row, $event)"></button>
+        <button fluxIconBtn variant="delete" icon="delete" matTooltip="Descartar"
+          (click)="discardNovedad(row, $event)"></button>
+      </flux-row-actions>
+    </flux-m3-list-item>
+    }
+    @if (filteredNovedades().length === 0) {
+    <flux-empty-state size="compact" title="Sin novedades pendientes"
+      text="Los documentos que cargues aparecen acá hasta convertirlos." />
+    }
+    }
+
+    @case ("calendar") {
+    <div class="absent-calendar">
+      <div class="days">
+        <div class="day-of-week weekend">Dom</div>
+        <div class="day-of-week">Lun</div>
+        <div class="day-of-week">Mar</div>
+        <div class="day-of-week">Mie</div>
+        <div class="day-of-week">Jue</div>
+        <div class="day-of-week">Vie</div>
+        <div class="day-of-week weekend">Sab</div>
+      </div>
+      <div class="calendar">
+        <div class="week">
+          @for (day of daysOfMonth(); track $index) {
+          <div class="day" [class.today]="day.isToday" [class.empty-day]="!day.day">
+            @if (day.day) {
+            <span class="day-number">{{ day.day }}</span>
+            }
+            @for (item of day.absences; track item.id) {
+            <div (click)="openAbsent(item.id)" [attr.absent-id]="item.id" class="absent"
+              [class]="'absent-' + item.type">
+              {{ getEmployeeName(item.employeeId) }}
             </div>
+            }
+          </div>
           }
         </div>
-      }
+      </div>
     </div>
-  </mat-tab>
-</mat-tab-group>
+    }
 
-<button
-  matFab
-  color="primary"
-  class="add-button"
-  [matTooltip]="activeTabIndex() === 0 ? 'Cargar novedad' : 'Agregar ausencia'"
-  (click)="activeTabIndex() === 0 ? uploadNovedad() : openAddAbsentDialog()"
->
-  <mat-icon>add</mat-icon>
-</button>
+    @case ("stats") {
+    @for (row of filteredStats(); track row.employeeId) {
+    <flux-m3-list-item [initials]="row.initials" [headline]="row.nameTitle" [support]="[row.legajo]"
+      [clickable]="false">
+      <div class="stat-tags">
+        @for (tag of row.tags; track tag.label) {
+        <span class="stat-tag" [class]="tag.class">
+          {{ tag.label }} <strong>{{ tag.value }}</strong>
+        </span>
+        }
+      </div>
+      <div class="total-badge" [class.warn]="row.stat.total >= 5">
+        {{ row.stat.total }}d
+      </div>
+    </flux-m3-list-item>
+    }
+    @if (filteredStats().length === 0) {
+    <flux-empty-state size="compact" title="Sin datos"
+      [text]="'No hay ausencias registradas en ' + monthLabel() + '.'" />
+    }
+    }
+    }
+    }
+  </div>
+
+  <button fluxFab variant="primary" icon="add"
+    [matTooltip]="tab() === 'novedades' ? 'Cargar novedad' : 'Nueva ausencia'"
+    (click)="tab() === 'novedades' ? uploadNovedad() : openAddAbsentDialog()"></button>
+</div>
+}
+
+<mat-menu #userMenu="matMenu">
+  <button mat-menu-item routerLink="/main/app-pages/users">
+    <mat-icon>account_circle</mat-icon>
+    <span>Mi cuenta</span>
+  </button>
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    <span>Cerrar sesión</span>
+  </button>
+</mat-menu>

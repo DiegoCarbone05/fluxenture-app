@@ -9,6 +9,8 @@ export class AppService {
 
   setDateOfData(date: { year: number, month: number }) {
     localStorage.setItem('dateOfData', JSON.stringify(date));
+    // Sin esto el mes elegido solo tomaba efecto al recargar la pagina.
+    this.dateOfData.set(date);
   }
 
   getDateOfData() {

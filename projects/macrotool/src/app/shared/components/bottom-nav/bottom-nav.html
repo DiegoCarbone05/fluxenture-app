@@ -1,0 +1,15 @@
+<nav class="bottom-nav">
+  @for (dest of destinations; track dest.link) {
+    <a
+      class="nav-dest"
+      routerLinkActive="active"
+      [routerLink]="dest.link"
+      [attr.aria-label]="dest.label"
+    >
+      <span class="nav-pill">
+        <mat-icon>{{ dest.icon }}</mat-icon>
+      </span>
+      <span class="nav-label">{{ dest.label }}</span>
+    </a>
+  }
+</nav>

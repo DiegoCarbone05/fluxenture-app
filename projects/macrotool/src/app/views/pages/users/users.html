@@ -1,0 +1,113 @@
+@if (!isMobile()) {
+<!-- ══ ESCRITORIO ═══════════════════════════════════════════════════════════ -->
+<div class="desk">
+  <flux-page-header title="Mi cuenta" subtitle="Tus datos y, si sos administrador, las cuentas de Fluxenture">
+    @if (isAdmin()) {
+    <button fluxPillBtn variant="primary" icon="person_add" (click)="openAddAccountDialog()">
+      <span>Nueva cuenta</span>
+    </button>
+    }
+  </flux-page-header>
+
+  <div class="table-card profile-card">
+    <flux-m3-list-item [initials]="meInitials()" [headline]="me()?.username || '-'" [support]="[me()?.mail || '-']"
+      [clickable]="false">
+      <span class="role-chip" [class]="'role-' + (me()?.role || '')">{{ me()?.role || '-' }}</span>
+    </flux-m3-list-item>
+  </div>
+
+  @if (isAdmin()) {
+  <flux-stats-grid [stats]="stats()" />
+
+  <div class="table-card">
+    @if (loadingAccounts()) {
+    <div class="loading-wrapper"><mat-spinner diameter="36" /></div>
+    } @else {
+    <flux-table-toolbar>
+      <div toolbarStart>
+        <flux-search-box [control]="searchFormControl" placeholder="Buscar por correo o rango" />
+      </div>
+      <div toolbarEnd>
+        <button fluxPillBtn variant="neutral" icon="refresh" matTooltip="Actualizar" (click)="refreshAccounts()">
+          <span>Actualizar</span>
+        </button>
+      </div>
+    </flux-table-toolbar>
+
+    <div class="table-head cols-accounts">
+      <span>Correo</span>
+      <span>Rango</span>
+      <span>Alta</span>
+      <span class="align-right">Acciones</span>
+    </div>
+
+    @for (account of filteredAccounts(); track account.mail) {
+    <div class="table-row cols-accounts">
+      <div class="cell-mail">{{ account.mail }}</div>
+      <div><span class="role-chip" [class]="'role-' + account.role">{{ account.role }}</span></div>
+      <div class="cell-date">
+        <mat-icon>event</mat-icon>
+        <span>{{ formatDate(account.audit?.createdAt) }}</span>
+      </div>
+      <flux-row-actions>
+        <button fluxIconBtn variant="delete" icon="person_remove" matTooltip="Dar de baja"
+          [disabled]="deletingMail() === account.mail" (click)="deleteAccount(account.mail)"></button>
+      </flux-row-actions>
+    </div>
+    }
+
+    @if (filteredAccounts().length === 0) {
+    <flux-empty-state title="Sin cuentas" text="Todavía no hay cuentas que coincidan con la búsqueda." />
+    }
+    }
+  </div>
+  }
+</div>
+} @else {
+<!-- ══ MÓVIL · Material 3 ═══════════════════════════════════════════════════ -->
+<div class="m3">
+  <div class="m3-title-bar">
+    <span>Mi cuenta</span>
+  </div>
+
+  <div class="m3-scroll">
+    <flux-m3-list-item [initials]="meInitials()" [headline]="me()?.username || '-'" [support]="[me()?.mail || '-']"
+      [clickable]="false">
+      <span class="role-chip" [class]="'role-' + (me()?.role || '')">{{ me()?.role || '-' }}</span>
+    </flux-m3-list-item>
+
+    @if (isAdmin()) {
+    <flux-m3-stats-row [stats]="stats()" />
+
+    <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar por correo o rango" />
+
+    <div class="m3-subheader">
+      <span class="m3-results">{{ resultsLabel() }}</span>
+    </div>
+
+    @if (loadingAccounts()) {
+    <div class="loading-wrapper"><mat-spinner diameter="36" /></div>
+    } @else {
+    @for (account of filteredAccounts(); track account.mail) {
+    <flux-m3-list-item [headline]="account.mail" [support]="['Alta: ' + formatDate(account.audit?.createdAt)]"
+      [clickable]="false">
+      <div class="m3-trailing">
+        <span class="role-chip" [class]="'role-' + account.role">{{ account.role }}</span>
+        <button fluxIconBtn variant="delete" icon="person_remove" [disabled]="deletingMail() === account.mail"
+          (click)="deleteAccount(account.mail)"></button>
+      </div>
+    </flux-m3-list-item>
+    }
+
+    @if (filteredAccounts().length === 0) {
+    <flux-empty-state size="compact" title="Sin cuentas" text="Todavía no hay cuentas que coincidan con la búsqueda." />
+    }
+    }
+    }
+  </div>
+
+  @if (isAdmin()) {
+  <button fluxFab variant="primary" icon="person_add" (click)="openAddAccountDialog()"></button>
+  }
+</div>
+}

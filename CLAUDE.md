@@ -34,7 +34,8 @@ views/      – Feature pages, auth screens, dialogs, and ViewsService
 
 `main.ts` boots the standalone `App` component via `bootstrapApplication` with these providers:
 - `provideZonelessChangeDetection()` — **no Zone.js**
-- `provideHttpClient(withInterceptors([authInterceptor]))`
+- `provideKeycloak({ config, initOptions })` — Keycloak/OIDC session (see `core/config/keycloak.config.ts`), initialized with `onLoad: 'check-sso'`
+- `provideHttpClient(withInterceptors([includeBearerTokenInterceptor]))` — attaches the Keycloak Bearer token only to requests matching `backendBearerCondition` (the Fluxenture API origin)
 - `provideRouter(APP_ROUTES, withComponentInputBinding())` — route params bind directly to component `@Input()`s
 - `provideAnimationsAsync()`
 
@@ -43,7 +44,7 @@ views/      – Feature pages, auth screens, dialogs, and ViewsService
 All routes are functional `Routes` arrays in `*.routes.ts` files using `loadComponent` (no `NgModule`-based lazy loading):
 
 - [app.routes.ts](projects/macrotool/src/app/app.routes.ts) — top-level: `''` loads `AUTH_ROUTES`, `'main'` loads `PAGES_ROUTES` (guarded by `authGuard`), `'**'` redirects to `splash`.
-- [auth.routes.ts](projects/macrotool/src/app/views/auth/auth.routes.ts) — `login`, `''` (splash, guarded).
+- [auth.routes.ts](projects/macrotool/src/app/views/auth/auth.routes.ts) — `''` (splash, guarded; no local login route, Keycloak owns the login UI).
 - [pages.routes.ts](projects/macrotool/src/app/views/pages/pages.routes.ts) — renders feature components as children of the `Pages` shell under `app-pages/*`.
 
 | Path | Feature |
@@ -72,11 +73,16 @@ Stateful services cache data in a `signal<T[]>()` and expose it via a typed `Sig
 | `DocsService` | `/docs` | also opens `AddDocDialog` directly |
 | `StorageService` | `/storage` | file upload/download proxy to Google Drive |
 
-### Auth flow
+### Auth flow (Keycloak / OIDC)
 
-1. `AuthService.login()` stores the JWT as `flux_token` in `localStorage`.
-2. `authInterceptor` attaches `Authorization: Bearer <token>` to every outgoing request.
-3. `authGuard` calls `AuthService.verifySession()` (which hits `GET /auth/me`) before allowing access to protected routes.
+Identity is centralized in Keycloak (`https://auth.servaltek.com`, realm `servaltek`, client `flux-frontend`) — this is the pilot app for that SSO setup; other projects are expected to follow the same pattern. Config lives in [keycloak.config.ts](projects/macrotool/src/app/core/config/keycloak.config.ts), hardcoded the same way `base-api.service.ts` hardcodes the backend URL (no Angular environment files in this repo).
+
+1. `authGuard` (built with `createAuthGuard` from `keycloak-angular`) protects both the splash route and `main`. If the user isn't authenticated it calls `keycloak.login()`, a full redirect to the Keycloak login page — there is no local login form/component anymore.
+2. Keycloak redirects back with a session; `includeBearerTokenInterceptor` attaches the resulting JWT as `Authorization: Bearer <token>` to requests matching `backendBearerCondition` (the Fluxenture API origin only — the token is never sent to third parties).
+3. `Pages` (the `main/app-pages` shell) calls `AuthService.saveUserInSignal()`, which hits `GET /auth/me` — the backend now reads this user's identity straight from the validated Keycloak JWT (`preferred_username`, `email`, `sub`), not from a local password table.
+4. `AuthService.logout()` calls `keycloak.logout()`, which ends the centralized Keycloak session (not just this app) and redirects back to the app root, where the guard sends the user back to Keycloak's login screen.
+
+The backend (`servisub-back`, separate repo) is an OAuth2 resource server that validates the same Keycloak-issued JWT — see that repo's CLAUDE.md "Security" section.
 
 ### Key implementation details
 

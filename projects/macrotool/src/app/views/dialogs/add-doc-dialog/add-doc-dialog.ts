@@ -23,6 +23,7 @@ import { DocsService } from '../../../core/services/api/docs/docs.service';
 import { DOC_TYPES, DOC_USAGE_MODULE_LABELS } from '../../../shared/constants/typesValues.constant';
 import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
 import { FileViewerDialog } from '../file-viewer-dialog/file-viewer-dialog';
+import { fullNameOf } from '../../../shared/models/Employee';
 
 export enum UploadStatus {
   IDLE,
@@ -107,7 +108,7 @@ export class AddDocDialog implements OnInit, AfterViewInit {
         if (!value || value === '') return employees;
         const search = value.toString().toLowerCase();
         return employees.filter(emp =>
-          emp.name.toLowerCase().includes(search) ||
+          fullNameOf(emp).toLowerCase().includes(search) ||
           String(emp.employeeId).toLowerCase().includes(search)
         );
       })

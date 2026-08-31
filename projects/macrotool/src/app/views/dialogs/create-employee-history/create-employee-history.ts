@@ -1,5 +1,5 @@
 import { Component, inject, Inject, OnInit, signal } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +14,7 @@ import { SelectDocDialog } from '../select-doc-dialog/select-doc-dialog';
 import { EDocType } from '../../../shared/models/Doc';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
+import { fullNameOf } from '../../../shared/models/Employee';
 
 @Component({
   selector: 'app-create-employee-history',
@@ -32,6 +33,16 @@ export class CreateEmployeeHistoryDialogComponent implements OnInit {
   currentDocId = signal(null);
   private currentDriveFileId = signal<string | null>(null);
 
+  // Alta/Baja/Renuncia/Despido normalmente tienen un papel de respaldo real
+  // (AFIP, telegrama, CD); Cambio de servicio/turno u "Otro" muchas veces no.
+  private readonly docRequiredTypes = new Set<EEmployeeHistoryType>([
+    EEmployeeHistoryType.ONBOARDING,
+    EEmployeeHistoryType.OFFBOARDING,
+    EEmployeeHistoryType.RESIGNATION,
+    EEmployeeHistoryType.DISMISSAL,
+  ]);
+  docRequired = signal(false);
+
   constructor(
     private fb: FormBuilder,
     private historyService: EmployeeHistoryService,
@@ -47,27 +58,32 @@ export class CreateEmployeeHistoryDialogComponent implements OnInit {
       employeeId: ['', Validators.required],
       employeeName: ['', Validators.required],
       description: [''],
-      docId: [null, Validators.required]
+      docId: [null]
     });
+
+    this.historyForm.get('type')?.valueChanges.subscribe((type) => this.updateDocRequirement(type));
+    this.updateDocRequirement(this.historyForm.get('type')?.value);
   }
 
   ngOnInit(): void {
-
     this.employeeService.getEmployeeById(this.data.employeeId).subscribe((emp) => {
-      console.log(emp);
       if (this.data.employeeId && emp) {
-
         this.historyForm.patchValue({
-          employeeName: emp.name,
+          employeeName: fullNameOf(emp),
           employeeId: emp.id
         })
       }
     });
-
   }
 
-  get details(): FormArray {
-    return this.historyForm.get('details') as FormArray;
+  private updateDocRequirement(type: EEmployeeHistoryType): void {
+    const docIdControl = this.historyForm.get('docId');
+    if (!docIdControl) return;
+
+    const required = this.docRequiredTypes.has(type);
+    this.docRequired.set(required);
+    docIdControl.setValidators(required ? [Validators.required] : []);
+    docIdControl.updateValueAndValidity();
   }
 
   addDocument() {
@@ -130,23 +146,9 @@ export class CreateEmployeeHistoryDialogComponent implements OnInit {
     });
   }
 
-  addDetail() {
-    const detailForm = this.fb.group({
-      field: ['', Validators.required],
-      oldValue: [''],
-      newValue: ['']
-    });
-    this.details.push(detailForm);
-  }
-
-  removeDetail(index: number) {
-    this.details.removeAt(index);
-  }
-
   save() {
     if (this.historyForm.valid) {
       const history: EmployeeHistory = this.historyForm.value;
-      console.log(history);
 
       this.historyService.saveHistory(history).subscribe({
         next: (savedRecord) => {

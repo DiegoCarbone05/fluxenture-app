@@ -6,7 +6,7 @@
 <div class="emp-view" [class.redbg]="!employee()?.isOperational">
     <div class="content">
         <span class="sector">{{employee()?.sector | empSectorPipe}}</span>
-        <span class="emeploye-name">{{employee()?.name}}</span>
+        <span class="emeploye-name">{{employeeName()}}</span>
     </div>
 </div>
 
@@ -22,7 +22,7 @@
             <div class="info-row">
                 <div class="info-item">
                     <span class="label">Nombre:</span>
-                    <span class="value">{{employee()?.name}}</span>
+                    <span class="value">{{employeeName()}}</span>
                 </div>
                 <div class="info-item">
                     <span class="label">CUIL:</span>
@@ -81,6 +81,10 @@
                 <div class="info-item">
                     <span class="label">Sector:</span>
                     <span class="value">{{employee()?.sector | empSectorPipe}}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Servicio:</span>
+                    <span class="value">{{employee()?.service || '—'}}</span>
                 </div>
             </div>
             <div class="info-row">

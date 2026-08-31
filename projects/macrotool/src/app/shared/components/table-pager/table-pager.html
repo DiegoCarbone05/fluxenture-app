@@ -1,0 +1,26 @@
+<span class="range-label">{{ rangeLabel }}</span>
+<div class="pager">
+  <button
+    class="pager-arrow"
+    [disabled]="currentPage === 0"
+    (click)="pageChange.emit(currentPage - 1)"
+  >
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+  @for (page of pageNumbers; track page) {
+    <button
+      class="pager-page"
+      [class.current]="page === currentPage"
+      (click)="pageChange.emit(page)"
+    >
+      {{ page + 1 }}
+    </button>
+  }
+  <button
+    class="pager-arrow"
+    [disabled]="currentPage >= totalPages - 1"
+    (click)="pageChange.emit(currentPage + 1)"
+  >
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

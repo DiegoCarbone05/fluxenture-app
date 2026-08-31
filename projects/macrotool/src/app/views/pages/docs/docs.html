@@ -1,120 +1,154 @@
-<flux-toolbar
-  title="Documentos"
-  subTitle="{{ months[currentDate().month - 1] }} - {{ currentDate().year }}"
->
-  <button matIconButton (click)="openDatePickerDialog()">
-    <mat-icon>calendar_today</mat-icon>
-  </button>
-</flux-toolbar>
+@if (!isMobile()) {
+<!-- ══ ESCRITORIO ═══════════════════════════════════════════════════════════ -->
+<div class="desk">
+  <flux-page-header title="Documentos" [subtitle]="subtitle()">
+    <button fluxPillBtn variant="neutral" icon="calendar_today" (click)="openDatePickerDialog()">
+      <span>{{ monthLabel() }}</span>
+    </button>
+    <button fluxPillBtn variant="primary" icon="add" (click)="openDialog()">
+      <span>Nuevo documento</span>
+    </button>
+  </flux-page-header>
 
-<div class="docs-content">
-  @if (isLoading()) {
-    <div class="loading-wrapper">
-      <mat-spinner diameter="44"></mat-spinner>
+  <div class="table-card">
+    @if (isLoading()) {
+    <div class="loading-wrapper"><mat-spinner diameter="36" /></div>
+    } @else {
+    <flux-table-toolbar>
+      <div toolbarStart>
+        <flux-search-box [control]="searchFormControl" placeholder="Buscar por empleado, descripción o usuario" />
+        <select class="flux-select" [value]="typeFilter()" (change)="setType($any($event.target).value)">
+          <option value="todos">Tipo: todos</option>
+          @for (type of docTypes; track type.value) {
+          <option [value]="type.value">{{ type.label }}</option>
+          }
+        </select>
+      </div>
+      <div toolbarEnd>
+        <button fluxPillBtn variant="neutral" icon="swap_vert" (click)="toggleSort()">
+          <span>{{ sortLabel() }}</span>
+        </button>
+        <button fluxPillBtn variant="accent" icon="download" (click)="exportCsv()">
+          <span>Exportar</span>
+        </button>
+      </div>
+    </flux-table-toolbar>
+
+    <div class="table-head cols-docs">
+      <span>Tipo</span>
+      <span>Empleado</span>
+      <span>Descripción</span>
+      <span>Fecha</span>
+      <span>Usuario</span>
+      <span class="align-right">Acciones</span>
     </div>
-  } @else if (docs().length === 0) {
-    <div class="docs-empty">
-      <mat-icon>folder_open</mat-icon>
-      <span
-        >No hay documentos en {{ months[currentDate().month - 1] }}
-        {{ currentDate().year }}.</span
-      >
-    </div>
-  } @else {
-    <div class="docs-table-wrap">
-      <!-- Cabecera de columnas (solo escritorio) -->
-      <div class="docs-list-header">
-        <span>Tipo</span>
-        <span>Empleado</span>
-        <span>Descripción</span>
-        <span>Fecha</span>
-        <span>Usuario</span>
-        <span></span>
+
+    @for (row of paged(); track row.id) {
+    <div class="table-row cols-docs">
+      <div>
+        <span class="doc-type-chip" [class]="'dtype-' + row.type">{{ row.type | docType }}</span>
       </div>
 
-      <!-- Lista de documentos -->
-      <div class="docs-list">
-        @for (doc of docs(); track doc.id) {
-          <div class="doc-card">
-            <!-- Tipo -->
-            <div class="f-type">
-              <span class="doc-type-chip" [class]="'dtype-' + doc.type">{{
-                doc.type | docType
-              }}</span>
-            </div>
+      <flux-employee-cell [initials]="row.employeeInitials" [name]="row.employeeName" [legajo]="row.employeeLegajo"
+        [sector]="row.employeeSector" />
 
-            <!-- Empleado -->
-            <div class="f-employee">
-              <span class="mobile-label">Empleado</span>
-              <span class="doc-employee-name">{{
-                getEmployeeName(doc.employeeId)
-              }}</span>
-            </div>
+      <div class="cell-desc">{{ row.description }}</div>
 
-            <!-- Descripción -->
-            <div class="f-desc">
-              <span class="mobile-label">Descripción</span>
-              <span class="doc-description">{{ doc.description || "—" }}</span>
-            </div>
+      <div class="cell-date">
+        <mat-icon>event</mat-icon>
+        <span>{{ row.dateLabel }}</span>
+      </div>
 
-            <!-- Fecha -->
-            <div class="f-date">
-              <mat-icon class="meta-icon">event</mat-icon>
-              <span class="doc-date-text">{{
-                formatDate(doc.uploadDate)
-              }}</span>
-            </div>
+      <div class="cell-user">
+        <mat-icon>person</mat-icon>
+        <span>{{ row.userLabel }}</span>
+      </div>
 
-            <!-- Usuario -->
-            <div class="f-user">
-              <mat-icon class="meta-icon">person</mat-icon>
-              <span class="doc-user-text">{{ doc.audit?.createdBy || "—" }}</span>
-            </div>
-
-            <!-- Acciones -->
-            <div class="f-actions">
-              @for (creator of creatorsFor(doc); track creator.id) {
-              <button
-                mat-icon-button
-                color="accent"
-                (click)="creator.create(doc)"
-                [matTooltip]="creator.label"
-              >
-                <mat-icon>{{ creator.icon }}</mat-icon>
-              </button>
-              }
-              <button
-                mat-icon-button
-                color="primary"
-                (click)="editDoc(doc.id)"
-                matTooltip="Editar"
-              >
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                color="primary"
-                (click)="openFile(doc)"
-                matTooltip="Ver archivo"
-              >
-                <mat-icon>visibility</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                color="warn"
-                (click)="deleteDoc(doc)"
-                matTooltip="Eliminar"
-              >
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </div>
+      <flux-row-actions>
+        @for (creator of creatorsFor(row.raw); track creator.id) {
+        <button fluxIconBtn variant="edit" [icon]="creator.icon" [matTooltip]="creator.label"
+          (click)="creator.create(row.raw)"></button>
         }
+        <button fluxIconBtn variant="edit" icon="edit" matTooltip="Editar" (click)="editDoc(row.id)"></button>
+        <button fluxIconBtn variant="view" icon="visibility" matTooltip="Ver archivo"
+          (click)="openFile(row.raw)"></button>
+        <button fluxIconBtn variant="delete" icon="delete" matTooltip="Eliminar" (click)="deleteDoc(row.raw)"></button>
+      </flux-row-actions>
+    </div>
+    }
+
+    @if (filtered().length === 0) {
+    <flux-empty-state title="Sin documentos" [text]="'No hay documentos que coincidan en ' + monthLabel() + '.'" />
+    }
+
+    <flux-pager [currentPage]="currentPage()" [totalPages]="totalPages()" [pageNumbers]="pageNumbers()"
+      [rangeLabel]="rangeLabel()" (pageChange)="goToPage($event)" />
+    }
+  </div>
+</div>
+} @else {
+<!-- ══ MÓVIL · Material 3 ═══════════════════════════════════════════════════ -->
+<div class="m3">
+  <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar documentos">
+    <button class="m3-avatar" [matMenuTriggerFor]="userMenu">{{ userInitials() }}</button>
+  </flux-m3-search-bar>
+
+  <div class="m3-scroll">
+    @if (isLoading()) {
+    <div class="loading-wrapper"><mat-spinner diameter="36" /></div>
+    } @else {
+    <div class="m3-subheader">
+      <span class="m3-results">{{ resultsLabel() }}</span>
+      <div class="m3-subheader-actions">
+        <button class="m3-sort" (click)="openDatePickerDialog()">
+          <mat-icon class="mat-icon-weight-regular">calendar_today</mat-icon>
+          <span>{{ monthLabel() }}</span>
+        </button>
+        <button class="m3-sort" (click)="toggleSort()">
+          <mat-icon class="mat-icon-weight-regular">swap_vert</mat-icon>
+          <span>{{ sortLabel() }}</span>
+        </button>
       </div>
     </div>
-  }
-</div>
 
-<button matFab color="primary" class="add-button" (click)="openDialog()">
-  <mat-icon>add</mat-icon>
-</button>
+    @for (row of filtered(); track row.id) {
+    <flux-m3-list-item [initials]="row.employeeInitials" [headline]="row.employeeNameTitle"
+      [support]="[row.description, row.dateLabel]" [clickable]="false">
+      <div class="m3-trailing">
+        <span class="doc-type-chip" [class]="'dtype-' + row.type">{{ row.type | docType }}</span>
+        <flux-row-actions>
+          @for (creator of creatorsFor(row.raw); track creator.id) {
+          <button fluxIconBtn variant="edit" [icon]="creator.icon" [matTooltip]="creator.label"
+            (click)="creator.create(row.raw)"></button>
+          }
+          <button fluxIconBtn variant="edit" icon="edit" matTooltip="Editar" (click)="editDoc(row.id)"></button>
+          <button fluxIconBtn variant="view" icon="visibility" matTooltip="Ver archivo"
+            (click)="openFile(row.raw)"></button>
+          <button fluxIconBtn variant="delete" icon="delete" matTooltip="Eliminar"
+            (click)="deleteDoc(row.raw)"></button>
+        </flux-row-actions>
+      </div>
+    </flux-m3-list-item>
+    }
+
+    @if (filtered().length === 0) {
+    <flux-empty-state size="compact" title="Sin documentos"
+      [text]="'No hay documentos que coincidan en ' + monthLabel() + '.'" />
+    }
+    }
+  </div>
+
+  <button fluxFab variant="primary" icon="add" (click)="openDialog()"></button>
+</div>
+}
+
+<mat-menu #userMenu="matMenu">
+  <button mat-menu-item routerLink="/main/app-pages/users">
+    <mat-icon>account_circle</mat-icon>
+    <span>Mi cuenta</span>
+  </button>
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    <span>Cerrar sesión</span>
+  </button>
+</mat-menu>

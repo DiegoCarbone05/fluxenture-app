@@ -1,0 +1,55 @@
+<button
+  type="button"
+  class="icon-btn user-btn"
+  [class.logged-in]="!!user()"
+  cdkOverlayOrigin
+  #trigger="cdkOverlayOrigin"
+  (click)="toggle()"
+  aria-haspopup="menu"
+  [attr.aria-expanded]="isOpen()"
+  [attr.title]="fullName() || null"
+  aria-label="Cuenta">
+  @if (initials()) {
+  <span class="user-btn__initials">{{ initials() }}</span>
+  } @else {
+  <span class="user-btn__icon"><mat-icon>person</mat-icon></span>
+  }
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayPositions]="positions"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (backdropClick)="close()"
+  (detach)="close()">
+  <div class="account" role="menu">
+    <div class="account__top">
+      <img class="account__brand" src="stek-logotype.svg" alt="Servaltek" height="16" />
+      <button type="button" class="account__signout" (click)="logout()">
+        Cerrar sesión
+      </button>
+    </div>
+
+    <div class="account__body">
+      <span class="account__avatar" aria-hidden="true">
+        @if (initials()) {
+        <span class="account__avatar-initials">{{ initials() }}</span>
+        } @else {
+        <span class="account__avatar-icon"><mat-icon>person</mat-icon></span>
+        }
+      </span>
+      <div class="account__id">
+        @if (fullName()) {
+        <p class="account__name">{{ fullName() }}</p>
+        }
+        @if (user()?.email) {
+        <p class="account__email">{{ user()?.email }}</p>
+        }
+        <a class="account__link" [routerLink]="accountLink" (click)="close()">Ver cuenta</a>
+      </div>
+    </div>
+  </div>
+</ng-template>

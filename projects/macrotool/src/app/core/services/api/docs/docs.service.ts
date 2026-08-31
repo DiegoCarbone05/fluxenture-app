@@ -43,6 +43,15 @@ export class DocsService extends BaseApiService<string> {
     return this.http.get<DocUsages>(`${this.endpoint + id}/usages`);
   }
 
+  /**
+   * Descarga masiva: el back baja los archivos de Drive y devuelve un unico ZIP,
+   * con cada archivo renombrado como dice `files[].name` (la extension la pone el back
+   * a partir del archivo real). Se manda por POST porque la seleccion puede ser larga.
+   */
+  exportZip(zipName: string, files: { docId: string; name: string }[]) {
+    return this.http.post(`${this.endpoint}export/zip`, { zipName, files }, { responseType: "blob" });
+  }
+
   saveDoc(doc: Doc) {
     return this.http.post<Doc>(this.endpoint, doc);
   }

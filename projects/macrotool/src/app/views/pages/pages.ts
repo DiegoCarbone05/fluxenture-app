@@ -5,11 +5,12 @@ import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { ChildrenOutletContexts, RouterOutlet } from '@angular/router';
 import { slideInAnimation } from '../../shared/constants/slideAnimaton';
 import { Sidenav } from '../../shared/components/sidenav/sidenav';
+import { BottomNav } from '../../shared/components/bottom-nav/bottom-nav';
 
 @Component({
   selector: 'app-pages',
   standalone: true,
-  imports: [MatSidenavModule, RouterOutlet, Sidenav],
+  imports: [MatSidenavModule, RouterOutlet, Sidenav, BottomNav],
   templateUrl: './pages.html',
   styleUrl: './pages.scss',
   animations: [slideInAnimation]
@@ -24,8 +25,9 @@ export class Pages {
     private contexts: ChildrenOutletContexts
   ) {
     this.authService.saveUserInSignal();
+    // En telefono no se renderiza el drawer, asi que puede no existir.
     this.viewsSvc.openSidenav$.subscribe(() => {
-      this.sideNav.toggle();
+      this.sideNav?.toggle();
     });
   }
 

@@ -1,0 +1,250 @@
+// Port del CSS de .user-btn / .account / .dropdown__panel de la landing
+// (servaltek/src/components/AppNavbar.astro + ui/DropdownMenu.astro). Alla los
+// valores salen de los tokens de Witlens; aca esos tokens no existen, asi que
+// se redeclaran con el valor del tema claro — que es el unico que tiene esta
+// app — conservando los nombres para poder comparar contra el original.
+//
+// El bloque va en :host (el trigger) y en .account (el panel), porque el panel
+// lo monta el overlay del CDK fuera del arbol del componente y no hereda de :host.
+:host,
+.account {
+  --gs-100: #ffffff;
+  --gs-200: #f5f5f7;
+  --font-color-100: #101114;
+  --font-color-200: #6b7280;
+  --border: rgba(16, 17, 20, 0.12);
+  --hover-layer: rgba(16, 17, 20, 0.04);
+  --active-layer: rgba(16, 17, 20, 0.09);
+  --accent: #2563eb;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --radius-pill: 999px;
+
+  --color: var(--font-color-100);
+  --color-secondary: var(--font-color-200);
+
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+:host {
+  display: inline-flex;
+}
+
+// Trigger sobre barra oscura/de color. Mismos valores que el bloque dark de los
+// tokens de la landing. No toca al panel: sus vars estan declaradas en .account,
+// que gana para su propio subarbol.
+:host(.dark) {
+  --font-color-100: #ffffff;
+  --font-color-200: rgba(255, 255, 255, 0.62);
+  --hover-layer: rgba(255, 255, 255, 0.08);
+  --active-layer: rgba(255, 255, 255, 0.16);
+}
+
+/* ── Boton de usuario ───────────────────────────────────────────────────── */
+.icon-btn {
+  all: unset;
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color);
+
+  &:hover {
+    background-color: var(--hover-layer);
+  }
+
+  &:active {
+    background-color: var(--active-layer);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+// Con sesion el boton se dibuja con borde, para distinguirlo del estado
+// deslogueado (que en la app practicamente no existe: el guard redirige antes).
+.logged-in {
+  color: var(--color);
+  border: 1px solid var(--color-secondary);
+
+  &:hover {
+    background-color: #74747446;
+  }
+}
+
+.user-btn__icon {
+  display: flex;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.user-btn__initials {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+/* ── Panel flotante ─────────────────────────────────────────────────────── */
+.account {
+  width: 320px;
+  // En mobile el trigger esta pegado al borde derecho: sin este tope el panel
+  // se sale de la pantalla y aparece scroll horizontal.
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
+
+  background: var(--gs-100);
+  color: var(--font-color-100);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.116);
+  box-shadow:
+    0 0 2px rgba(0, 0, 0, 0.12),
+    0 4px 8px rgba(0, 0, 0, 0.14);
+
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  animation: dropdown-in 0.15s ease;
+}
+
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account {
+    animation: none;
+  }
+}
+
+.account__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+}
+
+.account__brand {
+  height: 16px;
+  width: auto;
+}
+
+.account__signout {
+  all: unset;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--color-secondary);
+  border-radius: var(--radius-pill);
+  padding: 4px 8px;
+
+  &:hover {
+    color: var(--color);
+    background-color: var(--hover-layer);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+.account__body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+}
+
+.account__avatar {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--gs-200);
+  color: var(--color-secondary);
+}
+
+.account__avatar-icon {
+  display: flex;
+
+  mat-icon {
+    font-size: 30px;
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.account__avatar-initials {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.account__id {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  // Centra el bloque de identidad contra el avatar.
+  padding-top: var(--space-1);
+}
+
+.account__name,
+.account__email {
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account__name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.account__email {
+  font-size: 13px;
+  color: var(--color-secondary);
+}
+
+.account__link {
+  margin-top: var(--space-2);
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}

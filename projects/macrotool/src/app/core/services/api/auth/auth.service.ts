@@ -1,25 +1,19 @@
 import { Injectable, Signal, signal } from '@angular/core';
 import { BaseApiService } from '../../base-api.service';
-import { LoginDTO } from '../../../../shared/models/LoginDTO';
-import { tap } from 'rxjs';
 import { UserDto } from '../../../../shared/models/UserDto';
-import { catchError, map, Observable, of } from 'rxjs';
-import { Router } from '@angular/router';
-
-const TOKEN_KEY = 'flux_token';
-
-export interface LoginResponse {
-  token: string;
-}
+import { KeycloakClaims, KeycloakUser } from '../../../../shared/models/KeycloakUser';
+import { Observable } from 'rxjs';
+import Keycloak from 'keycloak-js';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService extends BaseApiService<LoginDTO> {
+export class AuthService extends BaseApiService<UserDto> {
   protected override readonly endpoint = this.api + '/auth';
   private user = signal<UserDto | null>(null);
+  private keycloakUser = signal<KeycloakUser | null>(null);
 
-  constructor(private router: Router) {
+  constructor(private keycloak: Keycloak) {
     super();
   }
 
@@ -27,40 +21,68 @@ export class AuthService extends BaseApiService<LoginDTO> {
     return this.user;
   }
 
+  // Identidad tal como la ve Keycloak (no el User de Fluxenture, que puede no existir).
+  getKeycloakUserSignal(): Signal<KeycloakUser | null> {
+    return this.keycloakUser;
+  }
+
   saveUserInSignal() {
+    this.keycloakUser.set(this.readKeycloakUser());
     this.getUser().subscribe(user => {
       this.user.set(user);
     });
   }
 
-  login(credentials: LoginDTO) {
-    return this.http.post<LoginResponse>(this.endpoint + '/login', credentials).pipe(
-      tap((res) => {
-        localStorage.setItem(TOKEN_KEY, res.token);
-      })
-    );
-  }
-
   logout() {
-    localStorage.removeItem(TOKEN_KEY);
-    window.location.reload();
     this.user.set(null);
+    this.keycloakUser.set(null);
+    this.keycloak.logout({ redirectUri: window.location.origin });
   }
 
   getUser(): Observable<UserDto> {
     return this.http.get<UserDto>(this.endpoint + '/me');
   }
 
-  /**
-   * Verifies current session. Returns true if valid, false otherwise.
-   * Caller is responsible for navigation.
-   */
-  verifySession(): Observable<boolean> {
-    return this.getUser().pipe(
-      map(user => {
-        return user !== null;
-      }),
-      catchError(() => of(false))
-    );
+  // Los datos del usuario ya viajan dentro del JWT que keycloak-js tiene en memoria,
+  // asi que esto es sincrono y no pega a la red. Equivale al userManager.getUser()
+  // de oidc-client-ts (lo que se usa en el starter de Astro).
+  readKeycloakUser(): KeycloakUser | null {
+    if (!this.keycloak.authenticated) return null;
+
+    // El access token trae los roles; el id token trae el perfil completo cuando
+    // el client no mapea esos claims al access token. Preferimos el que este.
+    const token = this.keycloak.tokenParsed as KeycloakClaims | undefined;
+    const idToken = this.keycloak.idTokenParsed as KeycloakClaims | undefined;
+    const claims = { ...idToken, ...token } as KeycloakClaims;
+    if (!claims.sub) return null;
+
+    return {
+      id: claims.sub,
+      username: claims.preferred_username ?? '',
+      email: claims.email ?? '',
+      emailVerified: claims.email_verified ?? false,
+      fullName: claims.name ?? '',
+      firstName: claims.given_name ?? '',
+      lastName: claims.family_name ?? '',
+      roles: this.readRoles(claims),
+    };
+  }
+
+  // Roles de realm + roles de este client (resource_access esta keyeado por clientId).
+  private readRoles(claims: KeycloakClaims): string[] {
+    const realmRoles = claims.realm_access?.roles ?? [];
+    const clientId = this.keycloak.clientId ?? '';
+    const clientRoles = claims.resource_access?.[clientId]?.roles ?? [];
+    return [...new Set([...realmRoles, ...clientRoles])];
+  }
+
+  hasRole(role: string): boolean {
+    return this.keycloak.hasRealmRole(role) || this.keycloak.hasResourceRole(role);
+  }
+
+  // Version por red del userinfo endpoint. Solo hace falta si el client no mapea
+  // algun claim al token; para lo normal alcanza con readKeycloakUser().
+  async loadKeycloakUserInfo(): Promise<KeycloakClaims> {
+    return (await this.keycloak.loadUserInfo()) as KeycloakClaims;
   }
 }

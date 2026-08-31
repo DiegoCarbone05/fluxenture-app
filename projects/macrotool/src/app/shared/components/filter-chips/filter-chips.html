@@ -1,0 +1,12 @@
+@for (chip of chips; track chip.key) {
+  <button
+    class="m3-chip"
+    [class.selected]="selected === chip.key"
+    (click)="selectedChange.emit(chip.key)"
+  >
+    @if (selected === chip.key) {
+      <mat-icon>check</mat-icon>
+    }
+    <span>{{ chip.label }}</span>
+  </button>
+}
