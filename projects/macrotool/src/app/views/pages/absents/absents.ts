@@ -622,6 +622,9 @@ export class Absents implements OnInit {
     const ref = this.dialog.open(AddDocDialog, {
       disableClose: true,
       panelClass: 'full-screen-dialog',
+      // La Novedad que se crea abajo (afterClosed) ya cubre este Doc como Registro Analitico en
+      // cola: no hace falta pedir un tipo de Registro Complementario aca tambien.
+      data: { skipRegistroLink: true },
     });
     ref.afterClosed().subscribe((doc: Doc | undefined) => {
       if (!doc?.id) return;

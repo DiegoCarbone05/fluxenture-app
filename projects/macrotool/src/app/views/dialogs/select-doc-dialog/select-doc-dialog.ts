@@ -81,6 +81,10 @@ export class SelectDocDialog implements OnInit {
         employeeId: this.data.employeeId,
         employee: this.data.employee,
         type: this.data.defaultUploadType,
+        // El caller de este dialog (Ausencia, Historial, CD...) ya va a colgar el Doc resultante
+        // de su propio Registro Analitico apenas se cierre: no hace falta pedir un tipo de
+        // Registro Complementario aca (ver context-refactor-documentos.md).
+        skipRegistroLink: true,
       }
     });
     ref.afterClosed().subscribe((result) => {

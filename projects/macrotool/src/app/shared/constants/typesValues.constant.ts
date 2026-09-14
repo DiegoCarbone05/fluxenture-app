@@ -65,4 +65,5 @@ export const DOC_USAGE_MODULE_LABELS: Record<string, string> = {
   employeeHistory: 'Legajo',
   cd: 'CD (TNT)',
   novedad: 'Novedad',
+  registroComplementario: 'Registro complementario',
 };

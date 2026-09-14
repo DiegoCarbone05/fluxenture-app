@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, computed, ElementRef, HostListener, Inject, OnInit, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, ElementRef, HostListener, Inject, OnInit, inject, signal, ViewChild } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe, CommonModule } from '@angular/common';
@@ -24,6 +24,13 @@ import { DOC_TYPES, DOC_USAGE_MODULE_LABELS } from '../../../shared/constants/ty
 import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
 import { FileViewerDialog } from '../file-viewer-dialog/file-viewer-dialog';
 import { fullNameOf } from '../../../shared/models/Employee';
+import { RegistroComplementarioService } from '../../../core/services/api/registro-complementario/registro-complementario.service';
+import { TipoRegistroComplementarioService } from '../../../core/services/api/tipo-registro-complementario/tipo-registro-complementario.service';
+import { RegistroComplementario } from '../../../shared/models/RegistroComplementario';
+
+// Nombre de modulo que usa el backend en DocUsages.byModule para el checker de RegistroComplementario
+// (ver com.fluxenture.core.registrocomplementario.application.RegistroComplementarioDocUsageChecker.MODULE).
+const REGISTRO_COMPLEMENTARIO_MODULE = 'registroComplementario';
 
 export enum UploadStatus {
   IDLE,
@@ -71,6 +78,19 @@ export class AddDocDialog implements OnInit, AfterViewInit {
     }));
   });
 
+  // ── Registro Complementario ──────────────────────────────────────────────
+  // Ningun Documento puede quedar "flotando" sin un Registro (Analitico o Complementario) que lo
+  // sostenga (ver context-refactor-documentos.md). Cuando este dialog se abre para un alta que YA
+  // va a quedar cubierta por un Registro Analitico (Ausencia/Historial/CD/Novedad - ver
+  // SelectDocDialog.uploadNew() y absents.ts#uploadNovedad, que abren este mismo dialog con
+  // `skipRegistroLink: true`), no hace falta pedir nada mas aca. En cualquier otro alta directa
+  // (Documentos > Nuevo, LPO del legajo) se exige elegir un tipo de RegistroComplementario antes
+  // de poder guardar.
+  needsRegistroComplementario = signal(false);
+  tiposRegistroComplementario = computed(() => this.tipoRegistroComplementarioService.activeTipos());
+  /** Si el Doc en edicion YA tiene un RegistroComplementario, se actualiza en vez de duplicarlo. */
+  private existingRegistroComplementarioId?: string;
+
   //Progress
   progress = signal<number>(0);
   private progressInterval: any;
@@ -83,11 +103,16 @@ export class AddDocDialog implements OnInit, AfterViewInit {
     date: new FormControl<Date | null>(null, Validators.required),
     description: new FormControl(''),
     file: new FormControl<File | null>(null, Validators.required),
+    tipoRegistroComplementarioId: new FormControl(''),
+    observaciones: new FormControl(''),
   });
 
   docTypes = DOC_TYPES;
   filteredEmployees!: Observable<EmployeeDTO[]>;
   employeeSelected!: EmployeeDTO;
+
+  private registroComplementarioService = inject(RegistroComplementarioService);
+  private tipoRegistroComplementarioService = inject(TipoRegistroComplementarioService);
 
   constructor(
     private employeeService: EmployeeService,
@@ -113,6 +138,14 @@ export class AddDocDialog implements OnInit, AfterViewInit {
         );
       })
     );
+
+    // skipRegistroLink: lo pasa un caller que YA va a colgar el Doc resultante de un Registro
+    // Analitico propio apenas se cierre este dialog (SelectDocDialog.uploadNew(), Novedad) - ver
+    // comentario de needsRegistroComplementario mas arriba.
+    const skipRegistroLink = !!this.data?.skipRegistroLink;
+    if (!skipRegistroLink) {
+      this.tipoRegistroComplementarioService.load().subscribe();
+    }
 
     if (this.data) {
 
@@ -144,7 +177,30 @@ export class AddDocDialog implements OnInit, AfterViewInit {
           }
         });
         this.docService.getDocUsages(this.data.editDocId).subscribe({
-          next: (usages) => this.usages.set(usages),
+          next: (usages) => {
+            this.usages.set(usages);
+            if (skipRegistroLink) return;
+
+            if (usages.byModule[REGISTRO_COMPLEMENTARIO_MODULE]?.length) {
+              // Ya tiene un RegistroComplementario cargado: se edita ese, no se crea otro.
+              this.requireTipoRegistroComplementario(true);
+              this.registroComplementarioService.getByDocId(this.data.editDocId).subscribe({
+                next: (registro) => {
+                  this.existingRegistroComplementarioId = registro.id;
+                  this.form.patchValue({
+                    tipoRegistroComplementarioId: registro.tipoId,
+                    observaciones: registro.observaciones ?? '',
+                  });
+                },
+                error: (err) => console.error('No se pudo cargar el registro complementario', err)
+              });
+            } else if (Object.keys(usages.byModule).length === 0) {
+              // Doc legado sin ningun Registro (previo a este refactor): se lo migra recien
+              // ahora, forzando a elegir un tipo antes de poder guardar la edicion.
+              this.requireTipoRegistroComplementario(true);
+            }
+            // Si ya esta cubierto por otro modulo (absent/employeeHistory/cd/novedad), no se pide nada mas.
+          },
           error: (err) => console.error('No se pudo cargar donde esta usado el documento', err)
         });
 
@@ -181,6 +237,20 @@ export class AddDocDialog implements OnInit, AfterViewInit {
         this.form.get('type')?.disable();
       }
     }
+
+    // Cualquier otra alta directa (Documentos > Nuevo sin `data`, LPO del legajo con solo
+    // `employeeId`) no tiene todavia ningun Registro esperando este Doc: se exige elegir un tipo
+    // de RegistroComplementario antes de poder guardar.
+    if (!skipRegistroLink) {
+      this.requireTipoRegistroComplementario(true);
+    }
+  }
+
+  private requireTipoRegistroComplementario(required: boolean): void {
+    this.needsRegistroComplementario.set(required);
+    const control = this.form.get('tipoRegistroComplementarioId');
+    control?.setValidators(required ? [Validators.required] : []);
+    control?.updateValueAndValidity();
   }
 
   // Escucha el evento 'paste' en todo el componente
@@ -339,11 +409,17 @@ export class AddDocDialog implements OnInit, AfterViewInit {
     // En edicion, se manda el id existente para que el backend actualice ese Doc en vez de crear uno nuevo.
     const docId = this.editMode() ? this.data?.editDocId : undefined;
 
+    // Si esta alta va a crear un Doc nuevo (no una edicion sobre uno existente) y ademas ese Doc
+    // no queda cubierto por ningun Registro Analitico externo, un fallo al crear el
+    // RegistroComplementario tiene que deshacer el Doc (y el archivo) recien creados: no puede
+    // quedar un Doc "flotando" sin Registro por un error a mitad de camino.
+    const isNewDoc = !docId;
+
     if (keepingExistingFile) {
       // Solo cambiaron metadatos (tipo/fecha/descripcion): no hace falta re-subir el archivo.
       const payload = new Doc(employeeObject.id, type as EDocType, this.currentFileID(), date as Date, docId, description!);
       payload.audit = this.existingAudit; // preserva createdAt/createdBy al actualizar
-      this.saveDocEntry(payload);
+      this.saveDocEntry(payload, undefined, isNewDoc);
       return;
     }
 
@@ -351,7 +427,7 @@ export class AddDocDialog implements OnInit, AfterViewInit {
       next: (fileId: any) => {
         const payload = new Doc(employeeObject.id, type as EDocType, fileId.response, date as Date, docId, description!);
         payload.audit = this.existingAudit; // preserva createdAt/createdBy al actualizar (undefined si es alta nueva)
-        this.saveDocEntry(payload, fileId.response);
+        this.saveDocEntry(payload, fileId.response, isNewDoc);
       },
       error: (err) => {
         this.uploadStatus.set(UploadStatus.ERROR);
@@ -361,19 +437,37 @@ export class AddDocDialog implements OnInit, AfterViewInit {
     });
   }
 
-  private saveDocEntry(payload: Doc, uploadedFileId?: string): void {
+  private saveDocEntry(payload: Doc, uploadedFileId?: string, isNewDoc?: boolean): void {
     this.docService.saveDoc(payload).subscribe({
       next: (doc) => {
-        this.uploadStatus.set(UploadStatus.SUCCESS);
-
-        // Si se habia marcado un archivo viejo para reemplazo (onDeleteFile), se borra recien ahora que el guardado fue exitoso.
-        if (this.tempFileID() !== '') {
-          this.storageService.deleteFile(this.tempFileID()).subscribe();
+        if (!this.needsRegistroComplementario()) {
+          this.finishSuccess(doc);
+          return;
         }
 
-        setTimeout(() => {
-          this.dialogRef.close(doc);
-        }, 1500);
+        const { tipoRegistroComplementarioId, observaciones } = this.form.getRawValue();
+        const registro: RegistroComplementario = {
+          id: this.existingRegistroComplementarioId,
+          employeeId: doc.employeeId,
+          tipoId: tipoRegistroComplementarioId!,
+          docId: doc.id!,
+          fechaCarga: new Date().toISOString(),
+          observaciones: observaciones || undefined,
+        };
+        this.registroComplementarioService.save(registro).subscribe({
+          next: () => this.finishSuccess(doc),
+          error: (err) => {
+            // El Doc quedo creado pero sin Registro que lo sostenga: si es una alta nueva, se
+            // deshace todo (Doc + archivo) en vez de dejarlo flotando. Si es una edicion sobre un
+            // Doc que ya existia antes de este refactor, se deja el Doc como estaba.
+            if (isNewDoc && doc.id) {
+              this.docService.deleteDocAndFile(doc.id, doc.driveFileId).subscribe();
+            }
+            this.uploadStatus.set(UploadStatus.ERROR);
+            this.errorMessage.set(err?.error?.error ?? err?.error ?? 'No se pudo guardar el registro complementario');
+            setTimeout(() => this.uploadStatus.set(UploadStatus.IDLE), 3000);
+          }
+        });
       },
       error: (err) => {
         this.uploadStatus.set(UploadStatus.ERROR);
@@ -388,6 +482,19 @@ export class AddDocDialog implements OnInit, AfterViewInit {
     });
 
     this.completeProgress();
+  }
+
+  private finishSuccess(doc: Doc): void {
+    this.uploadStatus.set(UploadStatus.SUCCESS);
+
+    // Si se habia marcado un archivo viejo para reemplazo (onDeleteFile), se borra recien ahora que el guardado fue exitoso.
+    if (this.tempFileID() !== '') {
+      this.storageService.deleteFile(this.tempFileID()).subscribe();
+    }
+
+    setTimeout(() => {
+      this.dialogRef.close(doc);
+    }, 1500);
   }
 
 
