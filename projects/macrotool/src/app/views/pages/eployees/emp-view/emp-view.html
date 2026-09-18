@@ -1,180 +1,176 @@
-@if(employee()){
-<flux-toolbar [backButton]="true" title="Resumen"
-    [bgColor]="employee()?.isOperational ? 'var(--primary)' : 'var(--warn)'" theme="dark">
-</flux-toolbar>
+@if (employee()) {
+<mat-drawer-container class="view-shell">
+  <mat-drawer-content>
+    <div class="desk">
+    <flux-page-header [title]="employeeName()" [compact]="true" [showBack]="true">
+      <button fluxPillBtn variant="neutral" icon="edit" (click)="editEmployee()">
+        <span>Editar</span>
+      </button>
+    </flux-page-header>
 
-<div class="emp-view" [class.redbg]="!employee()?.isOperational">
-    <div class="content">
-        <span class="sector">{{employee()?.sector | empSectorPipe}}</span>
-        <span class="emeploye-name">{{employeeName()}}</span>
-    </div>
-</div>
+    <div class="container">
+      <div class="card hero-card" [class.inactive]="!employee()?.isOperational">
+        <div class="hero-content">
+          <span class="hero-eyebrow">{{ employee()?.sector | empSectorPipe }}</span>
+          <span class="hero-name">{{ employeeName() }}</span>
+        </div>
+      </div>
 
-<div class="container">
-    <div class="card">
+      <div class="card">
         <div class="card-header">
-            <h2>Información Personal</h2>
-            <button mat-icon-button (click)="editEmployee()">
-                <mat-icon>edit</mat-icon>
-            </button>
+          <h2>Información Personal</h2>
         </div>
         <div class="card-body">
-            <div class="info-row">
-                <div class="info-item">
-                    <span class="label">Nombre:</span>
-                    <span class="value">{{employeeName()}}</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">CUIL:</span>
-                    <span class="value">{{employee()?.cuil}}</span>
-                </div>
+          <div class="info-row">
+            <div class="info-item">
+              <span class="label">Nombre</span>
+              <span class="value">{{employeeName()}}</span>
             </div>
-            <div class="info-row">
-                <div class="info-item">
-                    <span class="label">Documento:</span>
-                    <span class="value">{{employee()?.documentNumber}}</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">Fecha de Nacimiento:</span>
-                    <span class="value">{{employee()?.birthDate}}</span>
-                </div>
+            <div class="info-item">
+              <span class="label">CUIL</span>
+              <span class="value">{{employee()?.cuil}}</span>
             </div>
-            <div class="info-row">
-                <div class="info-item">
-                    <span class="label">Género:</span>
-                    <span class="value">{{employee()?.gender}}</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">Estado Civil:</span>
-                    <span class="value">{{employee()?.civilStatus}}</span>
-                </div>
+          </div>
+          <div class="info-row">
+            <div class="info-item">
+              <span class="label">Documento</span>
+              <span class="value">{{employee()?.documentNumber}}</span>
             </div>
-            <div class="info-row">
-                <div class="info-item">
-                    <span class="label">Nacionalidad:</span>
-                    <span class="value">{{employee()?.nationality}}</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">Teléfono:</span>
-                    <span class="value">{{employee()?.cellPhone}}</span>
-                </div>
+            <div class="info-item">
+              <span class="label">Fecha de Nacimiento</span>
+              <span class="value">{{employee()?.birthDate}}</span>
             </div>
-            <div class="info-row">
-                <div class="info-item">
-                    <span class="label">Email:</span>
-                    <span class="value">{{employee()?.email}}</span>
-                </div>
+          </div>
+          <div class="info-row">
+            <div class="info-item">
+              <span class="label">Género</span>
+              <span class="value">{{employee()?.gender}}</span>
             </div>
+            <div class="info-item">
+              <span class="label">Estado Civil</span>
+              <span class="value">{{employee()?.civilStatus}}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-item">
+              <span class="label">Nacionalidad</span>
+              <span class="value">{{employee()?.nationality}}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Teléfono</span>
+              <span class="value">{{employee()?.cellPhone}}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-item">
+              <span class="label">Email</span>
+              <span class="value">{{employee()?.email}}</span>
+            </div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <div class="card">
+      <div class="card">
         <div class="card-header">
-            <h2>Información Laboral</h2>
+          <h2>Información Laboral</h2>
         </div>
         <div class="card-body">
-            <div class="info-row">
-                <div class="info-item">
-                    <span class="label">ID Empleado:</span>
-                    <span class="value">{{employee()?.employeeID}}</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">Sector:</span>
-                    <span class="value">{{employee()?.sector | empSectorPipe}}</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">Servicio:</span>
-                    <span class="value">{{employee()?.service || '—'}}</span>
-                </div>
+          <div class="info-row">
+            <div class="info-item">
+              <span class="label">ID Empleado</span>
+              <span class="value">{{employee()?.employeeID}}</span>
             </div>
-            <div class="info-row">
-                <div class="info-item">
-                    <span class="label">Fecha de Ingreso:</span>
-                    <span class="value">{{employee()?.entryDate}}</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">Fecha de Egreso:</span>
-                    <span class="value">{{employee()?.leaveDate}}</span>
-                </div>
+            <div class="info-item">
+              <span class="label">Sector</span>
+              <span class="value">{{employee()?.sector | empSectorPipe}}</span>
             </div>
-            <div class="info-row">
-                <div class="info-item">
-                    <span class="label">Es Operativo:</span>
-                    <span class="value">{{employee()?.isOperational ? 'Sí' : 'No'}}</span>
-                </div>
+            <div class="info-item">
+              <span class="label">Servicio</span>
+              <span class="value">{{employee()?.service || '—'}}</span>
             </div>
+          </div>
+          <div class="info-row">
+            <div class="info-item">
+              <span class="label">Fecha de Ingreso</span>
+              <span class="value">{{employee()?.entryDate}}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Fecha de Egreso</span>
+              <span class="value">{{employee()?.leaveDate || '—'}}</span>
+            </div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <div class="card">
+      <div class="card">
         <div class="card-header">
-            <h2>Historial de Cambios</h2>
-            <button mat-icon-button (click)="addHistory()">
-                <mat-icon>add</mat-icon>
-            </button>
+          <h2>Historial de Cambios</h2>
+          <button fluxPillBtn variant="neutral" icon="add" (click)="addHistory()">
+            <span>Agregar</span>
+          </button>
         </div>
         <div class="card-body">
-            @if (employeeHistory().length === 0) {
-            <p class="no-history">No hay historial de cambios.</p>
-            } @else {
-            <div class="history-list">
-                @for (item of employeeHistory(); track item.id) {
-                <div class="history-item">
-                    <div class="wrap">
-                        <div class="history-date">{{item.date | date:'dd/MM/yyyy'}}</div>
-                        <span>{{ getEmployeeHistoryTypeLabel(item.type)}}</span>
-                        <span>{{ item.description}}</span>
-                    </div>
-                    <div class="wrap">
-                        <button mat-icon-button (click)="viewHistory(item)">
-                            <mat-icon>visibility</mat-icon>
-                        </button>
-                        <button mat-icon-button color="warn" (click)="deleteHistory(item)">
-                            <mat-icon>delete</mat-icon>
-                        </button>
-                    </div>
-                </div>
-                }
+          @if (employeeHistory().length === 0) {
+          <p class="no-history">No hay historial de cambios.</p>
+          } @else {
+          <div class="history-list">
+            @for (item of employeeHistory(); track item.id) {
+            <div class="history-item">
+              <div class="wrap">
+                <div class="history-date">{{item.date | date:'dd/MM/yyyy'}}</div>
+                <span>{{ getEmployeeHistoryTypeLabel(item.type)}}</span>
+                <span>{{ item.description}}</span>
+              </div>
+              <div class="wrap">
+                <button fluxIconBtn variant="view" icon="visibility" matTooltip="Ver" (click)="viewHistory(item)"></button>
+                <button fluxIconBtn variant="delete" icon="delete" matTooltip="Eliminar" (click)="deleteHistory(item)"></button>
+              </div>
             </div>
             }
+          </div>
+          }
         </div>
-    </div>
-    <div class="card">
+      </div>
+
+      <div class="card docs-card">
         <div class="card-header">
-            <h2>Documentos</h2>
-            <button mat-icon-button color="primary" (click)="addDoc()">
-                <mat-icon>add</mat-icon>
+          <h2>Documentos</h2>
+          <div class="docs-header-actions">
+            <flux-search-box [control]="docSearchControl" placeholder="Buscar documentos" />
+            <button fluxPillBtn variant="neutral" icon="swap_vert" (click)="toggleDocsSort()">
+              <span>{{ docsSortLabel() }}</span>
             </button>
+            <button fluxPillBtn variant="primary" icon="upload_file" [disabled]="uploadingDocs()" (click)="addDoc()">
+              <span>Subir</span>
+            </button>
+          </div>
         </div>
         <div class="card-body">
-            @if (docs().length === 0) {
-            <p class="no-history">Sin documentos registrados.</p>
-            } @else {
-            <div class="doc-list">
-                @for (doc of docs(); track doc.id) {
-                <div class="doc-item">
-                    <div class="wrap">
-                        <span class="doc-type-chip">{{ doc.type | docType }}</span>
-                        <span class="doc-date">{{ doc.uploadDate | date:'dd/MM/yyyy' }}</span>
-                        <span class="doc-desc">{{ doc.description || '—' }}</span>
-                    </div>
-                    <div class="wrap">
-                        <button mat-icon-button (click)="viewDoc(doc.driveFileId)">
-                            <mat-icon>visibility</mat-icon>
-                        </button>
-                        <button mat-icon-button color="warn" (click)="deleteDoc(doc)">
-                            <mat-icon>delete</mat-icon>
-                        </button>
-                    </div>
-                </div>
-                }
-            </div>
+          <div class="file-grid" appDragDropFile (filesDropped)="onDocsDropped($event)">
+            @for (row of filteredDocRows(); track row.id) {
+            <app-doc-tile [row]="row" [selected]="selectedDocId() === row.id" (tileClick)="onDocTileClick($event)"
+              (open)="openDocFile(row.raw)" />
             }
+            @if (filteredDocRows().length === 0) {
+            <flux-empty-state title="Sin documentos" text="Arrastrá archivos aquí o usá Subir." size="compact" />
+            }
+          </div>
         </div>
+      </div>
     </div>
-</div>
-}@else {
+    </div>
+  </mat-drawer-content>
+
+  <mat-drawer #detailDrawer mode="over" position="end" [opened]="docDetailOpen()"
+    (openedChange)="!$event && closeDocDetail()">
+    @if (selectedDoc()) {
+    <app-doc-detail-panel [doc]="selectedDoc()!" (saved)="onDocDetailSaved()"
+      (deleteRequested)="onDocDetailDeleteRequested($event)" (closed)="closeDocDetail()" />
+    }
+  </mat-drawer>
+</mat-drawer-container>
+} @else {
 <div class="loading">
-    <mat-spinner></mat-spinner>
+  <mat-spinner></mat-spinner>
 </div>
 }

@@ -1,55 +1,36 @@
-<flux-toolbar
-  [backButton]="true"
-  (backClick)="goBack()"
-  title="Carta Documento"
-  [bgColor]="cd()?.trackingCompleted ? '#0ead6d' : 'var(--primary)'"
-  theme="dark"
->
-  <button matButton [disabled]="downloadingFile()" (click)="downloadFile()">
-    <mat-icon [class.spin]="downloadingFile()">{{
-      downloadingFile() ? "sync" : "file_download"
-    }}</mat-icon>
-    Descargar
+<flux-page-header title="Carta Documento" [compact]="true" [showBack]="true" (backClick)="goBack()">
+  <button fluxPillBtn variant="primary" [icon]="downloadingFile() ? 'sync' : 'file_download'"
+    [spinning]="downloadingFile()" [disabled]="downloadingFile()" (click)="downloadFile()">
+    <span>Descargar</span>
   </button>
-  <!-- <button
-    matButton
-    [disabled]="savingSnapshot()"
-    (click)="syncSnapshotToDrive()"
-    title="Vuelve a guardar el estado actual del seguimiento en Drive"
-  >
-    <mat-icon [class.spin]="savingSnapshot()">{{
-      savingSnapshot() ? "sync" : "cloud_upload"
-    }}</mat-icon>
-    <strong>Sincronizar</strong>
-  </button> -->
-</flux-toolbar>
+</flux-page-header>
 
 @if (cd()) {
-  <!-- Hero (solo display web) -->
-  <div class="cds-hero" [class.completed]="cd()?.trackingCompleted">
-    <div class="content">
-      <div class="status-chip">
-        <mat-icon>{{
-          cd()?.trackingCompleted ? "check_circle" : "local_shipping"
-        }}</mat-icon>
-        <span>{{
-          cd()?.trackingCompleted ? "Seguimiento completo" : "En seguimiento"
+  <div class="container">
+    <!-- Hero -->
+    <div class="card hero-card" [class.completed]="cd()?.trackingCompleted">
+      <div class="hero-content">
+        <div class="hero-status-chip">
+          <mat-icon>{{
+            cd()?.trackingCompleted ? "check_circle" : "local_shipping"
+          }}</mat-icon>
+          <span>{{
+            cd()?.trackingCompleted ? "Seguimiento completo" : "En seguimiento"
+          }}</span>
+        </div>
+        <span class="hero-name">{{
+          employeeName() || "Empleado no encontrado"
         }}</span>
-      </div>
-      <span class="employee-name">{{
-        employeeName() || "Empleado no encontrado"
-      }}</span>
-      <div class="cd-period">
-        <mat-icon>tag</mat-icon>
-        <span>{{ trackingCode() }}</span>
-        <span class="period-sep">·</span>
-        <mat-icon>event</mat-icon>
-        <span>{{ cd()?.emissionDate | date: "dd/MM/yyyy" }}</span>
+        <div class="hero-period">
+          <mat-icon>tag</mat-icon>
+          <span>{{ trackingCode() }}</span>
+          <span class="period-sep">·</span>
+          <mat-icon>event</mat-icon>
+          <span>{{ cd()?.emissionDate | date: "dd/MM/yyyy" }}</span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="container">
     <div class="card toggle-card">
       <div class="card-body">
         <mat-checkbox
@@ -106,7 +87,9 @@
             <div class="tracking-msg">
               <mat-icon>cloud_off</mat-icon>
               <span>{{ trackingError() }}</span>
-              <button matButton (click)="refreshTracking()">Reintentar</button>
+              <button fluxPillBtn variant="neutral" icon="refresh" (click)="refreshTracking()">
+                <span>Reintentar</span>
+              </button>
             </div>
           } @else if (tnts().length === 0) {
             <div class="tracking-msg">

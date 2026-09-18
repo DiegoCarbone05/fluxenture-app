@@ -187,34 +187,42 @@
     background-color: #d4edbc;
     color: #11734b;
   }
+
   &.unjustified {
     background-color: #ffcfc9;
     color: #b10202;
   }
+
   &.suspension {
     background-color: #f3e597;
     color: #655814;
   }
+
   &.total-injust {
     background-color: #ffcfc9;
     color: #b10202;
   }
+
   &.license {
     background-color: #d2eff0;
     color: #0ea8ad;
   }
+
   &.ft {
     background-color: #f0d2d2;
     color: #ad0e0e;
   }
+
   &.dt {
     background-color: #d2e0f0;
     color: #0e4ead;
   }
+
   &.art {
     background-color: #f0eee5;
     color: #877a31;
   }
+
   &.vacations {
     background-color: #d2f0e4;
     color: #0ead6d;
@@ -339,40 +347,49 @@
             background-color: #d2f0e4;
             color: #0ead6d;
           }
+
           &.absent-MEDICAL_CERTIFICATE {
             background-color: #ecf2fd;
             color: #3d7dc7;
           }
+
           &.absent-LICENSE {
             background-color: #d2eff0;
             color: #0ea8ad;
           }
+
           &.absent-SUSPENSION {
             background-color: #f3e597;
             color: #655814;
           }
+
           &.absent-FT,
           &.absent-DT {
             background-color: #f0d2d2;
             color: #ad0e0e;
           }
+
           &.absent-DG,
           &.absent-PG {
             background-color: #ebebeb;
             color: #828282;
           }
+
           &.absent-DESPIDO {
             background-color: #313131;
             color: #ffffff;
           }
+
           &.absent-RENUNCIA {
             background-color: #f1f1f1;
             color: #313131;
           }
+
           &.absent-FERIADO {
             background-color: #d89a64;
             color: #603d35;
           }
+
           &.absent-ART {
             background-color: #f0eee5;
             color: #877a31;

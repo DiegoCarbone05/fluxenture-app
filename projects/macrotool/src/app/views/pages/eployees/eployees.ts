@@ -3,16 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { AbsentService } from '../../../core/services/api/absents/absent.service';
-import { AuthService } from '../../../core/services/api/auth/auth.service';
 import { EmployeeDraftService } from '../../../core/services/employee-draft.service';
 import { ViewsService } from '../../views.service';
 import { AddEmployee } from '../../dialogs/add-employee/add-employee';
@@ -70,7 +68,7 @@ const PAGE_SIZE = 12;
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, MatButtonModule, MatIconModule,
-    MatMenuModule, MatProgressSpinnerModule, MatTooltipModule, RouterLink, EmpSectorPipePipe,
+    MatProgressSpinnerModule, MatTooltipModule, EmpSectorPipePipe,
     PageHeader, PillButton, IconButton, SearchBox, TableToolbar, EmployeeCell,
     StatusChip, StatsGrid, TablePager, EmptyState, M3SearchBar, M3StatsRow,
     M3ListItem, FilterChips, FabButton, RowActions,
@@ -83,7 +81,6 @@ export class Eployees {
   private readonly dialog = inject(MatDialog);
 
   isMobile = computed(() => this.viewsSvc.getIsMobile());
-  user = computed(() => this.authService.getUserSignal()());
 
   readonly sectors = EMPLOYEE_SECTOR;
   /** Solo los vigentes en el desplegable; los archivados igual se muestran en la tabla. */
@@ -177,7 +174,6 @@ export class Eployees {
 
   sortLabel = computed(() => (this.asc() ? 'A → Z' : 'Z → A'));
 
-  userInitials = computed(() => (this.user()?.username ?? '').slice(0, 2).toUpperCase());
 
   /**
    * Las cuatro metricas del encabezado. La linea inferior no muestra una
@@ -252,7 +248,6 @@ export class Eployees {
   constructor(
     private employeeService: EmployeeService,
     private absentService: AbsentService,
-    private authService: AuthService,
     private viewsSvc: ViewsService,
     private router: Router,
     private route: ActivatedRoute,
@@ -467,9 +462,5 @@ export class Eployees {
     dialog.afterClosed().subscribe((draftId: string | undefined) => {
       if (draftId) this.openAddEmployeeDialog(draftId);
     });
-  }
-
-  logout() {
-    this.authService.logout();
   }
 }

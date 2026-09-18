@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { CdStatusChip } from '../../../shared/components/cd-status-chip/cd-status-chip';
@@ -12,10 +11,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddPdf } from '../../dialogs/add-pdf/add-pdf';
 import { Cd, trackingCodeOf } from '../../../shared/models/Cd.model';
 import { ESector, fullNameOf } from '../../../shared/models/Employee';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { CdService } from '../../../core/services/api/cd-api/cd.service';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
-import { AuthService } from '../../../core/services/api/auth/auth.service';
 import { ViewsService } from '../../views.service';
 import { Prompt } from '../../dialogs/prompt/prompt';
 import { StorageService } from '../../../core/services/api/storage/storage.service';
@@ -60,7 +58,7 @@ interface CdRow {
   selector: 'app-tnt',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatButtonModule, MatIconModule, MatMenuModule, RouterLink,
+    CommonModule, ReactiveFormsModule, MatButtonModule, MatIconModule,
     CdStatusChip, TntStatusPipePipe,
     PageHeader, PillButton, IconButton, SearchBox, TableToolbar, EmployeeCell,
     RowActions, TablePager, EmptyState, M3SearchBar, M3ListItem, FabButton,
@@ -74,8 +72,6 @@ export class Tnt {
   readonly pageSize = PAGE_SIZE;
 
   isMobile = computed(() => this.viewsSvc.getIsMobile());
-  user = computed(() => this.authService.getUserSignal()());
-  userInitials = computed(() => (this.user()?.username ?? '').slice(0, 2).toUpperCase());
 
   cdsSignal = computed(() => this.cdService.getCdsSignal());
   sortedCds = computed(() =>
@@ -189,7 +185,6 @@ export class Tnt {
     private router: Router,
     private cdService: CdService,
     private employeeService: EmployeeService,
-    private authService: AuthService,
     private viewsSvc: ViewsService,
     private storageService: StorageService,
   ) {
@@ -365,9 +360,5 @@ export class Tnt {
       data: cd,
       panelClass: 'custom-flex-dialog',
     });
-  }
-
-  logout() {
-    this.authService.logout();
   }
 }

@@ -9,7 +9,7 @@ import { AddAbsentDialog } from '../../../../views/dialogs/add-absent-dialog/add
 // Tipos de documento que no tiene sentido convertir en una ausencia (equipamiento, altas/bajas
 // AFIP, recibos, etc). Todo lo demas se deja pasar: RRHH termina de elegir/ajustar el tipo real
 // de ausencia dentro del dialog, esto solo decide si el boton "Crear Ausencia" aparece o no.
-const INCOMPATIBLE_TYPES = new Set<EDocType>([
+const INCOMPATIBLE_TYPES = new Set<string>([
   EDocType.EPP,
   EDocType.ALTA_AFIP,
   EDocType.BAJA_AFIP,
@@ -27,7 +27,7 @@ export class AbsentDocRecordCreatorService implements DocRecordCreator {
   constructor(private dialog: MatDialog) { }
 
   isCompatible(doc: Doc): boolean {
-    return !INCOMPATIBLE_TYPES.has(doc.type);
+    return !doc.type || !INCOMPATIBLE_TYPES.has(doc.type);
   }
 
   create(doc: Doc): Observable<any> {
@@ -42,7 +42,8 @@ export class AbsentDocRecordCreatorService implements DocRecordCreator {
     return ref.afterClosed();
   }
 
-  private suggestType(docType: EDocType): AbsentType | undefined {
+  private suggestType(docType: string | undefined): AbsentType | undefined {
+    if (!docType) return undefined;
     switch (docType) {
       case EDocType.CD: return AbsentType.DESPIDO;
       case EDocType.TELEGRAMA: return AbsentType.RENUNCIA;

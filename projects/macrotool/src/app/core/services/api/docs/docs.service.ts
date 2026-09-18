@@ -11,7 +11,6 @@ import { AddDocDialog } from '../../../../views/dialogs/add-doc-dialog/add-doc-d
 export interface DeleteDocExclude {
   absentId?: string;
   historyId?: string;
-  registroComplementarioId?: string;
 }
 
 @Injectable({
@@ -69,7 +68,6 @@ export class DocsService extends BaseApiService<string> {
     let params = new HttpParams();
     if (exclude?.absentId) params = params.set('excludeAbsentId', exclude.absentId);
     if (exclude?.historyId) params = params.set('excludeHistoryId', exclude.historyId);
-    if (exclude?.registroComplementarioId) params = params.set('excludeRegistroComplementarioId', exclude.registroComplementarioId);
     return params;
   }
 

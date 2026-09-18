@@ -1,10 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { AbstentTypePipe } from '../../../../shared/pipes/abstent-type-pipe';
-import { Toolbar } from '../../../../shared/components/toolbar/toolbar';
 import { AbsentService } from '../../../../core/services/api/absents/absent.service';
 import { ActivatedRoute } from '@angular/router';
 import { AbsentResponseDTO } from '../../../../shared/models/AbsentResponseDTO';
@@ -13,12 +11,22 @@ import { StorageService } from '../../../../core/services/api/storage/storage.se
 import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
 import { AddAbsentDialog } from '../../../dialogs/add-absent-dialog/add-absent-dialog';
 import { DocsService } from '../../../../core/services/api/docs/docs.service';
+import { Doc } from '../../../../shared/models/Doc';
 import { UtilsService } from '../../../../core/services/utils.service';
+
+import { PageHeader } from '../../../../shared/components/page-header/page-header';
+import { PillButton } from '../../../../shared/components/pill-button/pill-button';
+import { StatusChip } from '../../../../shared/components/status-chip/status-chip';
+import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
+import { DocTile, DocGridRow } from '../../docs/doc-tile/doc-tile';
 
 @Component({
   selector: 'app-absent-view',
   standalone: true,
-  imports: [CommonModule, DatePipe, MatButtonModule, MatIconModule, AbstentTypePipe, Toolbar],
+  imports: [
+    CommonModule, DatePipe, MatIconModule, AbstentTypePipe,
+    PageHeader, PillButton, StatusChip, EmptyState, DocTile,
+  ],
   templateUrl: './absent-view.html',
   styleUrl: './absent-view.scss'
 })
@@ -26,6 +34,19 @@ export class AbsentView {
 
   absent = signal<AbsentResponseDTO | null>(null);
   employee = signal<EmployeeDTO | null>(null);
+  attachedDoc = signal<Doc | undefined>(undefined);
+
+  attachedDocRow = computed<DocGridRow | undefined>(() => {
+    const doc = this.attachedDoc();
+    if (!doc) return undefined;
+    return {
+      id: doc.id ?? '',
+      description: doc.description || 'Comprobante de ausencia',
+      typeId: doc.type,
+      extension: doc.extension,
+      blocked: false,
+    };
+  });
 
   private readonly dialog = inject(MatDialog);
 
@@ -45,6 +66,9 @@ export class AbsentView {
       const employee = this.employeeService.getLocalEmployeeById(absent.employeeId);
       if (employee) {
         this.employee.set(employee);
+      }
+      if (absent.docId) {
+        this.docsService.getDoc(absent.docId).subscribe((doc) => this.attachedDoc.set(doc));
       }
     }
   }

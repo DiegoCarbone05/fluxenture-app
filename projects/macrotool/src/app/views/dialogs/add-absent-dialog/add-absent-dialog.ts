@@ -20,7 +20,7 @@ import { StorageService } from '../../../core/services/api/storage/storage.servi
 import { AbsentService } from '../../../core/services/api/absents/absent.service';
 import { Doc, EDocType } from '../../../shared/models/Doc';
 import { SelectDocDialog } from '../select-doc-dialog/select-doc-dialog';
-import { ABSENT_TYPES, DOC_TYPES } from '../../../shared/constants/typesValues.constant';
+import { ABSENT_TYPES } from '../../../shared/constants/typesValues.constant';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
 import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
@@ -141,7 +141,9 @@ export class AddAbsentDialog implements OnInit {
       return;
     }
 
-    const compatibleTypes = DOC_TYPES.map(t => t.value);
+    // EDocType es el set de tipos "reservados" que el codigo referencia por valor exacto (ver
+    // Doc.ts) - ya no es la lista completa del catalogo, pero para esta sugerencia alcanza.
+    const compatibleTypes: string[] = Object.values(EDocType);
     let docType = compatibleTypes.includes(type as EDocType) ? type : EDocType.OTHER;
 
     switch (type) {

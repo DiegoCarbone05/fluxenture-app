@@ -107,12 +107,29 @@ mat-dialog-content {
     min-width: 0;
   }
 
+  .doc-type-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
   .doc-type {
     font-weight: 700;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
     color: var(--primary, #0468d7);
+  }
+
+  .doc-ext {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    background-color: #f0f0f0;
+    color: #9a9a9a;
+    border: 1px solid #e2e2e2;
+    padding: 1px 6px;
+    border-radius: 6px;
   }
 
   .doc-desc {

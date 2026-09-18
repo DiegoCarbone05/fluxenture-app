@@ -2,16 +2,10 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100vh;
-  overflow: auto;
-  background-color: rgb(247, 247, 247);
-}
-
-flux-toolbar {
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #f8f8f8;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 .loading {
@@ -42,103 +36,101 @@ flux-toolbar {
   }
 }
 
-// ── HERO ─────────────────────────────────────────────────────────────────────
-.absent-hero {
-  width: 100%;
-  padding: 25px;
-  background-color: var(--primary);
-  box-sizing: border-box;
-  transition: all 0.3s ease-in-out;
-
-  &.unjustified {
-    background-color: var(--warn);
-  }
-
-  .content {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-    .status-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background-color: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(8px);
-      color: white;
-      padding: 4px 12px 4px 8px;
-      border-radius: 50px;
-      font-size: 12px;
-      font-weight: 600;
-      width: fit-content;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-
-      mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-      }
-    }
-
-    .employee-name {
-      color: white;
-      font-size: 34px;
-      font-weight: 600;
-      line-height: 1.1;
-    }
-
-    .absent-period {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 14px;
-      font-weight: 500;
-
-      mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-      }
-
-      .period-arrow {
-        opacity: 0.7;
-        margin: 0 2px;
-      }
-    }
-  }
-}
-
 // ── CONTAINER ────────────────────────────────────────────────────────────────
 .container {
-  width: 90%;
-  padding: 16px;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 20px 32px;
+  box-sizing: border-box;
 }
 
 .card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  margin-bottom: 20px;
   overflow: hidden;
 }
 
+// ── HERO CARD (antes: banner de color a todo el ancho) ─────────────────────
+.hero-card {
+  background-color: var(--primary, #0468d7);
+  border: none;
+  transition: background-color 0.3s ease-in-out;
+
+  &.unjustified {
+    background-color: var(--warn, #d1002d);
+  }
+}
+
+.hero-content {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .hero-status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 4px 12px 4px 8px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .hero-name {
+    color: white;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .hero-period {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    font-weight: 500;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .period-arrow {
+      opacity: 0.7;
+      margin: 0 2px;
+    }
+  }
+}
+
 .card-header {
-  background: #ffffff;
   padding: 16px 20px;
-  border-bottom: 1px solid #e9ecef;
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   h2 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
   }
 }
 
@@ -167,13 +159,13 @@ flux-toolbar {
     font-size: 12px;
     color: #6c757d;
     text-transform: uppercase;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 0.3px;
   }
 
   .value {
-    font-size: 16px;
-    color: #212529;
+    font-size: 15px;
+    color: #1a1a2e;
     font-weight: 500;
   }
 }
@@ -187,7 +179,7 @@ flux-toolbar {
   .days-number {
     font-size: 28px;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--primary, #0468d7);
     line-height: 1;
   }
 
@@ -195,34 +187,6 @@ flux-toolbar {
     font-size: 14px;
     color: #6c757d;
     font-weight: 500;
-  }
-}
-
-// ── STATUS PILL ──────────────────────────────────────────────────────────────
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px 4px 8px;
-  border-radius: 50px;
-  font-size: 13px;
-  font-weight: 600;
-  width: fit-content;
-
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-
-  &.justified {
-    background-color: #d2f0e4;
-    color: #0ead6d;
-  }
-
-  &.not-justified {
-    background-color: #f0d2d2;
-    color: #ad0e0e;
   }
 }
 
@@ -311,119 +275,44 @@ flux-toolbar {
   margin: 0;
 }
 
-// ── DOCUMENT ─────────────────────────────────────────────────────────────────
-.doc-attached {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 16px;
-  background: #f8f8f8;
-  border-radius: 8px;
-  border-left: 4px solid var(--primary);
-  flex-wrap: wrap;
-
-  .doc-icon-wrap {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    background-color: rgba(13, 110, 253, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    mat-icon {
-      color: var(--primary);
-      font-size: 26px;
-      width: 26px;
-      height: 26px;
-    }
-  }
-
-  .doc-info {
-    flex: 1 1 200px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-
-    .doc-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #212529;
-    }
-
-    .doc-meta {
-      font-size: 12px;
-      color: #6c757d;
-    }
-  }
-
-  .doc-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-
-    button {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-
-      mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-      }
-    }
-  }
-}
-
-.no-doc {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+// ── DOCUMENTO ADJUNTO: mismo look que la grilla de Documentos ───────────────
+.file-grid {
+  min-height: 120px;
+  display: grid;
+  align-content: flex-start;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
   gap: 8px;
-  padding: 24px 0;
-  color: #adb5bd;
-
-  mat-icon {
-    font-size: 40px;
-    width: 40px;
-    height: 40px;
-  }
-
-  span {
-    font-size: 14px;
-    font-weight: 500;
-  }
 }
 
-// ── EDIT FAB ──────────────────────────────────────────────────────────────────
-.edit-fab {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 100;
+flux-empty-state {
+  grid-area: 1 / 1 / -1 / -1;
+  align-self: center;
+  justify-self: center;
+}
+
+.doc-actions-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
 }
 
 // ── RESPONSIVE ───────────────────────────────────────────────────────────────
-@media screen and (min-width: 768px) {
-  .absent-hero {
-    padding: 50px;
+@media screen and (max-width: 640px) {
+  .container {
+    padding: 0 16px 28px;
+  }
 
-    .content {
-      .employee-name {
-        font-size: 28px;
-      }
+  .hero-content {
+    padding: 20px 16px;
+
+    .hero-name {
+      font-size: 21px;
     }
   }
 
-  .doc-attached {
-    flex-wrap: nowrap;
-
-    .doc-actions {
-      margin-left: auto;
-    }
+  .card-header,
+  .card-body {
+    padding: 14px 16px;
   }
 }

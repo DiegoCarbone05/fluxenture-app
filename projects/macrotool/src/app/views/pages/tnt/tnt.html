@@ -88,9 +88,7 @@
 } @else {
 <!-- ══ MÓVIL · Material 3 ═══════════════════════════════════════════════════ -->
 <div class="m3">
-  <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar envíos">
-    <button class="m3-avatar" [matMenuTriggerFor]="userMenu">{{ userInitials() }}</button>
-  </flux-m3-search-bar>
+  <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar envíos" />
 
   <flux-m3-tab-strip [tabs]="tabs()" [selected]="tab()" (selectedChange)="setTab($event)" />
 
@@ -141,14 +139,3 @@
   <button fluxFab variant="primary" icon="add" (click)="loadPDF()"></button>
 </div>
 }
-
-<mat-menu #userMenu="matMenu">
-  <button mat-menu-item routerLink="/main/app-pages/users">
-    <mat-icon>account_circle</mat-icon>
-    <span>Mi cuenta</span>
-  </button>
-  <button mat-menu-item (click)="logout()">
-    <mat-icon>logout</mat-icon>
-    <span>Cerrar sesión</span>
-  </button>
-</mat-menu>

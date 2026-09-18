@@ -1,0 +1,51 @@
+<div class="container">
+  <div class="header">
+    <div class="wrap">
+      <h2>Editar en lote</h2>
+      <span>{{ count }} documentos seleccionados — completá solo los campos que querés cambiar</span>
+    </div>
+    <button mat-icon-button (click)="cancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="mat-typography">
+    <form [formGroup]="form" class="bulk-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Descripción</mat-label>
+        <input matInput formControlName="description" placeholder="No cambiar">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Empleado</mat-label>
+        <input matInput formControlName="employee" [matAutocomplete]="empAuto" placeholder="No cambiar">
+        <mat-autocomplete #empAuto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onEmployeeSelected($event)">
+          @for (emp of (filteredEmployees | async); track emp.id) {
+          <mat-option [value]="emp">{{ emp.name }} — N° {{ emp.employeeId }}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Tipo de documento</mat-label>
+        <mat-select formControlName="type" placeholder="No cambiar">
+          @for (tipo of docTypes(); track tipo.id) {
+          <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="date" placeholder="No cambiar">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">Cancelar</button>
+    <button mat-flat-button color="primary" [disabled]="applying()" (click)="apply()">Aplicar a {{ count }}</button>
+  </mat-dialog-actions>
+</div>

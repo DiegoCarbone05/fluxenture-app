@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AbsentType } from '../../shared/models/Absent.model';
-import { EDocType } from '../../shared/models/Doc';
-import { ABSENT_TYPES, DOC_TYPES } from '../../shared/constants/typesValues.constant';
+import { ABSENT_TYPES } from '../../shared/constants/typesValues.constant';
 import { DocsService } from './api/docs/docs.service';
+import { TipoDocumentoService } from './api/tipo-documento/tipo-documento.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,14 +11,15 @@ export class UtilsService {
 
   constructor(
     private docsService: DocsService,
+    private tipoDocumentoService: TipoDocumentoService,
   ) { }
 
   getAbstenFullName(type: AbsentType) {
     return ABSENT_TYPES.find(t => t.value === type)?.label;
   }
 
-  getDocFullName(type: EDocType) {
-    return DOC_TYPES.find(t => t.value === type)?.label;
+  getDocFullName(type: string | undefined) {
+    return this.tipoDocumentoService.nombreDe(type);
   }
 
   openFile(docId: string) {

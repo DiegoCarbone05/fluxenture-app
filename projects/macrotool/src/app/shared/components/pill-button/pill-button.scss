@@ -59,4 +59,18 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  .spin {
+    animation: flux-pill-spin 1.4s linear infinite;
+  }
+}
+
+@keyframes flux-pill-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -8,7 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { AbstentTypePipe } from '../../../shared/pipes/abstent-type-pipe';
@@ -24,7 +24,6 @@ import { NovedadService } from '../../../core/services/api/novedades/novedad.ser
 import { NovedadResponseDTO } from '../../../shared/models/Novedad';
 import { Doc } from '../../../shared/models/Doc';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
-import { AuthService } from '../../../core/services/api/auth/auth.service';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
 import { UtilsService } from '../../../core/services/utils.service';
 import { AppService } from '../../../core/services/app.service';
@@ -112,7 +111,7 @@ const PAGE_SIZE = 12;
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, MatButtonModule, MatIconModule,
-    MatMenuModule, MatProgressSpinnerModule, MatTooltipModule, MatSnackBarModule, RouterLink,
+    MatMenuModule, MatProgressSpinnerModule, MatTooltipModule, MatSnackBarModule,
     AbstentTypePipe, DocTypePipe,
     PageHeader, PillButton, IconButton, SearchBox, TableToolbar, EmployeeCell,
     StatusChip, StatsGrid, TablePager, EmptyState, M3SearchBar, M3StatsRow,
@@ -126,8 +125,6 @@ export class Absents implements OnInit {
   private readonly dialog = inject(MatDialog);
 
   isMobile = computed(() => this.viewsSvc.getIsMobile());
-  user = computed(() => this.authService.getUserSignal()());
-  userInitials = computed(() => (this.user()?.username ?? '').slice(0, 2).toUpperCase());
 
   readonly months = MONTHS;
   readonly absentTypes = ABSENT_TYPES;
@@ -196,7 +193,7 @@ export class Absents implements OnInit {
 
   private novedadRows = computed<NovedadRow[]>(() =>
     this.novedades().map((novedad) => ({
-      ...this.employeeCell(novedad.doc.employeeId),
+      ...this.employeeCell(novedad.doc.employeeId ?? ''),
       id: novedad.id,
       doc: novedad.doc,
       description: novedad.doc.description || '—',
@@ -427,7 +424,6 @@ export class Absents implements OnInit {
   constructor(
     private absentService: AbsentService,
     private employeeService: EmployeeService,
-    private authService: AuthService,
     private viewsSvc: ViewsService,
     private router: Router,
     private utilsSvc: UtilsService,
@@ -622,9 +618,6 @@ export class Absents implements OnInit {
     const ref = this.dialog.open(AddDocDialog, {
       disableClose: true,
       panelClass: 'full-screen-dialog',
-      // La Novedad que se crea abajo (afterClosed) ya cubre este Doc como Registro Analitico en
-      // cola: no hace falta pedir un tipo de Registro Complementario aca tambien.
-      data: { skipRegistroLink: true },
     });
     ref.afterClosed().subscribe((doc: Doc | undefined) => {
       if (!doc?.id) return;
@@ -795,10 +788,6 @@ export class Absents implements OnInit {
     link.download = fileName;
     link.click();
     URL.revokeObjectURL(url);
-  }
-
-  logout() {
-    this.authService.logout();
   }
 
   // ── Carga de datos ──────────────────────────────────────────────────────────

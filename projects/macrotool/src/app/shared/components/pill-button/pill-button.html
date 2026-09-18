@@ -1,4 +1,4 @@
 @if (icon) {
-  <mat-icon>{{ icon }}</mat-icon>
+  <mat-icon [class.spin]="spinning">{{ icon }}</mat-icon>
 }
 <ng-content></ng-content>

@@ -39,7 +39,12 @@
           @for (doc of filteredDocs(); track doc.id) {
             <div class="doc-card" (click)="selectDoc(doc)">
               <div class="doc-info">
-                <span class="doc-type">{{ doc.type | docType }}</span>
+                <span class="doc-type-row">
+                  <span class="doc-type">{{ doc.type | docType }}</span>
+                  @if (doc.extension) {
+                  <span class="doc-ext">{{ doc.extension }}</span>
+                  }
+                </span>
                 <span class="doc-desc">{{ doc.description || 'Sin descripción' }}</span>
               </div>
               <button mat-stroked-button color="primary" (click)="selectDoc(doc); $event.stopPropagation()">

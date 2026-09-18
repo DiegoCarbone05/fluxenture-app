@@ -54,26 +54,9 @@ input {
   }
 }
 
-// El consumidor le pone class="m3-avatar" al elemento proyectado (normalmente
-// el boton con [matMenuTriggerFor] del usuario).
-::ng-deep .m3-search .m3-avatar {
-  width: 40px;
-  height: 40px;
+// El boton de cuenta ya trae sus 40px circulares; aca solo lo despega del
+// borde redondeado de la barra.
+flux-user-account-dialog {
   flex-shrink: 0;
   margin-right: 8px;
-  padding: 0;
-  border: none;
-  outline: none;
-  border-radius: 20px !important;
-  background-color: var(--primary, #0468d7);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: Roboto, system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  box-shadow: none;
 }

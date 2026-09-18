@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { Toolbar } from '../../../../shared/components/toolbar/toolbar';
+import { PageHeader } from '../../../../shared/components/page-header/page-header';
+import { PillButton } from '../../../../shared/components/pill-button/pill-button';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Cd, parseTrackingCode, trackingCodeOf } from '../../../../shared/models/Cd.model';
 import html2Canvas from 'html2canvas';
@@ -23,7 +23,7 @@ import { firstValueFrom } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule, MatTableModule, MatSortModule,
-    MatButtonModule, MatIconModule, MatCheckboxModule, Toolbar,
+    MatIconModule, MatCheckboxModule, PageHeader, PillButton,
   ],
   templateUrl: './cds-viewer.html',
   styleUrl: './cds-viewer.scss',

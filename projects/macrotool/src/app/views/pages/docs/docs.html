@@ -1,154 +1,170 @@
-@if (!isMobile()) {
-<!-- ══ ESCRITORIO ═══════════════════════════════════════════════════════════ -->
-<div class="desk">
-  <flux-page-header title="Documentos" [subtitle]="subtitle()">
-    <button fluxPillBtn variant="neutral" icon="calendar_today" (click)="openDatePickerDialog()">
-      <span>{{ monthLabel() }}</span>
-    </button>
-    <button fluxPillBtn variant="primary" icon="add" (click)="openDialog()">
-      <span>Nuevo documento</span>
-    </button>
-  </flux-page-header>
-
-  <div class="table-card">
-    @if (isLoading()) {
-    <div class="loading-wrapper"><mat-spinner diameter="36" /></div>
-    } @else {
-    <flux-table-toolbar>
-      <div toolbarStart>
-        <flux-search-box [control]="searchFormControl" placeholder="Buscar por empleado, descripción o usuario" />
-        <select class="flux-select" [value]="typeFilter()" (change)="setType($any($event.target).value)">
-          <option value="todos">Tipo: todos</option>
-          @for (type of docTypes; track type.value) {
-          <option [value]="type.value">{{ type.label }}</option>
-          }
-        </select>
-      </div>
-      <div toolbarEnd>
-        <button fluxPillBtn variant="neutral" icon="swap_vert" (click)="toggleSort()">
-          <span>{{ sortLabel() }}</span>
-        </button>
-        <button fluxPillBtn variant="accent" icon="download" (click)="exportCsv()">
-          <span>Exportar</span>
-        </button>
-      </div>
-    </flux-table-toolbar>
-
-    <div class="table-head cols-docs">
-      <span>Tipo</span>
-      <span>Empleado</span>
-      <span>Descripción</span>
-      <span>Fecha</span>
-      <span>Usuario</span>
-      <span class="align-right">Acciones</span>
-    </div>
-
-    @for (row of paged(); track row.id) {
-    <div class="table-row cols-docs">
-      <div>
-        <span class="doc-type-chip" [class]="'dtype-' + row.type">{{ row.type | docType }}</span>
-      </div>
-
-      <flux-employee-cell [initials]="row.employeeInitials" [name]="row.employeeName" [legajo]="row.employeeLegajo"
-        [sector]="row.employeeSector" />
-
-      <div class="cell-desc">{{ row.description }}</div>
-
-      <div class="cell-date">
-        <mat-icon>event</mat-icon>
-        <span>{{ row.dateLabel }}</span>
-      </div>
-
-      <div class="cell-user">
-        <mat-icon>person</mat-icon>
-        <span>{{ row.userLabel }}</span>
-      </div>
-
-      <flux-row-actions>
-        @for (creator of creatorsFor(row.raw); track creator.id) {
-        <button fluxIconBtn variant="edit" [icon]="creator.icon" [matTooltip]="creator.label"
-          (click)="creator.create(row.raw)"></button>
-        }
-        <button fluxIconBtn variant="edit" icon="edit" matTooltip="Editar" (click)="editDoc(row.id)"></button>
-        <button fluxIconBtn variant="view" icon="visibility" matTooltip="Ver archivo"
-          (click)="openFile(row.raw)"></button>
-        <button fluxIconBtn variant="delete" icon="delete" matTooltip="Eliminar" (click)="deleteDoc(row.raw)"></button>
-      </flux-row-actions>
-    </div>
-    }
-
-    @if (filtered().length === 0) {
-    <flux-empty-state title="Sin documentos" [text]="'No hay documentos que coincidan en ' + monthLabel() + '.'" />
-    }
-
-    <flux-pager [currentPage]="currentPage()" [totalPages]="totalPages()" [pageNumbers]="pageNumbers()"
-      [rangeLabel]="rangeLabel()" (pageChange)="goToPage($event)" />
-    }
-  </div>
-</div>
-} @else {
-<!-- ══ MÓVIL · Material 3 ═══════════════════════════════════════════════════ -->
-<div class="m3">
-  <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar documentos">
-    <button class="m3-avatar" [matMenuTriggerFor]="userMenu">{{ userInitials() }}</button>
-  </flux-m3-search-bar>
-
-  <div class="m3-scroll">
-    @if (isLoading()) {
-    <div class="loading-wrapper"><mat-spinner diameter="36" /></div>
-    } @else {
-    <div class="m3-subheader">
-      <span class="m3-results">{{ resultsLabel() }}</span>
-      <div class="m3-subheader-actions">
-        <button class="m3-sort" (click)="openDatePickerDialog()">
-          <mat-icon class="mat-icon-weight-regular">calendar_today</mat-icon>
+<mat-drawer-container class="docs-shell" [hasBackdrop]="isMobile()">
+  <mat-drawer-content>
+    @if (!isMobile()) {
+    <!-- ══ ESCRITORIO ═══════════════════════════════════════════════════════════ -->
+    <div class="desk">
+      <flux-page-header title="Documentos" [subtitle]="subtitle()" [compact]="true">
+        <!-- <button fluxPillBtn variant="neutral" icon="calendar_today" (click)="openDatePickerDialog()">
           <span>{{ monthLabel() }}</span>
+        </button> -->
+        <!-- <button fluxPillBtn variant="primary" icon="upload_file" [disabled]="uploading()" (click)="triggerUpload()">
+          <span>Subir</span>
+        </button> -->
+        <input class="month-year-anchor" [matDatepicker]="deskMonthYearPicker" [formControl]="monthYearControl"
+          tabindex="-1" aria-hidden="true">
+
+        <mat-datepicker #deskMonthYearPicker startView="year" (yearSelected)="onYearSelected($event)"
+          (monthSelected)="onMonthSelected($event, deskMonthYearPicker)" />
+        <button mat-icon-button (click)="openMonthYearPicker(deskMonthYearPicker)" class="toolbar-icons">
+          <mat-icon>calendar_today</mat-icon>
         </button>
-        <button class="m3-sort" (click)="toggleSort()">
-          <mat-icon class="mat-icon-weight-regular">swap_vert</mat-icon>
-          <span>{{ sortLabel() }}</span>
+        <button mat-icon-button (click)="focusSearch()" class="toolbar-icons">
+          <mat-icon>search</mat-icon>
         </button>
+        <button mat-icon-button (click)="manageDocTypes()" class="toolbar-icons">
+          <mat-icon>sell</mat-icon>
+        </button>
+      </flux-page-header>
+
+      <div class="grid-card">
+        @if (isLoading()) {
+        <div class="loading-wrapper"><mat-spinner diameter="36" /></div>
+        } @else {
+
+        @if (selectionCount() === 0) {
+        <flux-table-toolbar>
+          <div toolbarStart>
+            <flux-search-box [control]="searchFormControl" placeholder="Buscar por descripción, empleado o tipo" />
+            <select class="flux-select" [value]="typeFilter()" (change)="setType($any($event.target).value)">
+              <option value="todos">Tipo: todos</option>
+              @for (type of docTypes(); track type.value) {
+              <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select>
+          </div>
+          <div toolbarEnd>
+            <button fluxPillBtn variant="neutral" icon="swap_vert" (click)="toggleSort()">
+              <span>{{ sortLabel() }}</span>
+            </button>
+            <button fluxPillBtn variant="accent" icon="download" (click)="exportCsv()">
+              <span>Exportar CSV</span>
+            </button>
+          </div>
+        </flux-table-toolbar>
+        } @else {
+        <flux-table-toolbar>
+          <div toolbarStart>
+            <span class="selection-count">{{ selectionCount() }} seleccionados</span>
+          </div>
+          <div toolbarEnd>
+            @if (selectionCount() > 1) {
+            <button fluxPillBtn variant="neutral" icon="edit" (click)="editBulk()">
+              <span>Editar en lote</span>
+            </button>
+            }
+            <button fluxPillBtn variant="accent" icon="download" (click)="exportSelected()">
+              <span>Exportar</span>
+            </button>
+            <button fluxPillBtn variant="neutral" icon="delete" [disabled]="deleting()" (click)="deleteSelected()">
+              <span>Eliminar</span>
+            </button>
+            <button fluxPillBtn variant="neutral" icon="close" (click)="clearSelection()">
+              <span>Cancelar</span>
+            </button>
+          </div>
+        </flux-table-toolbar>
+        }
+
+        <div class="file-grid" #grid (mousedown)="onGridMouseDown($event)" appDragDropFile
+          (filesDropped)="onFilesDropped($event)">
+          @for (row of filtered(); track row.id) {
+          <app-doc-tile [row]="row" [selected]="isSelected(row.id)" (tileClick)="onTileClick($event)"
+            (open)="openFile(row.raw)" />
+          }
+          @if (filtered().length === 0) {
+          <flux-empty-state title="Sin documentos"
+            [text]="'Arrastrá archivos aquí o usá Subir — no hay documentos en ' + monthLabel() + '.'" />
+          }
+        </div>
+
+        @if (marqueeRect()) {
+        <div class="marquee-box" [style.left.px]="marqueeRect()!.left" [style.top.px]="marqueeRect()!.top"
+          [style.width.px]="marqueeRect()!.width" [style.height.px]="marqueeRect()!.height"></div>
+        }
+        }
       </div>
     </div>
+    } @else {
+    <!-- ══ MÓVIL · Material 3 ═══════════════════════════════════════════════════ -->
+    <div class="m3">
+      <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar documentos" />
 
-    @for (row of filtered(); track row.id) {
-    <flux-m3-list-item [initials]="row.employeeInitials" [headline]="row.employeeNameTitle"
-      [support]="[row.description, row.dateLabel]" [clickable]="false">
-      <div class="m3-trailing">
-        <span class="doc-type-chip" [class]="'dtype-' + row.type">{{ row.type | docType }}</span>
-        <flux-row-actions>
-          @for (creator of creatorsFor(row.raw); track creator.id) {
-          <button fluxIconBtn variant="edit" [icon]="creator.icon" [matTooltip]="creator.label"
-            (click)="creator.create(row.raw)"></button>
+      <div class="m3-scroll">
+        @if (isLoading()) {
+        <div class="loading-wrapper"><mat-spinner diameter="36" /></div>
+        } @else {
+
+        <div class="m3-subheader">
+          @if (selectionCount() === 0) {
+          <span class="m3-results">{{ resultsLabel() }}</span>
+          <div class="m3-subheader-actions">
+            <input class="month-year-anchor" [matDatepicker]="mobileMonthYearPicker" [formControl]="monthYearControl"
+              tabindex="-1" aria-hidden="true">
+            <mat-datepicker #mobileMonthYearPicker startView="year" (yearSelected)="onYearSelected($event)"
+              (monthSelected)="onMonthSelected($event, mobileMonthYearPicker)" />
+            <button class="m3-sort" (click)="openMonthYearPicker(mobileMonthYearPicker)">
+              <mat-icon class="mat-icon-weight-regular">calendar_today</mat-icon>
+              <span>{{ monthLabel() }}</span>
+            </button>
+            <button class="m3-sort" (click)="manageDocTypes()">
+              <mat-icon class="mat-icon-weight-regular">sell</mat-icon>
+              <span>Tipos</span>
+            </button>
+          </div>
+          } @else {
+          <span class="m3-results">{{ selectionCount() }} seleccionados</span>
+          <div class="m3-subheader-actions">
+            @if (selectionCount() > 1) {
+            <button class="m3-sort" (click)="editBulk()">
+              <mat-icon class="mat-icon-weight-regular">edit</mat-icon>
+            </button>
+            }
+            <button class="m3-sort" [disabled]="deleting()" (click)="deleteSelected()">
+              <mat-icon class="mat-icon-weight-regular">delete</mat-icon>
+            </button>
+            <button class="m3-sort" (click)="clearSelection()">
+              <mat-icon class="mat-icon-weight-regular">close</mat-icon>
+            </button>
+          </div>
           }
-          <button fluxIconBtn variant="edit" icon="edit" matTooltip="Editar" (click)="editDoc(row.id)"></button>
-          <button fluxIconBtn variant="view" icon="visibility" matTooltip="Ver archivo"
-            (click)="openFile(row.raw)"></button>
-          <button fluxIconBtn variant="delete" icon="delete" matTooltip="Eliminar"
-            (click)="deleteDoc(row.raw)"></button>
-        </flux-row-actions>
+        </div>
+
+        <div class="file-grid mobile" (mousedown)="onGridMouseDown($event)" appDragDropFile
+          (filesDropped)="onFilesDropped($event)">
+          @for (row of filtered(); track row.id) {
+          <app-doc-tile [row]="row" [selected]="isSelected(row.id)" (tileClick)="onTileClick($event)"
+            (open)="openFile(row.raw)" />
+          }
+          @if (filtered().length === 0) {
+          <flux-empty-state size="compact" title="Sin documentos"
+            [text]="'No hay documentos en ' + monthLabel() + '.'" />
+          }
+        </div>
+        }
       </div>
-    </flux-m3-list-item>
-    }
 
-    @if (filtered().length === 0) {
-    <flux-empty-state size="compact" title="Sin documentos"
-      [text]="'No hay documentos que coincidan en ' + monthLabel() + '.'" />
+      <button fluxFab variant="primary" icon="upload_file" [disabled]="uploading()" (click)="triggerUpload()"></button>
+    </div>
     }
+  </mat-drawer-content>
+
+  <mat-drawer #detailDrawer mode="over" position="end" [opened]="detailOpen()"
+    (openedChange)="onDrawerOpenedChange($event)">
+    @if (selectedDoc()) {
+    <app-doc-detail-panel [doc]="selectedDoc()!" (saved)="onDetailSaved()"
+      (deleteRequested)="onDetailDeleteRequested($event)" (closed)="clearSelection()" />
     }
-  </div>
+  </mat-drawer>
+</mat-drawer-container>
 
-  <button fluxFab variant="primary" icon="add" (click)="openDialog()"></button>
-</div>
-}
-
-<mat-menu #userMenu="matMenu">
-  <button mat-menu-item routerLink="/main/app-pages/users">
-    <mat-icon>account_circle</mat-icon>
-    <span>Mi cuenta</span>
-  </button>
-  <button mat-menu-item (click)="logout()">
-    <mat-icon>logout</mat-icon>
-    <span>Cerrar sesión</span>
-  </button>
-</mat-menu>
+<input #fileInput type="file" multiple hidden (change)="onFilePickerChange($event)">

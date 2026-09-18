@@ -1,5 +1,4 @@
 import { AbsentType } from '../models/Absent.model';
-import { EDocType } from '../models/Doc';
 import { ESector } from '../models/Employee';
 import { EEmployeeHistoryType } from '../models/EmployeeHistory.model';
 
@@ -20,27 +19,9 @@ export const ABSENT_TYPES = [
   { value: AbsentType.OTHER, label: 'Otro' },
 ];
 
-export const DOC_TYPES = [
-  { value: EDocType.NOTIFICATION, label: 'Notificación' },
-  { value: EDocType.MEDICAL_CERTIFICATE, label: 'Médico' },
-  { value: EDocType.VACATIONS, label: 'Vacaciones' },
-  { value: EDocType.CERTIFICATE, label: 'Certificado' },
-  { value: EDocType.LICENSE, label: 'Licencia' },
-  { value: EDocType.SUSPENSION, label: 'Suspensión' },
-  { value: EDocType.DG, label: 'Dia Gremial' },
-  { value: EDocType.PG, label: 'Permiso Gremial' },
-  { value: EDocType.CD, label: 'CD' },
-  { value: EDocType.EPP, label: 'EPP' },
-  { value: EDocType.TELEGRAMA, label: 'Telegrama' },
-  { value: EDocType.ALTA_AFIP, label: 'Alta AFIP' },
-  { value: EDocType.BAJA_AFIP, label: 'Baja AFIP' },
-  { value: EDocType.PREOCUPACIONAL, label: 'Preocupacional' },
-  { value: EDocType.APERCIBIMIENTO, label: 'Apercibimiento' },
-  { value: EDocType.ART, label: 'ART' },
-  { value: EDocType.RECEIPT, label: 'Recibo' },
-  { value: EDocType.INCOME, label: 'Legajo' },
-  { value: EDocType.OTHER, label: 'Otro' },
-];
+// DOC_TYPES ya no existe: los tipos de documento son un catalogo dinamico (ver
+// TipoDocumentoService), no una lista fija. Los componentes que antes importaban DOC_TYPES ahora
+// leen tipoDocumentoService.activeTipos().
 
 export const EMPLOYEE_HISTORY_TYPES = [
   { value: EEmployeeHistoryType.ONBOARDING, label: 'Alta' },
@@ -65,5 +46,4 @@ export const DOC_USAGE_MODULE_LABELS: Record<string, string> = {
   employeeHistory: 'Legajo',
   cd: 'CD (TNT)',
   novedad: 'Novedad',
-  registroComplementario: 'Registro complementario',
 };

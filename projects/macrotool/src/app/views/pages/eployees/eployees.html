@@ -103,9 +103,7 @@
 } @else {
 <!-- ══ MOVIL · Material 3 ═══════════════════════════════════════════════════ -->
 <div class="m3">
-  <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar empleados">
-    <button class="m3-avatar" [matMenuTriggerFor]="userMenu">{{ userInitials() }}</button>
-  </flux-m3-search-bar>
+  <flux-m3-search-bar [control]="searchFormControl" placeholder="Buscar empleados" />
 
   <flux-filter-chips [chips]="chips" [selected]="status()" (selectedChange)="setStatus($event)" />
 
@@ -142,14 +140,3 @@
   }
 </div>
 }
-
-<mat-menu #userMenu="matMenu">
-  <button mat-menu-item routerLink="/main/app-pages/users">
-    <mat-icon>account_circle</mat-icon>
-    <span>Mi cuenta</span>
-  </button>
-  <button mat-menu-item (click)="logout()">
-    <mat-icon>logout</mat-icon>
-    <span>Cerrar sesión</span>
-  </button>
-</mat-menu>

@@ -1,0 +1,16 @@
+<div class="tile" [class.selected]="selected" [class.size-lg]="size === 'lg'">
+  <div class="icon-canvas" [style.background-color]="color().bg" [style.color]="color().fg">
+    <span class="icon-main">{{ mainText() }}</span>
+    @if (subText()) {
+    <span class="icon-sub">{{ subText() }}</span>
+    }
+    @if (blocked) {
+    <span class="blocked-badge" matTooltip="Sin empleado ni empresa asignado">
+      <mat-icon>block</mat-icon>
+    </span>
+    }
+  </div>
+  @if (text) {
+  <span class="icon-caption">{{ text }}</span>
+  }
+</div>

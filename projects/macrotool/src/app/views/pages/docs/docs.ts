@@ -1,98 +1,101 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, ElementRef, HostListener, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-import { RouterLink } from '@angular/router';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatDatepicker, MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { catchError, debounceTime, distinctUntilChanged, forkJoin, map, of, switchMap } from 'rxjs';
 
-import { DocTypePipe } from '../../../shared/pipes/doc-type-pipe';
-import { AddDocDialog } from '../../dialogs/add-doc-dialog/add-doc-dialog';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
-import { AuthService } from '../../../core/services/api/auth/auth.service';
 import { StorageService } from '../../../core/services/api/storage/storage.service';
-import { Doc, EDocType } from '../../../shared/models/Doc';
-import { ESector, fullNameOf } from '../../../shared/models/Employee';
+import { Doc, baseNameOf, extensionOf } from '../../../shared/models/Doc';
+import { fullNameOf } from '../../../shared/models/Employee';
 import { Prompt } from '../../dialogs/prompt/prompt';
-import { DatepickerDialog } from '../../dialogs/datepicker-dialog/datepicker-dialog';
 import { MONTHS } from '../../../shared/constants/general-constant';
-import { DOC_TYPES } from '../../../shared/constants/typesValues.constant';
+import { TipoDocumentoService } from '../../../core/services/api/tipo-documento/tipo-documento.service';
 import { AppService } from '../../../core/services/app.service';
 import { UtilsService } from '../../../core/services/utils.service';
 import { ViewsService } from '../../views.service';
 import { FileViewerDialog } from '../../dialogs/file-viewer-dialog/file-viewer-dialog';
-import { DOC_RECORD_CREATORS, DocRecordCreator } from '../../../shared/services/doc-record-creator';
+import { ManageDocTypes } from '../../dialogs/manage-doc-types/manage-doc-types';
+import { DocBulkEditDialog } from '../../dialogs/doc-bulk-edit-dialog/doc-bulk-edit-dialog';
+import { DragDropFileDirective } from '../../../shared/directives/drag-drop-file';
 
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { PillButton } from '../../../shared/components/pill-button/pill-button';
-import { IconButton } from '../../../shared/components/icon-button/icon-button';
 import { SearchBox } from '../../../shared/components/search-box/search-box';
 import { TableToolbar } from '../../../shared/components/table-toolbar/table-toolbar';
-import { EmployeeCell } from '../../../shared/components/employee-cell/employee-cell';
-import { RowActions } from '../../../shared/components/row-actions/row-actions';
-import { TablePager } from '../../../shared/components/table-pager/table-pager';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
 import { M3SearchBar } from '../../../shared/components/m3-search-bar/m3-search-bar';
-import { M3ListItem } from '../../../shared/components/m3-list-item/m3-list-item';
 import { FabButton } from '../../../shared/components/fab-button/fab-button';
+import { DocTile, DocGridRow } from './doc-tile/doc-tile';
+import { DocDetailPanel } from './doc-detail-panel/doc-detail-panel';
 
-type TypeFilter = 'todos' | EDocType;
+type TypeFilter = 'todos' | string;
 
-/** Fila ya derivada para la vista: evita repetir lookups dentro del template. */
-interface DocRow {
-  id: string;
+/** Fila derivada para la grilla — ver Docs#toRow. */
+interface DocRow extends DocGridRow {
   employeeName: string;
-  employeeNameTitle: string;
-  employeeInitials: string;
-  employeeLegajo: string;
-  employeeSector?: ESector;
-  type: EDocType;
-  description: string;
-  dateLabel: string;
   uploadDateMs: number;
-  userLabel: string;
+  dateLabel: string;
   raw: Doc;
 }
 
-const PAGE_SIZE = 12;
+interface MarqueeRect {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
 
 @Component({
   selector: 'app-docs',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, MatButtonModule, MatIconModule,
-    MatMenuModule, MatTooltipModule, MatProgressSpinnerModule, MatSnackBarModule, RouterLink,
-    DocTypePipe, PageHeader, PillButton, IconButton, SearchBox, TableToolbar,
-    EmployeeCell, RowActions, TablePager, EmptyState, M3SearchBar, M3ListItem,
-    FabButton,
+    MatTooltipModule, MatProgressSpinnerModule, MatSnackBarModule, MatSidenavModule,
+    MatDatepickerModule,
+    PageHeader, PillButton, SearchBox, TableToolbar, EmptyState, M3SearchBar,
+    FabButton, DocTile, DocDetailPanel, DragDropFileDirective,
   ],
   templateUrl: './docs.html',
-  styleUrl: './docs.scss'
+  styleUrl: './docs.scss',
+  providers: [provideNativeDateAdapter()],
 })
 export class Docs implements OnInit {
 
   readonly dialog = inject(MatDialog);
-  readonly recordCreators = inject(DOC_RECORD_CREATORS);
+
+  @ViewChild('grid') gridRef?: ElementRef<HTMLElement>;
+  @ViewChild('fileInput') fileInputRef?: ElementRef<HTMLInputElement>;
+  @ViewChild(SearchBox) searchBoxCmp?: SearchBox;
 
   isMobile = computed(() => this.viewsSvc.getIsMobile());
-  user = computed(() => this.authService.getUserSignal()());
-  userInitials = computed(() => (this.user()?.username ?? '').slice(0, 2).toUpperCase());
 
   readonly months = MONTHS;
-  readonly docTypes = DOC_TYPES;
-  readonly pageSize = PAGE_SIZE;
+  // El filtro usa el catalogo completo (no solo activos): un tipo archivado puede seguir
+  // teniendo documentos viejos que hace falta poder encontrar.
+  readonly docTypes = computed(() =>
+    this.tipoDocumentoService.tipos().map(t => ({ value: t.id!, label: t.nombre }))
+  );
 
   currentDate = computed(() => this.appSvc.dateOfData());
   monthLabel = computed(() => `${this.months[this.currentDate().month - 1]} ${this.currentDate().year}`);
 
+  /** Valor del datepicker mes/año del header — sincronizado con currentDate() al abrir el picker. */
+  monthYearControl = new FormControl<Date>(new Date());
+
   docs = signal<Doc[]>([]);
   isLoading = signal(true);
+  uploading = signal(false);
+  deleting = signal(false);
 
   searchFormControl = new FormControl<string>('');
 
@@ -100,7 +103,18 @@ export class Docs implements OnInit {
   term = signal<string>('');
   typeFilter = signal<TypeFilter>('todos');
   desc = signal<boolean>(true);
-  page = signal<number>(0);
+
+  // ── Seleccion (click / ctrl / shift / marquee) ──────────────────────────────
+  selectedIds = signal<ReadonlySet<string>>(new Set());
+  private lastAnchorId = signal<string | undefined>(undefined);
+
+  isMarqueeing = signal(false);
+  marqueeRect = signal<MarqueeRect | undefined>(undefined);
+  private marqueeBase = new Set<string>();
+  private marqueeAdditive = false;
+  private marqueeMoved = false;
+  private marqueeStartX = 0;
+  private marqueeStartY = 0;
 
   private rows = computed<DocRow[]>(() => this.docs().map((doc) => this.toRow(doc)));
 
@@ -109,9 +123,10 @@ export class Docs implements OnInit {
     const type = this.typeFilter();
 
     const result = this.rows().filter((row) => {
-      if (type !== 'todos' && row.type !== type) return false;
+      if (type !== 'todos' && row.typeId !== type) return false;
       if (term) {
-        const haystack = [row.employeeName, row.description, row.userLabel].join(' ').toLowerCase();
+        const typeLabel = this.tipoDocumentoService.nombreDe(row.typeId);
+        const haystack = [row.employeeName, row.description, typeLabel].join(' ').toLowerCase();
         if (!haystack.includes(term)) return false;
       }
       return true;
@@ -121,27 +136,15 @@ export class Docs implements OnInit {
     return result.sort((a, b) => (desc ? b.uploadDateMs - a.uploadDateMs : a.uploadDateMs - b.uploadDateMs));
   });
 
-  totalPages = computed(() => Math.max(1, Math.ceil(this.filtered().length / PAGE_SIZE)));
-  currentPage = computed(() => Math.min(this.page(), this.totalPages() - 1));
-
-  pageNumbers = computed(() => {
-    const total = this.totalPages();
-    const start = Math.max(0, Math.min(this.currentPage() - 1, total - 3));
-    return Array.from({ length: Math.min(3, total) }, (_, i) => start + i);
+  selectionCount = computed(() => this.selectedIds().size);
+  selectedDocsList = computed<Doc[]>(() => {
+    const ids = this.selectedIds();
+    return this.docs().filter((d) => d.id && ids.has(d.id));
   });
-
-  paged = computed(() => {
-    const start = this.currentPage() * PAGE_SIZE;
-    return this.filtered().slice(start, start + PAGE_SIZE);
-  });
-
-  rangeLabel = computed(() => {
-    const total = this.filtered().length;
-    if (total === 0) return 'Sin resultados';
-    const start = this.currentPage() * PAGE_SIZE + 1;
-    const end = Math.min(start + PAGE_SIZE - 1, total);
-    return `${start} – ${end} de ${total} documentos`;
-  });
+  selectedDoc = computed<Doc | undefined>(() =>
+    this.selectionCount() === 1 ? this.selectedDocsList()[0] : undefined
+  );
+  detailOpen = computed(() => this.selectionCount() === 1);
 
   resultsLabel = computed(() => {
     const n = this.filtered().length;
@@ -158,18 +161,17 @@ export class Docs implements OnInit {
   constructor(
     private docsService: DocsService,
     private employeeService: EmployeeService,
-    private authService: AuthService,
     private viewsSvc: ViewsService,
     private snackBar: MatSnackBar,
     private storageSvc: StorageService,
     private appSvc: AppService,
-    private utilsSvc: UtilsService
+    private utilsSvc: UtilsService,
+    private tipoDocumentoService: TipoDocumentoService
   ) {
     this.searchFormControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((value) => {
         this.term.set(value?.trim() ?? '');
-        this.page.set(0);
       });
   }
 
@@ -199,34 +201,18 @@ export class Docs implements OnInit {
 
   private toRow(doc: Doc): DocRow {
     const employee = doc.employeeId ? this.employeeService.getLocalEmployeeById(doc.employeeId) : undefined;
-    const name = fullNameOf(employee) || 'Empleado no encontrado';
     const uploadDate = new Date(doc.uploadDate);
     return {
       id: doc.id ?? '',
-      employeeName: name,
-      employeeNameTitle: this.toTitleCase(name),
-      employeeInitials: this.initials(name),
-      employeeLegajo: employee?.employeeId != null ? `N° ${employee.employeeId}` : 'N° —',
-      employeeSector: employee?.sector,
-      type: doc.type,
-      description: doc.description || '—',
+      employeeName: fullNameOf(employee) || '',
+      typeId: doc.type,
+      extension: doc.extension,
+      description: doc.description || 'Sin nombre',
+      blocked: !doc.employeeId && !doc.empresaId,
       dateLabel: this.formatDate(doc.uploadDate),
       uploadDateMs: uploadDate.getTime(),
-      userLabel: doc.audit?.createdBy || '—',
       raw: doc,
     };
-  }
-
-  private initials(name: string): string {
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return '?';
-    return (parts[0][0] + (parts[1]?.[0] ?? '')).toUpperCase();
-  }
-
-  private toTitleCase(name: string): string {
-    return name
-      .toLowerCase()
-      .replace(/(^|\s)([a-záéíóúñ])/g, (_m, sep: string, char: string) => sep + char.toUpperCase());
   }
 
   formatDate(date: any): string {
@@ -234,35 +220,29 @@ export class Docs implements OnInit {
     return new Date(date).toLocaleDateString('es-AR');
   }
 
-  // ── Filtros y paginado ───────────────────────────────────────────────────────
+  // ── Filtros y orden ──────────────────────────────────────────────────────────
 
   setType(value: string) {
     this.typeFilter.set(value as TypeFilter);
-    this.page.set(0);
   }
 
   toggleSort() {
     this.desc.update((value) => !value);
-    this.page.set(0);
   }
 
-  goToPage(page: number) {
-    this.page.set(Math.max(0, Math.min(page, this.totalPages() - 1)));
-  }
-
-  /** Exporta los documentos filtrados (todos, no solo la pagina) como CSV. */
+  /** Exporta los documentos filtrados (todos, no solo los seleccionados) como CSV. */
   exportCsv() {
     const rows = this.filtered();
     if (rows.length === 0) return;
 
-    const header = ['Tipo', 'Empleado', 'Descripción', 'Fecha', 'Usuario'];
+    const header = ['Tipo', 'Empleado', 'Descripción', 'Fecha'];
     const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
-    const typeLabel = (type: EDocType) => DOC_TYPES.find((item) => item.value === type)?.label ?? type;
+    const typeLabel = (type: string | undefined) => this.tipoDocumentoService.nombreDe(type);
 
     const csv = [
       header.join(';'),
       ...rows.map((row) =>
-        [typeLabel(row.type), row.employeeName, row.description, row.dateLabel, row.userLabel]
+        [typeLabel(row.typeId), row.employeeName || '—', row.description, row.dateLabel]
           .map(escape).join(';')
       ),
     ].join('\r\n');
@@ -276,31 +256,220 @@ export class Docs implements OnInit {
     URL.revokeObjectURL(url);
   }
 
-  // ── Acciones ────────────────────────────────────────────────────────────────
+  // ── Seleccion: click / ctrl / shift ─────────────────────────────────────────
 
-  openDatePickerDialog(): void {
-    const dialogRef = this.dialog.open(DatepickerDialog, {
-      disableClose: true,
-      data: this.currentDate()
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.appSvc.setDateOfData(result);
-        this.page.set(0);
-        this.loadDocs();
+  isSelected(id: string): boolean {
+    return this.selectedIds().has(id);
+  }
+
+  clearSelection(): void {
+    this.selectedIds.set(new Set());
+    this.lastAnchorId.set(undefined);
+  }
+
+  onTileClick(event: { id: string; ctrlKey: boolean; shiftKey: boolean }): void {
+    const order = this.filtered().map((r) => r.id);
+
+    if (event.shiftKey) {
+      const anchor = this.lastAnchorId();
+      const anchorIdx = anchor ? order.indexOf(anchor) : -1;
+      const clickIdx = order.indexOf(event.id);
+      if (anchorIdx === -1 || clickIdx === -1) {
+        this.selectedIds.set(new Set([event.id]));
+        this.lastAnchorId.set(event.id);
+        return;
       }
+      const [from, to] = anchorIdx < clickIdx ? [anchorIdx, clickIdx] : [clickIdx, anchorIdx];
+      const range = order.slice(from, to + 1);
+      const base = event.ctrlKey ? new Set(this.selectedIds()) : new Set<string>();
+      range.forEach((id) => base.add(id));
+      this.selectedIds.set(base);
+      return; // el ancla no se mueve con shift-click
+    }
+
+    if (event.ctrlKey) {
+      const next = new Set(this.selectedIds());
+      if (next.has(event.id)) next.delete(event.id); else next.add(event.id);
+      this.selectedIds.set(next);
+      this.lastAnchorId.set(event.id);
+      return;
+    }
+
+    this.selectedIds.set(new Set([event.id]));
+    this.lastAnchorId.set(event.id);
+  }
+
+  // ── Seleccion por rectangulo (marquee) ──────────────────────────────────────
+
+  onGridMouseDown(event: MouseEvent): void {
+    if (event.button !== 0) return;
+    const target = event.target as HTMLElement;
+    if (target.closest('.doc-tile')) return; // el click sobre un tile lo maneja onTileClick
+
+    this.marqueeAdditive = event.ctrlKey || event.metaKey || event.altKey || event.shiftKey;
+    this.marqueeBase = this.marqueeAdditive ? new Set(this.selectedIds()) : new Set<string>();
+    this.marqueeStartX = event.clientX;
+    this.marqueeStartY = event.clientY;
+    this.marqueeMoved = false;
+    this.isMarqueeing.set(true);
+    this.marqueeRect.set({ left: event.clientX, top: event.clientY, width: 0, height: 0 });
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onDocumentMouseMove(event: MouseEvent): void {
+    if (!this.isMarqueeing()) return;
+    this.updateMarquee(event.clientX, event.clientY);
+  }
+
+  @HostListener('document:mouseup')
+  onDocumentMouseUp(): void {
+    if (!this.isMarqueeing()) return;
+    this.finishMarquee();
+  }
+
+  /** Supr/Delete con algo seleccionado = eliminar, igual que en un explorador de archivos.
+   *  No dispara si el foco esta en un campo editable (buscador, campos del panel, etc). */
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeyDown(event: KeyboardEvent): void {
+    if (event.key !== 'Delete') return;
+    if (this.selectionCount() === 0 || this.deleting()) return;
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
+    event.preventDefault();
+    this.deleteSelected();
+  }
+
+  private updateMarquee(clientX: number, clientY: number): void {
+    const dx = clientX - this.marqueeStartX;
+    const dy = clientY - this.marqueeStartY;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) this.marqueeMoved = true;
+
+    const left = Math.min(clientX, this.marqueeStartX);
+    const top = Math.min(clientY, this.marqueeStartY);
+    const width = Math.abs(dx);
+    const height = Math.abs(dy);
+    this.marqueeRect.set({ left, top, width, height });
+
+    const right = left + width;
+    const bottom = top + height;
+    const tiles = this.gridRef?.nativeElement.querySelectorAll('.doc-tile');
+    const intersecting = new Set<string>();
+    tiles?.forEach((el) => {
+      const id = el.getAttribute('data-doc-id');
+      if (!id) return;
+      const r = el.getBoundingClientRect();
+      if (r.left < right && r.right > left && r.top < bottom && r.bottom > top) {
+        intersecting.add(id);
+      }
+    });
+    this.selectedIds.set(new Set([...this.marqueeBase, ...intersecting]));
+  }
+
+  private finishMarquee(): void {
+    this.isMarqueeing.set(false);
+    this.marqueeRect.set(undefined);
+    if (!this.marqueeMoved && !this.marqueeAdditive) {
+      this.clearSelection();
+    }
+  }
+
+  onDrawerOpenedChange(opened: boolean): void {
+    // OJO: esto tambien se dispara cuando [opened]="detailOpen()" pasa a false porque la
+    // seleccion cambio de 1 a 2+ (multi-seleccion en curso) — en ese caso selectionCount()
+    // ya NO es 1 y no hay que tocar nada, o se borraria la seleccion que se acaba de armar.
+    // Solo limpiar cuando el cierre vino de afuera de nuestro propio estado (ej: tecla Escape
+    // sobre el drawer con 1 solo doc todavia seleccionado).
+    if (!opened && this.selectionCount() === 1) {
+      this.clearSelection();
+    }
+  }
+
+  // ── Subida multiple ──────────────────────────────────────────────────────────
+
+  triggerUpload(): void {
+    if (this.uploading()) return;
+    this.fileInputRef?.nativeElement.click();
+  }
+
+  onFilePickerChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = input.files ? Array.from(input.files) : [];
+    input.value = '';
+    this.handleFilesSelected(files);
+  }
+
+  onFilesDropped(files: File[]): void {
+    this.handleFilesSelected(files);
+  }
+
+  private handleFilesSelected(files: File[]): void {
+    if (files.length === 0 || this.uploading()) return;
+    this.uploading.set(true);
+    // Sin duration: queda visible hasta que el snackbar final de resultado lo reemplace.
+    this.snackBar.open(
+      files.length === 1 ? 'Subiendo archivo…' : `Subiendo ${files.length} archivos…`,
+      undefined,
+      { duration: undefined }
+    );
+
+    const uploads = files.map((file) =>
+      this.storageSvc.uploadDoc(file).pipe(
+        switchMap((res: any) => {
+          const payload: Doc = {
+            driveFileId: res.response,
+            extension: extensionOf(file.name),
+            uploadDate: new Date(),
+            description: baseNameOf(file.name),
+          } as Doc;
+          return this.docsService.saveDoc(payload);
+        }),
+        map(() => ({ ok: true, name: file.name })),
+        catchError((err) => {
+          console.error('Error subiendo archivo', file.name, err);
+          return of({ ok: false, name: file.name });
+        })
+      )
+    );
+
+    forkJoin(uploads).subscribe((results) => {
+      this.uploading.set(false);
+      const okCount = results.filter((r) => r.ok).length;
+      const failed = results.filter((r) => !r.ok).map((r) => r.name);
+      const msg = failed.length === 0
+        ? `${okCount} ${okCount === 1 ? 'archivo subido' : 'archivos subidos'}`
+        : `${okCount} de ${results.length} subidos · fallaron: ${failed.join(', ')}`;
+      this.snackBar.open(msg, 'OK', { duration: 4000 });
+      this.loadDocs();
     });
   }
 
-  editDoc(docId: string | undefined): void {
-    if (!docId) return;
-    const dialogRef = this.dialog.open(AddDocDialog, {
-      data: { editDocId: docId },
-      disableClose: true
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) this.loadDocs();
-    });
+  // ── Acciones ────────────────────────────────────────────────────────────────
+
+  /** Abre el datepicker mes/año del header, sincronizando su valor con el período actual. */
+  openMonthYearPicker(picker: MatDatepicker<Date>): void {
+    const current = this.currentDate();
+    this.monthYearControl.setValue(new Date(current.year, current.month - 1, 1));
+    picker.open();
+  }
+
+  onYearSelected(normalizedYear: Date): void {
+    const value = this.monthYearControl.value ?? new Date();
+    const next = new Date(value);
+    next.setFullYear(normalizedYear.getFullYear());
+    this.monthYearControl.setValue(next);
+  }
+
+  /** Se dispara al elegir el mes: aplica el período y cierra sin llegar a la vista de días. */
+  onMonthSelected(normalizedMonth: Date, picker: MatDatepicker<Date>): void {
+    const value = this.monthYearControl.value ?? new Date();
+    const next = new Date(value);
+    next.setMonth(normalizedMonth.getMonth());
+    this.monthYearControl.setValue(next);
+    picker.close();
+
+    this.appSvc.setDateOfData({ month: next.getMonth() + 1, year: next.getFullYear() });
+    this.clearSelection();
+    this.loadDocs();
   }
 
   openFile(doc: Doc): void {
@@ -310,19 +479,62 @@ export class Docs implements OnInit {
     });
   }
 
-  creatorsFor(doc: Doc): DocRecordCreator[] {
-    return this.recordCreators.filter(c => c.isCompatible(doc));
+  manageDocTypes(): void {
+    this.dialog.open(ManageDocTypes);
   }
 
-  openDialog(): void {
-    const ref = this.dialog.open(AddDocDialog, { disableClose: true });
-    ref.afterClosed().subscribe(result => {
-      if (result) this.loadDocs();
+  /** Botón lupa del header: le da foco al buscador de la toolbar (no es un campo propio). */
+  focusSearch(): void {
+    this.searchBoxCmp?.focus();
+  }
+
+  editBulk(): void {
+    const docs = this.selectedDocsList();
+    if (docs.length < 2) return;
+    const ref = this.dialog.open(DocBulkEditDialog, { data: { docs }, disableClose: true });
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        this.clearSelection();
+        this.loadDocs();
+      }
     });
   }
 
+  exportSelected(): void {
+    const rows = this.filtered().filter((r) => this.selectedIds().has(r.id));
+    if (rows.length === 0) return;
+
+    const files = rows.map((r) => ({ docId: r.id, name: r.description }));
+    const zipName = `documentos-${this.currentDate().year}-${String(this.currentDate().month).padStart(2, '0')}.zip`;
+
+    this.docsService.exportZip(zipName, files).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = zipName;
+        link.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Error exportando seleccionados', err);
+        this.snackBar.open('No se pudieron exportar los documentos', 'OK', { duration: 3000 });
+      }
+    });
+  }
+
+  onDetailSaved(): void {
+    this.snackBar.open('Documento actualizado', 'OK', { duration: 2000 });
+    this.loadDocs();
+  }
+
+  onDetailDeleteRequested(doc: Doc): void {
+    this.clearSelection();
+    this.deleteDoc(doc);
+  }
+
   deleteDoc(doc: Doc): void {
-    if (!doc.id) return;
+    if (!doc.id || this.deleting()) return;
     const dialogRef = this.dialog.open(Prompt, {
       data: {
         title: 'Eliminar documento',
@@ -332,21 +544,26 @@ export class Docs implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (!result) return;
       if (!doc.id) return;
+      this.deleting.set(true);
+      this.snackBar.open('Eliminando documento…', undefined, { duration: undefined });
       this.docsService.deleteDoc(doc.id).subscribe({
         next: () => {
           this.storageSvc.deleteFile(doc.driveFileId).subscribe({
             next: () => {
+              this.deleting.set(false);
               this.loadDocs();
               this.snackBar.open('Documento eliminado correctamente', 'OK', { duration: 2000 });
             },
             error: (err) => {
               console.error('Error borrando archivo', err);
+              this.deleting.set(false);
               this.snackBar.open('Error borrando archivo', 'OK', { duration: 2000 });
             }
           });
         },
         error: (err) => {
           console.error('Error borrando doc', err);
+          this.deleting.set(false);
           const msg = err?.status === 409
             ? 'Este documento esta en uso (ausencia u otro registro), no se puede eliminar'
             : 'Error borrando documento';
@@ -356,7 +573,42 @@ export class Docs implements OnInit {
     });
   }
 
-  logout() {
-    this.authService.logout();
+  deleteSelected(): void {
+    if (this.deleting()) return;
+    const docsToDelete = this.selectedDocsList();
+    if (docsToDelete.length === 0) return;
+    if (docsToDelete.length === 1) {
+      this.deleteDoc(docsToDelete[0]);
+      return;
+    }
+
+    const dialogRef = this.dialog.open(Prompt, {
+      data: {
+        title: 'Eliminar documentos',
+        desc: `¿Está seguro que desea eliminar ${docsToDelete.length} documentos?`
+      }
+    });
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (!confirmed) return;
+      this.deleting.set(true);
+      this.snackBar.open(`Eliminando ${docsToDelete.length} documentos…`, undefined, { duration: undefined });
+      const requests = docsToDelete.filter((d) => d.id).map((doc) =>
+        this.docsService.deleteDoc(doc.id!).pipe(
+          switchMap(() => this.storageSvc.deleteFile(doc.driveFileId)),
+          map(() => true),
+          catchError((err) => {
+            console.error('Error borrando doc', err);
+            return of(false);
+          })
+        )
+      );
+      forkJoin(requests).subscribe((results) => {
+        this.deleting.set(false);
+        const okCount = results.filter(Boolean).length;
+        this.snackBar.open(`${okCount} de ${results.length} documentos eliminados`, 'OK', { duration: 3000 });
+        this.clearSelection();
+        this.loadDocs();
+      });
+    });
   }
 }

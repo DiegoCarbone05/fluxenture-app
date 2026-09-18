@@ -63,15 +63,18 @@
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Tipo de Documento</mat-label>
             <mat-select formControlName="type">
-              @for (type of docTypes; track type) {
-              <mat-option [value]="type.value">
-                {{ type.label }}
+              @for (type of docTypes(); track type.id) {
+              <mat-option [value]="type.id">
+                {{ type.nombre }}
               </mat-option>
               }
             </mat-select>
             <mat-error *ngIf="form.get('type')?.hasError('required')">
               Debe seleccionar el tipo de documento
             </mat-error>
+            <mat-hint>
+              <button type="button" class="link-btn" (click)="manageTypes()">¿Falta un tipo? Agregalo</button>
+            </mat-hint>
           </mat-form-field>
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Fecha</mat-label>
@@ -89,31 +92,6 @@
           <mat-label>Descripción</mat-label>
           <input matInput formControlName="description" placeholder="Escriba una breve descripción..." rows="3">
         </mat-form-field>
-
-        @if (needsRegistroComplementario()) {
-        <!-- Este Doc no va a quedar cubierto por ninguna Ausencia/Historial/CD/Novedad: no puede
-             quedar "flotando" sin Registro (ver context-refactor-documentos.md), asi que se exige
-             elegir a que Registro Complementario pertenece antes de poder guardar. -->
-        <div class="row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Tipo de Registro Complementario</mat-label>
-            <mat-select formControlName="tipoRegistroComplementarioId">
-              @for (tipo of tiposRegistroComplementario(); track tipo.id) {
-              <mat-option [value]="tipo.id">
-                {{ tipo.nombre }}
-              </mat-option>
-              }
-            </mat-select>
-            <mat-error *ngIf="form.get('tipoRegistroComplementarioId')?.hasError('required')">
-              Todo documento tiene que quedar anclado a un registro
-            </mat-error>
-          </mat-form-field>
-        </div>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Observaciones</mat-label>
-          <input matInput formControlName="observaciones" placeholder="Opcional...">
-        </mat-form-field>
-        }
 
         <div class="file-upload-section">
           @if ((form.value.file == null) && (currentFileID() == '')) {

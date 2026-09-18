@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="header">
+    <div class="wrap">
+      <h2>Tipos de documento</h2>
+      <span>El catálogo con el que se etiqueta cada documento</span>
+    </div>
+    <button mat-icon-button (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="add-row">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nuevo tipo</mat-label>
+      <input matInput [formControl]="newName" placeholder="Ej: Firma digital"
+             (keyup.enter)="add()" />
+    </mat-form-field>
+    <button mat-flat-button color="primary" (click)="add()"
+            [disabled]="newName.invalid || saving()">
+      <mat-icon>add</mat-icon>
+      Agregar
+    </button>
+  </div>
+
+  <mat-dialog-content class="mat-typography">
+    <div class="type-list">
+      @for (tipo of tipos(); track tipo.id) {
+        <div class="type-row" [class.archived]="!tipo.activo">
+          <div class="type-info">
+            <span class="type-name">{{ tipo.nombre }}</span>
+            <span class="type-meta">
+              @if (!tipo.activo) { archivado }
+            </span>
+          </div>
+          <button mat-icon-button
+                  [matTooltip]="tipo.activo ? 'Archivar' : 'Reactivar'"
+                  [disabled]="saving()"
+                  (click)="toggleActive(tipo)">
+            <mat-icon>{{ tipo.activo ? 'archive' : 'unarchive' }}</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <span class="count-note">{{ activeCount() }} activos de {{ tipos().length }}</span>
+    <button mat-button (click)="closeDialog()">Cerrar</button>
+  </mat-dialog-actions>
+</div>

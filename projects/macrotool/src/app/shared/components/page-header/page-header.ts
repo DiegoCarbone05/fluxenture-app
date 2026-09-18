@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,4 +27,19 @@ import { UserAccountDialog } from '../../../views/dialogs/user-account-dialog/us
 export class PageHeader {
   @Input() title: string = '';
   @Input() subtitle: string = '';
+  @Input() compact: boolean = false;
+  /** Muestra una flecha "volver" antes del titulo — para paginas de detalle (emp-view, absent-view). */
+  @Input() showBack: boolean = false;
+  /** Override opcional de la navegacion "volver" (ej. cds-viewer, que siempre vuelve al listado de T&T en vez del historial del navegador). Sin listeners, cae en Location.back(). */
+  @Output() backClick = new EventEmitter<void>();
+
+  private readonly location = inject(Location);
+
+  goBack(): void {
+    if (this.backClick.observed) {
+      this.backClick.emit();
+      return;
+    }
+    this.location.back();
+  }
 }

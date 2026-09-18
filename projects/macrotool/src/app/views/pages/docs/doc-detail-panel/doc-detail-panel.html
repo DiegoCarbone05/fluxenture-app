@@ -1,0 +1,86 @@
+<div class="panel-header">
+  <flux-file-icon [extension]="doc.extension" [typeId]="doc.type" size="lg" [blocked]="isUnassigned()" />
+  <button mat-icon-button matTooltip="Cerrar" (click)="closed.emit()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+@if (isUnassigned()) {
+<div class="warning-banner">
+  <mat-icon>warning</mat-icon>
+  <span>Sin empleado ni empresa asignado — no se puede usar en Ausencias, Historial ni Track&amp;Trace hasta que se le
+    asigne uno.</span>
+</div>
+}
+
+<form [formGroup]="form" class="panel-form">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Nombre / descripción</mat-label>
+    <input matInput formControlName="description">
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Empleado</mat-label>
+    <input matInput formControlName="employee" [matAutocomplete]="empAuto" placeholder="Sin asignar">
+    @if (form.value.employee) {
+    <button matSuffix mat-icon-button type="button" matTooltip="Quitar empleado" (click)="clearEmployee()">
+      <mat-icon>close</mat-icon>
+    </button>
+    }
+    <mat-autocomplete #empAuto="matAutocomplete" [displayWith]="displayFn"
+      (optionSelected)="onEmployeeSelected($event)">
+      @for (emp of (filteredEmployees | async); track emp.id) {
+      <mat-option [value]="emp">{{ emp.name }} — N° {{ emp.employeeId }}</mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Tipo de documento</mat-label>
+    <mat-select formControlName="type" placeholder="Sin tipo">
+      <mat-option [value]="null">Sin tipo</mat-option>
+      @for (tipo of docTypes(); track tipo.id) {
+      <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Fecha</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="date">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+  @if (doc.extension) {
+  <span class="ext-chip">{{ doc.extension }}</span>
+  }
+</form>
+
+@if (usageEntries().length > 0) {
+<div class="usages">
+  <span class="usages-title">Usado en:</span>
+  @for (entry of usageEntries(); track entry.module) {
+  <span class="usage-chip">{{ entry.label }} · {{ entry.count }}</span>
+  }
+</div>
+}
+
+@if (creatorsFor().length > 0) {
+<div class="creator-actions">
+  @for (creator of creatorsFor(); track creator.id) {
+  <button mat-stroked-button [matTooltip]="creator.label" (click)="creator.create(doc)">
+    <mat-icon>{{ creator.icon }}</mat-icon>
+    {{ creator.label }}
+  </button>
+  }
+</div>
+}
+
+<div class="panel-actions">
+  <button mat-icon-button matTooltip="Ver archivo" (click)="view()"><mat-icon>visibility</mat-icon></button>
+  <button mat-icon-button matTooltip="Descargar" (click)="download()"><mat-icon>download</mat-icon></button>
+  <button mat-icon-button color="warn" matTooltip="Eliminar" (click)="delete()"><mat-icon>delete</mat-icon></button>
+  <span class="spacer"></span>
+  <button mat-flat-button color="primary" [disabled]="saving()" (click)="save()">Guardar</button>
+</div>

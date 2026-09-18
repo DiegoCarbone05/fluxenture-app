@@ -1,0 +1,8 @@
+<div class="doc-tile-inner" (click)="onClick($event)" (dblclick)="open.emit()">
+  <flux-file-icon
+    [extension]="row.extension"
+    [typeId]="row.typeId"
+    [text]="row.description"
+    [selected]="selected"
+    [blocked]="row.blocked" />
+</div>

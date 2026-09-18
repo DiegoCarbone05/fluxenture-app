@@ -23,4 +23,6 @@ import { MatIconModule } from '@angular/material/icon';
 export class PillButton {
   @Input() variant: 'neutral' | 'primary' | 'accent' = 'neutral';
   @Input() icon?: string;
+  /** Gira el icono (ej. "sync" mientras se descarga/sube algo). */
+  @Input() spinning = false;
 }

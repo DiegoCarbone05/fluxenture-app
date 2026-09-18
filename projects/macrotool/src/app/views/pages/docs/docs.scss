@@ -1,28 +1,76 @@
-// Documentos — mismo lenguaje visual que Empleados/Ausencias v3.
-// El grueso vive en shared/components/. Acá solo queda lo especifico de esta
-// pagina: las columnas de la tabla y el chip de tipo de documento (18 colores).
+// Documentos — grilla tipo explorador de archivos. El grueso del look de cada
+// archivo vive en shared/components/flux-file-icon; aca solo queda el layout de
+// la grilla, la seleccion por rectangulo (marquee) y el drawer de detalle.
 
 :host {
   display: block;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: #f8f8f8;
+}
+
+.docs-shell {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+
+  ::ng-deep mat-drawer {
+    width: 400px;
+    box-sizing: border-box;
+  }
+
+  @media screen and (max-width: 640px) {
+    ::ng-deep mat-drawer {
+      width: 100vw;
+    }
+  }
 }
 
 // ══ ESCRITORIO ═══════════════════════════════════════════════════════════════
 
 .desk {
   height: 100%;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   box-sizing: border-box;
-  padding: 28px 32px 40px;
   font-family: "Plus Jakarta Sans", sans-serif;
 }
 
-.table-card {
-  background-color: #ffffff;
-  border-radius: 12px;
+.toolbar-icons {
+  color: #35353C;
+}
+
+// Input "ancla" del mat-datepicker mes/año del header: no se ve, pero queda posicionado
+// junto al boton de calendario para que el overlay del picker se abra ahi cerca.
+.month-year-anchor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+flux-empty-state {
+  grid-area: 1 / 1 / -1 / -1;
+  align-self: center;
+  justify-self: center;
+}
+
+// flex:1 para que ocupe todo el alto disponible bajo el header: la idea es que en
+// desktop se suba EXCLUSIVAMENTE arrastrando, asi que el area de drop tiene que ser
+// grande de verdad y no solo el rectangulo que ocupan los tiles existentes — si no,
+// soltar un archivo en el "espacio vacio" de abajo (que antes ni era parte de
+// .file-grid) no hacia nada.
+.grid-card {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   animation: fade-in 0.3s ease-in-out;
 }
@@ -34,165 +82,56 @@
   padding: 80px 0;
 }
 
-.table-head,
-.table-row {
-  display: grid;
-  column-gap: 12px;
-  padding: 10px 16px;
-}
-
-.cols-docs {
-  grid-template-columns: 175px 1.4fr 1.6fr 100px 140px 176px;
-}
-
-.table-head {
-  background-color: #f7f7f7;
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #7a8090;
-
-  .align-right {
-    text-align: right;
-  }
-}
-
-.table-row {
-  align-items: center;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.15s ease;
-
-  &:hover {
-    background-color: #f7f8fa;
-  }
-}
-
-.cell-desc {
+.selection-count {
   font-size: 13px;
-  color: #35353c;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cell-date,
-.cell-user {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-
-  mat-icon {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-    color: #9aa0ac;
-    flex-shrink: 0;
-  }
-
-  span {
-    font-size: 12px;
-    font-weight: 600;
-    color: #6c757d;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-// ── Chip de tipo de documento (18 variantes) ────────────────────────────────
-.doc-type-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 12px;
-  border-radius: 50px;
-  font-size: 11px;
   font-weight: 700;
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: 0.25px;
-  background-color: #ebebeb;
-  color: #828282;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--primary, #0468d7);
+}
 
-  // Ausencias
-  &.dtype-MEDICAL_CERTIFICATE,
-  &.dtype-CERTIFICATE {
-    background-color: #ecf2fd;
-    color: #3d7dc7;
-  }
-  &.dtype-VACATIONS {
-    background-color: #d2f0e4;
-    color: #0ead6d;
-  }
-  &.dtype-SUSPENSION {
-    background-color: #f3e597;
-    color: #655814;
-  }
-  &.dtype-LICENSE {
-    background-color: #d2eff0;
-    color: #0ea8ad;
-  }
-  &.dtype-DG,
-  &.dtype-PG,
-  &.dtype-OTHER {
-    background-color: #ebebeb;
-    color: #828282;
+.file-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  align-content: flex-start;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  transition: background-color 0.15s ease, outline-color 0.15s ease;
+
+  &.file-over {
+    background-color: rgba(4, 104, 215, 0.05);
+    outline: 2px dashed var(--primary, #0468d7);
+    outline-offset: -6px;
   }
 
-  // Documentos empresa
-  &.dtype-CD {
-    background-color: #ffe4c4;
-    color: #a35200;
-  }
-  &.dtype-EPP {
-    background-color: #d2ffc9;
-    color: #1d5f0e;
-  }
-  &.dtype-TELEGRAMA {
-    background-color: #e8d5f0;
-    color: #6b1d9e;
-  }
-  &.dtype-ALTA_AFIP {
-    background-color: #d0e8f0;
-    color: #0e5e8a;
-  }
-  &.dtype-BAJA_AFIP {
-    background-color: #f0d2d2;
-    color: #ad0e0e;
-  }
-  &.dtype-PREOCUPACIONAL {
-    background-color: #d2eff0;
-    color: #0ea8ad;
-  }
-  &.dtype-APERCIBIMIENTO {
-    background-color: #f0d2d2;
-    color: #ad0e0e;
-  }
-  &.dtype-ART {
-    background-color: #f0eee5;
-    color: #877a31;
-  }
-  &.dtype-NOTIFICATION {
-    background-color: #e0e0f8;
-    color: #3f3fd4;
-  }
-  &.dtype-RECEIPT {
-    background-color: #d2e8f0;
-    color: #0e5e8a;
-  }
-  &.dtype-INCOME {
-    background-color: #d2ffc9;
-    color: #1d5f0e;
+  &.mobile {
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    padding: 12px;
+    min-height: 200px;
   }
 }
 
-// ══ MOVIL · Material 3 ═══════════════════════════════════════════════════════
+.marquee-box {
+  position: fixed;
+  border: 1px solid var(--primary, #0468d7);
+  background-color: rgba(4, 104, 215, 0.1);
+  pointer-events: none;
+  z-index: 1000;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+// ══ MÓVIL · Material 3 ═══════════════════════════════════════════════════════
 
 .m3 {
   position: relative;
@@ -261,19 +200,5 @@
     &:hover {
       background-color: rgba(0, 0, 0, 0.06);
     }
-  }
-}
-
-// Trailing de cada m3-list-item: chip de tipo arriba, acciones abajo.
-.m3-trailing {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-
-  .doc-type-chip {
-    font-size: 10px;
-    padding: 2px 9px;
   }
 }
