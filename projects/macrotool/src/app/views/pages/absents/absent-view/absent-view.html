@@ -1,5 +1,5 @@
 @if (absent()) {
-<flux-page-header [title]="employee()?.name || 'Empleado no encontrado'" [compact]="true" [showBack]="true">
+<flux-page-header [title]="employeeName() || 'Empleado no encontrado'" [compact]="true" [showBack]="true">
   <button fluxPillBtn variant="neutral" icon="edit" (click)="editAbsent()">
     <span>Editar</span>
   </button>
@@ -12,7 +12,7 @@
         <mat-icon>{{ absent()?.justified ? 'check_circle' : 'cancel' }}</mat-icon>
         <span>{{ absent()?.justified ? 'Justificada' : 'No Justificada' }}</span>
       </div>
-      <span class="hero-name">{{ employee()?.name || 'Empleado no encontrado' }}</span>
+      <span class="hero-name">{{ employeeName() || 'Empleado no encontrado' }}</span>
       <span class="hero-period">
         <mat-icon>event</mat-icon>
         {{ absent()?.originalStartDate | date:'dd/MM/yyyy' }}

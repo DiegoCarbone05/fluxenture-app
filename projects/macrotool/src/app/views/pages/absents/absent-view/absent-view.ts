@@ -9,6 +9,7 @@ import { AbsentResponseDTO } from '../../../../shared/models/AbsentResponseDTO';
 import { EmployeeService } from '../../../../core/services/api/employees/employee.service';
 import { StorageService } from '../../../../core/services/api/storage/storage.service';
 import { EmployeeDTO } from '../../../../shared/models/EmployeeDTO';
+import { fullNameOf } from '../../../../shared/models/Employee';
 import { AddAbsentDialog } from '../../../dialogs/add-absent-dialog/add-absent-dialog';
 import { DocsService } from '../../../../core/services/api/docs/docs.service';
 import { Doc } from '../../../../shared/models/Doc';
@@ -34,6 +35,8 @@ export class AbsentView {
 
   absent = signal<AbsentResponseDTO | null>(null);
   employee = signal<EmployeeDTO | null>(null);
+  /** APELLIDO NOMBRES: despues del split, employee.name son solo los nombres de pila. */
+  employeeName = computed(() => fullNameOf(this.employee()));
   attachedDoc = signal<Doc | undefined>(undefined);
 
   attachedDocRow = computed<DocGridRow | undefined>(() => {
@@ -106,7 +109,7 @@ export class AbsentView {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `DOC. DE AUSENCIA [${this.absent()?.type}] - ${this.employee()?.name} - [${this.absent()?.originalStartDate} - ${this.absent()?.originalEndDate}].${type}`;
+      link.download = `DOC. DE AUSENCIA [${this.absent()?.type}] - ${this.employeeName()} - [${this.absent()?.originalStartDate} - ${this.absent()?.originalEndDate}].${type}`;
       link.click();
       URL.revokeObjectURL(url);
     });

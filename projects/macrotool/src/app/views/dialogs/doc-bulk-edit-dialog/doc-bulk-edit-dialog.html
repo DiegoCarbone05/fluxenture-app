@@ -21,7 +21,7 @@
         <input matInput formControlName="employee" [matAutocomplete]="empAuto" placeholder="No cambiar">
         <mat-autocomplete #empAuto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onEmployeeSelected($event)">
           @for (emp of (filteredEmployees | async); track emp.id) {
-          <mat-option [value]="emp">{{ emp.name }} — N° {{ emp.employeeId }}</mat-option>
+          <mat-option [value]="emp">{{ emp | fullName }} — N° {{ emp.employeeId }}</mat-option>
           }
         </mat-autocomplete>
       </mat-form-field>

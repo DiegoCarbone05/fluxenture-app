@@ -8,8 +8,8 @@ import { IncludeBearerTokenCondition, createInterceptorCondition } from 'keycloa
 export const keycloakConfig = {
   url: 'https://auth.servaltek.com/',
   realm: 'servaltek',
-  clientId: 'servaltek-auth-dev',
-  // clientId: 'fluxapp', // produccion (fluxenture.web.app)
+  // clientId: 'servaltek-auth-dev',
+  clientId: 'fluxapp', // produccion (fluxenture.web.app)
 };
 
 // Solo se agrega el Bearer token a los requests que van hacia el backend de Fluxenture.

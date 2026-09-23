@@ -507,7 +507,7 @@ export class Absents implements OnInit {
   }
 
   getEmployeeName(employeeId: string) {
-    return this.employees().find((emp) => emp.id === employeeId)?.name;
+    return fullNameOf(this.employees().find((emp) => emp.id === employeeId));
   }
 
   // ── Filtros y navegación ────────────────────────────────────────────────────

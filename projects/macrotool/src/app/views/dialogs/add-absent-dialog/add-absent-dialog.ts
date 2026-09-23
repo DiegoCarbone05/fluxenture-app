@@ -25,6 +25,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
 import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
 import { fullNameOf } from '../../../shared/models/Employee';
+import { FullNamePipe } from '../../../shared/pipes/full-name-pipe';
 
 export enum UploadStatus {
   IDLE,
@@ -40,7 +41,7 @@ export enum UploadStatus {
     CommonModule, AsyncPipe, ReactiveFormsModule, MatDialogModule,
     MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule,
     MatSelectModule, MatAutocompleteModule, MatDatepickerModule,
-    MatCheckboxModule, MatProgressSpinnerModule, MatSnackBarModule,
+    MatCheckboxModule, MatProgressSpinnerModule, MatSnackBarModule, FullNamePipe,
   ],
   templateUrl: './add-absent-dialog.html',
   styleUrl: './add-absent-dialog.scss',
@@ -198,10 +199,10 @@ export class AddAbsentDialog implements OnInit {
 
   displayFn = (empOrStr: EmployeeDTO | string | null): string => {
     if (!empOrStr) return '';
-    if (typeof empOrStr === 'object' && 'name' in empOrStr) return empOrStr.name;
+    if (typeof empOrStr === 'object' && 'name' in empOrStr) return fullNameOf(empOrStr);
     const employees = this.employeeService.getEmployeesSignal()();
     const found = employees.find(e => String(e.employeeId) === String(empOrStr));
-    return found ? found.name : '';
+    return fullNameOf(found);
   };
 
   onEmployeeSelected(event: any): void {

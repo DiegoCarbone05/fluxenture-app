@@ -27,6 +27,7 @@ import { DOC_RECORD_CREATORS, DocRecordCreator } from '../../../../shared/servic
 import { DocUsages } from '../../../../shared/models/DocUsages';
 import { DOC_USAGE_MODULE_LABELS } from '../../../../shared/constants/typesValues.constant';
 import { FluxFileIcon } from '../../../../shared/components/flux-file-icon/flux-file-icon';
+import { FullNamePipe } from '../../../../shared/pipes/full-name-pipe';
 
 /**
  * Panel lateral de un documento seleccionado. Edicion explicita (boton Guardar, sin
@@ -38,7 +39,7 @@ import { FluxFileIcon } from '../../../../shared/components/flux-file-icon/flux-
   imports: [
     CommonModule, ReactiveFormsModule, MatButtonModule, MatIconModule, MatFormFieldModule,
     MatInputModule, MatSelectModule, MatAutocompleteModule, MatDatepickerModule, MatTooltipModule,
-    FluxFileIcon,
+    FluxFileIcon, FullNamePipe,
   ],
   templateUrl: './doc-detail-panel.html',
   styleUrl: './doc-detail-panel.scss',
@@ -137,16 +138,19 @@ export class DocDetailPanel implements OnChanges {
 
   displayFn = (empOrStr: EmployeeDTO | string | null): string => {
     if (!empOrStr) return '';
-    if (typeof empOrStr === 'object' && 'name' in empOrStr) return empOrStr.name;
+    if (typeof empOrStr === 'object' && 'name' in empOrStr) return fullNameOf(empOrStr);
     const employees = this.employeeService.getEmployeesSignal()();
     const found = employees.find(e => e.id === empOrStr || String(e.employeeId) === String(empOrStr));
-    return found ? found.name : '';
+    return fullNameOf(found);
   };
 
   onEmployeeSelected(event: any): void {
     const emp = event.option.value as EmployeeDTO;
     this.employeeSelected = emp;
-    this.form.patchValue({ employeeId: String(emp.employeeId ?? ''), employee: emp as any });
+    // emp.id es el id real (Mongo), que es lo que guarda Doc.employeeId; emp.employeeId es el
+    // legajo. Guardar el legajo dejaba el doc apuntando a un empleado inexistente (el campo
+    // aparecia vacio al recargar y el doc no se veia en el legajo del empleado).
+    this.form.patchValue({ employeeId: emp.id, employee: emp as any });
   }
 
   clearEmployee(): void {

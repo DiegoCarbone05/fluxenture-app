@@ -57,7 +57,7 @@
             (optionSelected)="onEmployeeSelected($event)">
             @for (emp of filteredEmployees | async; track emp.id) {
             <mat-option [value]="emp">
-              {{ emp.name }} <small>({{ emp.employeeId }})</small>
+              {{ emp | fullName }} <small>({{ emp.employeeId }})</small>
             </mat-option>
             }
           </mat-autocomplete>

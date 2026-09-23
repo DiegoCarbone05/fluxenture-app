@@ -18,6 +18,7 @@ import { Cd, DEFAULT_TRACKING_PRODUCT, TRACKING_PRODUCTS, parseTrackingCode, tra
 import { Doc, EDocType } from '../../../shared/models/Doc';
 import { SelectDocDialog } from '../select-doc-dialog/select-doc-dialog';
 import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
+import { FullNamePipe } from '../../../shared/pipes/full-name-pipe';
 
 @Component({
   selector: 'app-add-pdf',
@@ -25,7 +26,7 @@ import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
   imports: [
     CommonModule, AsyncPipe, ReactiveFormsModule, MatDialogModule,
     MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule,
-    MatSelectModule, MatSnackBarModule,
+    MatSelectModule, MatSnackBarModule, FullNamePipe,
   ],
   templateUrl: './add-pdf.html',
   styleUrl: './add-pdf.scss',

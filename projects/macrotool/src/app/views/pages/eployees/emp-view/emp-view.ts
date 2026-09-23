@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, HostListener, signal, computed, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { catchError, debounceTime, distinctUntilChanged, forkJoin, map, of, switchMap } from 'rxjs';
@@ -32,6 +32,7 @@ import { IconButton } from '../../../../shared/components/icon-button/icon-butto
 import { SearchBox } from '../../../../shared/components/search-box/search-box';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
 import { DragDropFileDirective } from '../../../../shared/directives/drag-drop-file';
+import { filesFromClipboard } from '../../../../shared/utils/clipboard-files';
 import { DocTile, DocGridRow } from '../../docs/doc-tile/doc-tile';
 import { DocDetailPanel } from '../../docs/doc-detail-panel/doc-detail-panel';
 
@@ -209,6 +210,17 @@ export class EmpView {
       this.snackBar.open(msg, 'OK', { duration: 4000 });
       this.loadDocs();
     });
+  }
+
+  /** Ctrl+V con archivos en el portapapeles = subirlos a este empleado, igual que el drop.
+   *  Si lo pegado es solo texto se deja pasar normal. */
+  @HostListener('document:paste', ['$event'])
+  onDocumentPaste(event: ClipboardEvent): void {
+    if (this.dialog.openDialogs.length > 0) return; // con un dialogo abierto, el paste es de el
+    const files = filesFromClipboard(event);
+    if (files.length === 0) return;
+    event.preventDefault();
+    this.onDocsDropped(files);
   }
 
   private toEmployeeDto(e: Employee): EmployeeDTO {

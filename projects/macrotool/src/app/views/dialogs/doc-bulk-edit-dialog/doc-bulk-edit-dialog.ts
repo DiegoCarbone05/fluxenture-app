@@ -19,6 +19,7 @@ import { fullNameOf } from '../../../shared/models/Employee';
 import { EmployeeService } from '../../../core/services/api/employees/employee.service';
 import { DocsService } from '../../../core/services/api/docs/docs.service';
 import { TipoDocumentoService } from '../../../core/services/api/tipo-documento/tipo-documento.service';
+import { FullNamePipe } from '../../../shared/pipes/full-name-pipe';
 
 export interface DocBulkEditDialogData {
   docs: Doc[];
@@ -36,7 +37,7 @@ export interface DocBulkEditDialogData {
   imports: [
     CommonModule, ReactiveFormsModule, MatButtonModule, MatIconModule, MatDialogModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatAutocompleteModule,
-    MatDatepickerModule, MatSnackBarModule,
+    MatDatepickerModule, MatSnackBarModule, FullNamePipe,
   ],
   templateUrl: './doc-bulk-edit-dialog.html',
   styleUrl: './doc-bulk-edit-dialog.scss',
@@ -86,13 +87,14 @@ export class DocBulkEditDialog {
 
   displayFn = (empOrStr: EmployeeDTO | string | null): string => {
     if (!empOrStr) return '';
-    if (typeof empOrStr === 'object' && 'name' in empOrStr) return empOrStr.name;
+    if (typeof empOrStr === 'object' && 'name' in empOrStr) return fullNameOf(empOrStr);
     return '';
   };
 
   onEmployeeSelected(event: any): void {
     const emp = event.option.value as EmployeeDTO;
-    this.form.patchValue({ employeeId: String(emp.employeeId ?? ''), employee: emp as any });
+    // El id real (Mongo), no el legajo: es lo que guarda Doc.employeeId (ver DocDetailPanel).
+    this.form.patchValue({ employeeId: emp.id, employee: emp as any });
   }
 
   apply(): void {

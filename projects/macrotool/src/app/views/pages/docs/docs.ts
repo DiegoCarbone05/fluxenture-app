@@ -27,6 +27,7 @@ import { FileViewerDialog } from '../../dialogs/file-viewer-dialog/file-viewer-d
 import { ManageDocTypes } from '../../dialogs/manage-doc-types/manage-doc-types';
 import { DocBulkEditDialog } from '../../dialogs/doc-bulk-edit-dialog/doc-bulk-edit-dialog';
 import { DragDropFileDirective } from '../../../shared/directives/drag-drop-file';
+import { filesFromClipboard } from '../../../shared/utils/clipboard-files';
 
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { PillButton } from '../../../shared/components/pill-button/pill-button';
@@ -399,6 +400,18 @@ export class Docs implements OnInit {
   }
 
   onFilesDropped(files: File[]): void {
+    this.handleFilesSelected(files);
+  }
+
+  /** Ctrl+V con archivos en el portapapeles (capturas, imagenes o archivos copiados del
+   *  explorador) = subirlos, igual que soltarlos sobre la grilla. Si lo pegado es solo texto
+   *  (ej: en el buscador o en el panel) se deja pasar normal. */
+  @HostListener('document:paste', ['$event'])
+  onDocumentPaste(event: ClipboardEvent): void {
+    if (this.dialog.openDialogs.length > 0) return; // con un dialogo abierto, el paste es de el
+    const files = filesFromClipboard(event);
+    if (files.length === 0) return;
+    event.preventDefault();
     this.handleFilesSelected(files);
   }
 

@@ -26,6 +26,8 @@ import { EmployeeDTO } from '../../../shared/models/EmployeeDTO';
 import { FileViewerDialog } from '../file-viewer-dialog/file-viewer-dialog';
 import { fullNameOf } from '../../../shared/models/Employee';
 import { ManageDocTypes } from '../manage-doc-types/manage-doc-types';
+import { FullNamePipe } from '../../../shared/pipes/full-name-pipe';
+import { filesFromClipboard } from '../../../shared/utils/clipboard-files';
 
 export enum UploadStatus {
   IDLE,
@@ -41,7 +43,7 @@ export enum UploadStatus {
     CommonModule, AsyncPipe, ReactiveFormsModule, MatDialogModule,
     MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule,
     MatSelectModule, MatAutocompleteModule, MatDatepickerModule, MatProgressBarModule,
-    DragDropFileDirective,
+    DragDropFileDirective, FullNamePipe,
   ],
   templateUrl: './add-doc-dialog.html',
   styleUrl: './add-doc-dialog.scss',
@@ -203,34 +205,30 @@ export class AddDocDialog implements OnInit, AfterViewInit {
     }
   }
 
-  // Escucha el evento 'paste' en todo el componente
+  /**
+   * Ctrl+V con un archivo en el portapapeles (captura, imagen o archivo copiado del explorador)
+   * lo carga igual que si se hubiera arrastrado. Antes se ignoraba el paste si el foco estaba en
+   * un input de texto, y el dialogo abre con el foco en el buscador de empleado, asi que en la
+   * practica no andaba. Ahora se decide por el contenido: si lo pegado es solo texto, sigue de
+   * largo hacia el input con foco.
+   */
   @HostListener('window:paste', ['$event'])
   onPaste(event: ClipboardEvent) {
-    // Opcional: Si el usuario está escribiendo en el campo 'description', no queremos capturar el paste aquí
-    const target = event.target as HTMLElement;
-    if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT' && target.getAttribute('type') === 'text') {
-      return;
-    }
+    // Solo si este dialogo es el de arriba (no con el visor o el catalogo de tipos abiertos encima).
+    if (this.dialog.openDialogs.at(-1) !== this.dialogRef) return;
+    // En edicion, el archivo ya subido se quita primero con el tacho (onDeleteFile), igual que
+    // para arrastrar uno nuevo: si no, el viejo quedaria huerfano en Drive.
+    if (this.currentFileID()) return;
 
-    const items = event.clipboardData?.items;
-    if (items) {
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].kind === 'file') {
-          const file = items[i].getAsFile();
-          if (file) {
-            this.addFiles(file);
-            this.fluxDocUploadMsg.set('Archivo pegado exitosamente');
-            break; // Nos aseguramos de tomar solo el primer archivo del portapapeles
-          }
-        }
-      }
-    }
+    const files = filesFromClipboard(event);
+    if (files.length === 0) return;
+    event.preventDefault(); // que no se pegue ademas el nombre del archivo como texto en el input
+    if (this.addFiles(files[0])) this.fluxDocUploadMsg.set('Archivo pegado exitosamente');
   }
 
   onFileDropped(e: any) {
     const file = e as File
-    this.fluxDocUploadMsg.set('Archivo arrastrado exitosamente');
-    this.addFiles(file)
+    if (this.addFiles(file)) this.fluxDocUploadMsg.set('Archivo arrastrado exitosamente');
   }
 
   ngAfterViewInit(): void {
@@ -238,10 +236,10 @@ export class AddDocDialog implements OnInit, AfterViewInit {
 
   displayFn = (empOrStr: EmployeeDTO | string | null): string => {
     if (!empOrStr) return '';
-    if (typeof empOrStr === 'object' && 'name' in empOrStr) return empOrStr.name;
+    if (typeof empOrStr === 'object' && 'name' in empOrStr) return fullNameOf(empOrStr);
     const employees = this.employeeService.getEmployeesSignal()();
     const found = employees.find(e => e.id === empOrStr || String(e.employeeId) === String(empOrStr));
-    return found ? found.name : '';
+    return fullNameOf(found);
   };
 
   /** Abre el catalogo de tipos sin perder lo ya completado; si se crea uno nuevo, lo autoselecciona. */
@@ -255,12 +253,15 @@ export class AddDocDialog implements OnInit, AfterViewInit {
     const emp = event.option.value as EmployeeDTO;
     this.employeeSelected = emp;
     this.form.patchValue({
-      employeeId: String(emp.employeeId ?? ''),
+      // Id real (Mongo), igual que en alta con empleado preseleccionado y en edicion. Antes era el
+      // legajo, que si el empleado no lo tenia cargado dejaba el form invalido.
+      employeeId: emp.id,
       employee: emp as any
     });
   }
 
-  addFiles(file: File) {
+  /** Carga el archivo en el form si es de un tipo permitido. Devuelve si se acepto. */
+  addFiles(file: File): boolean {
     // Coincide con el atributo `accept` del input y con el mensaje de error del template - antes
     // faltaban los mime types de Word, asi que un .docx pasaba el selector de archivos pero se
     // rechazaba en silencio aca (solo un console.error, sin feedback visible para el usuario).
@@ -272,12 +273,13 @@ export class AddDocDialog implements OnInit, AfterViewInit {
       this.form.patchValue({ file });
       this.form.get('file')?.markAsTouched();
       this.form.get('file')?.updateValueAndValidity(); // Asegura que el estado del formulario se refresque
-      console.log(this.form.value);
-
-    } else {
-      // Opcional: podrías setear el errorMessage() aquí si el tipo no es válido
-      console.error('Tipo de archivo no permitido');
+      return true;
     }
+
+    // Marcarlo como tocado muestra el mat-error con los formatos admitidos.
+    this.form.get('file')?.markAsTouched();
+    console.error('Tipo de archivo no permitido', file.type);
+    return false;
   }
 
   startFakeProgress() {
