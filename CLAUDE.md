@@ -15,6 +15,10 @@ npm run build      # Production web build → dist/fluxetnure/
 npm test           # Karma + Jasmine unit tests
 ```
 
+### Versionado y novedades
+- `npm start` / `build` / `deploy` / `watch` / `test` corren antes `npm run gen:version` ([scripts/generate-version.mjs](scripts/generate-version.mjs)), que genera `core/config/app-version.generated.ts` (gitignoreado) con la versión de `package.json`, el hash corto del commit (`-dirty` si hay cambios sin commitear) y la cantidad de commits como número de build. Si se corre `ng serve`/`ng build` directo sin ese paso, el archivo no existe y no compila.
+- Anunciar algo en un deploy: subir `version` en `package.json` y agregar arriba en [release-notes.ts](projects/macrotool/src/app/core/config/release-notes.ts) una entrada con esa versión y `announce: true`. `WhatsNewService` (disparado desde el shell `Pages`) la muestra una sola vez por navegador (`localStorage` `flux.whatsNew.seenVersion`). Sin entrada nueva con `announce: true`, un deploy no muestra nada.
+
 ### Single test
 ```bash
 ng test --include="**/path/to/component.spec.ts"
@@ -56,7 +60,7 @@ All routes are functional `Routes` arrays in `*.routes.ts` files using `loadComp
 | `main/app-pages/absents` | Absence management |
 | `main/app-pages/absents/:id` | Absence detail |
 | `main/app-pages/docs` | Document management |
-| `main/app-pages/sgi` | SGI module |
+| `main/app-pages/doc-generator` | Generador de documentos (hub). Cada documento generable vive en `doc-generator/<id>` y se registra en [doc-generators.ts](projects/macrotool/src/app/views/pages/doc-generator/doc-generators.ts); el form se envuelve en `<flux-doc-form-shell>` y el back arma el PDF (`POST /doc-generator/{id}/pdf`). `main/app-pages/sgi` redirige a `doc-generator/sgi`. |
 
 ### API services (`core/services/api/`)
 

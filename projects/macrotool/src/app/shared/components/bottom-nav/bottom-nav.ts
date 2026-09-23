@@ -27,6 +27,6 @@ export class BottomNav {
     { label: 'Empleados', icon: 'people', link: '/main/app-pages/eployees' },
     { label: 'Ausencias', icon: 'event_busy', link: '/main/app-pages/absents' },
     { label: 'Docs', icon: 'description', link: '/main/app-pages/docs' },
-    { label: 'SGI', icon: 'falling', link: '/main/app-pages/sgi' },
+    { label: 'Generar', icon: 'post_add', link: '/main/app-pages/doc-generator' },
   ];
 }

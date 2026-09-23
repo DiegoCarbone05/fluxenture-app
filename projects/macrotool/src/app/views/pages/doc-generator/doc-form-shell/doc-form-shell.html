@@ -1,0 +1,38 @@
+<div class="shell">
+  <flux-page-header [title]="'Generador ' + (generator?.name ?? '')" [subtitle]="generator?.description ?? ''"
+    [compact]="true" [showBack]="true" (backClick)="goToHub()">
+    <button fluxPillBtn variant="neutral" icon="drive_folder_upload" [disabled]="busy()" (click)="saveToDocs()">
+      <span>Guardar en Documentos</span>
+    </button>
+    <button fluxPillBtn variant="primary" icon="download" [disabled]="busy()" (click)="download()">
+      <span>Descargar PDF</span>
+    </button>
+  </flux-page-header>
+
+  <div class="shell-body">
+    <div class="sheet" #content>
+      <ng-content></ng-content>
+    </div>
+  </div>
+
+  @if (busy()) {
+  <div class="processing-overlay" role="status" aria-live="polite">
+    <div class="processing-card">
+      @if (stage() === 'generating') {
+      <mat-spinner diameter="44" />
+      <span class="processing-title">Generando PDF…</span>
+      <span class="processing-text">El servidor está armando el documento</span>
+      } @else if (stage() === 'saving') {
+      <mat-spinner diameter="44" />
+      <span class="processing-title">Guardando en Documentos…</span>
+      <span class="processing-text">Subiendo el PDF a Fluxenture</span>
+      } @else {
+      <mat-spinner diameter="44" [mode]="progress() === null ? 'indeterminate' : 'determinate'"
+        [value]="progress() ?? 0" />
+      <span class="processing-title">Descargando archivo…</span>
+      <span class="processing-text">{{ progress() === null ? 'Recibiendo el PDF' : progress() + '%' }}</span>
+      }
+    </div>
+  </div>
+  }
+</div>

@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../core/services/api/auth/auth.service';
 import { KeycloakUser } from '../../../shared/models/KeycloakUser';
+import { APP_VERSION } from '../../../core/config/app-version.generated';
 
 /**
  * Menu de cuenta de Servaltek: boton de usuario + panel flotante con el
@@ -31,6 +32,7 @@ import { KeycloakUser } from '../../../shared/models/KeycloakUser';
 })
 export class UserAccountDialog {
   private authService = inject(AuthService);
+  readonly appVersion = APP_VERSION;
 
   /** Destino de "Ver cuenta". */
   @Input() accountLink: string = '/main/app-pages/users';

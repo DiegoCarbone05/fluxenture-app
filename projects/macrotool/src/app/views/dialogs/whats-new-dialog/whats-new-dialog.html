@@ -1,0 +1,41 @@
+<div class="container">
+  <header class="hero">
+    <mat-icon class="hero-art" aria-hidden="true">{{ note.icon ?? 'auto_awesome' }}</mat-icon>
+    <button type="button" class="close-btn" mat-dialog-close aria-label="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <span class="badge">
+      <mat-icon>auto_awesome</mat-icon>
+      NOVEDADES · v{{ note.version }}
+    </span>
+    <h1>{{ note.title }}</h1>
+    <p class="summary">{{ note.summary }}</p>
+  </header>
+
+  <div class="content">
+    <ul class="highlights">
+      @for (item of note.highlights; track item.title; let i = $index) {
+      <li [style.animation-delay.ms]="120 + i * 70">
+        <span class="highlight-icon"><mat-icon>{{ item.icon }}</mat-icon></span>
+        <div>
+          <span class="highlight-title">{{ item.title }}</span>
+          <span class="highlight-text">{{ item.text }}</span>
+        </div>
+      </li>
+      }
+    </ul>
+
+    <span class="build-info">{{ note.date }} · build {{ build.commits }} ({{ build.commit }})</span>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="dialog-btn cancel-btn" mat-dialog-close>Cerrar</button>
+    @if (note.cta) {
+    <button type="button" class="dialog-btn submit-btn" cdkFocusInitial (click)="goToCta()">
+      {{ note.cta.label }}
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+    }
+  </div>
+</div>

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { DOC_GENERATORS } from './doc-generator/doc-generators';
 
 export const PAGES_ROUTES: Routes = [
   {
@@ -41,10 +42,18 @@ export const PAGES_ROUTES: Routes = [
         data: { animation: 'Docs' }
       },
       {
-        path: 'sgi',
-        loadComponent: () => import('./sgi/sgi').then(c => c.Sgi),
-        data: { animation: 'Sgi' }
+        path: 'doc-generator',
+        loadComponent: () => import('./doc-generator/doc-generator').then(c => c.DocGenerator),
+        data: { animation: 'DocGenerator' }
       },
+      // Un formulario por documento generable, armado desde el registro (ver doc-generators.ts).
+      ...DOC_GENERATORS.filter(g => g.available && g.loadComponent).map(g => ({
+        path: `doc-generator/${g.id}`,
+        loadComponent: g.loadComponent,
+        data: { animation: `DocGenerator-${g.id}` }
+      })),
+      // Ruta vieja del modulo SGI, antes de que existiera el hub.
+      { path: 'sgi', redirectTo: 'doc-generator/sgi' },
       {
         path: 'users',
         loadComponent: () => import('./users/users').then(c => c.Users),

@@ -1,0 +1,303 @@
+// Cabecera azul solida (el anuncio) y acciones siempre visibles; entre medio, el detalle hace
+// scroll si no entra (ej. 720p): lo que tiene que verse entero es la cabecera.
+$blue: var(--primary, #0468d7);
+$blue-soft: #eaf3fc;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-width: 280px;
+  width: 640px;
+  max-width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  font-family: "Plus Jakarta Sans", sans-serif;
+
+  .content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 24px 28px;
+    box-sizing: border-box;
+  }
+
+  .actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    padding: 16px 28px 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+}
+
+// ── Cabecera ────────────────────────────────────────────────────────────────
+
+.hero {
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  padding: 28px 28px 30px;
+  background-color: $blue;
+  color: #fff;
+
+  h1 {
+    position: relative;
+    margin: 14px 0 10px;
+    max-width: 80%;
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.6px;
+  }
+
+  .summary {
+    position: relative;
+    margin: 0;
+    max-width: 78%;
+    font-size: 15px;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.88);
+  }
+}
+
+// Icono gigante de fondo, recortado en la esquina: da identidad sin competir con el texto.
+.hero-art {
+  position: absolute;
+  right: -28px;
+  bottom: -34px;
+  font-size: 168px;
+  width: 168px;
+  height: 168px;
+  color: rgba(255, 255, 255, 0.12);
+  transform: rotate(-12deg);
+  pointer-events: none;
+  animation: hero-art-in 0.6s cubic-bezier(.08, .64, .28, .99) both;
+}
+
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.26);
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ── Detalle ─────────────────────────────────────────────────────────────────
+
+.highlights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 24px;
+
+  li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    animation: item-in 0.35s ease-out both;
+  }
+}
+
+.highlight-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background-color: $blue-soft;
+  color: $blue;
+}
+
+.highlight-title {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.highlight-text {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #6c757d;
+}
+
+.build-info {
+  display: block;
+  margin-top: 22px;
+  font-size: 11px;
+  color: #adb5bd;
+}
+
+// ── Acciones ────────────────────────────────────────────────────────────────
+
+.dialog-btn {
+  flex: 1;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &.cancel-btn {
+    flex: 0 0 auto;
+    padding: 0 20px;
+    background-color: transparent;
+    color: $blue;
+
+    &:hover {
+      background-color: $blue-soft;
+    }
+  }
+
+  &.submit-btn {
+    background-color: $blue;
+    color: #fff;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: var(--primary-hover, #0557b4);
+    }
+  }
+}
+
+@keyframes hero-art-in {
+  from {
+    opacity: 0;
+    transform: rotate(-30deg) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotate(-12deg) scale(1);
+  }
+}
+
+@keyframes item-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .hero-art,
+  .highlights li {
+    animation: none;
+  }
+}
+
+// En la accion principal el boton no necesita ocupar todo el ancho del dialogo de 640px.
+@media screen and (min-width: 641px) {
+  .container .actions {
+    justify-content: flex-end;
+  }
+
+  .dialog-btn.submit-btn {
+    flex: 0 0 auto;
+    padding: 0 28px;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .container {
+    width: 100vw;
+    max-height: 92vh;
+
+    .content {
+      padding: 20px;
+    }
+
+    .actions {
+      padding: 12px 20px 16px;
+    }
+  }
+
+  .highlights {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .hero {
+    padding: 24px 20px 26px;
+
+    h1 {
+      font-size: 28px;
+      max-width: 86%;
+    }
+
+    .summary {
+      max-width: 92%;
+      font-size: 14px;
+    }
+  }
+
+  .hero-art {
+    font-size: 140px;
+    width: 140px;
+    height: 140px;
+  }
+}

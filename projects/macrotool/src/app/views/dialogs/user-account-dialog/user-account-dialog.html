@@ -51,5 +51,9 @@
         <a class="account__link" [routerLink]="accountLink" (click)="close()">Ver cuenta</a>
       </div>
     </div>
+
+    <p class="account__version" [attr.title]="'Build ' + appVersion.commits + ' · ' + appVersion.builtAt">
+      Fluxenture v{{ appVersion.version }} · {{ appVersion.commit }}
+    </p>
   </div>
 </ng-template>

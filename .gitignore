@@ -40,3 +40,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Version generada en cada build (scripts/generate-version.mjs)
+/projects/macrotool/src/app/core/config/app-version.generated.ts

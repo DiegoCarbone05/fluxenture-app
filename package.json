@@ -1,14 +1,20 @@
 {
   "name": "macrotools-app",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MacroTools - Web application for CD and employee management",
   "author": "MacroTools",
   "scripts": {
     "ng": "ng",
+    "gen:version": "node scripts/generate-version.mjs",
+    "prestart": "npm run gen:version",
     "start": "ng serve --open",
+    "prebuild": "npm run gen:version",
     "build": "ng build",
+    "predeploy": "npm run gen:version",
     "deploy": "ng build --configuration production && firebase deploy",
+    "prewatch": "npm run gen:version",
     "watch": "ng build --watch --configuration development",
+    "pretest": "npm run gen:version",
     "test": "ng test"
   },
   "prettier": {

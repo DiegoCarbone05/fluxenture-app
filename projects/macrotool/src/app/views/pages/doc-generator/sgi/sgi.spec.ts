@@ -8,7 +8,7 @@ describe('Sgi', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [Sgi]
+      imports: [Sgi]
     })
     .compileComponents();
 

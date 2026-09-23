@@ -1,0 +1,22 @@
+<div class="hub">
+  <flux-page-header title="Generador de documentos" [compact]="true" />
+
+  <div class="hub-body">
+    <div class="generator-grid">
+      @for (gen of generators; track gen.id) {
+      @if (gen.available) {
+      <a class="generator-card" [routerLink]="gen.id" [attr.aria-label]="'Generar ' + gen.description">
+        <mat-icon class="generator-icon">{{ gen.icon }}</mat-icon>
+        <span class="generator-title">GENERADOR<br><strong>{{ gen.name }}</strong></span>
+      </a>
+      } @else {
+      <div class="generator-card disabled" aria-disabled="true">
+        <span class="soon-chip">PROXIMAMENTE</span>
+        <mat-icon class="generator-icon">{{ gen.icon }}</mat-icon>
+        <span class="generator-title">GENERADOR<br><strong>{{ gen.name }}</strong></span>
+      </div>
+      }
+      }
+    </div>
+  </div>
+</div>

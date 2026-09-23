@@ -1,18 +1,9 @@
-.app-content {
-  height: 100%;
-  display: grid;
-  grid-template-rows: auto 1fr;
-}
-
 :host {
   display: block;
-  box-sizing: border-box;
-  min-height: 100%;
+  height: 100%;
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.4;
   color: var(--text-color);
-  background-color: var(--bg-color);
-  //   padding: 20px;
 }
 
 .container {
@@ -187,4 +178,10 @@ th {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
+}
+
+.signature {
+  text-align: right;
+  font-weight: bold;
+  margin-top: 10px;
 }
