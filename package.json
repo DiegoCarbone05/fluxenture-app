@@ -1,8 +1,8 @@
 {
-  "name": "macrotools-app",
+  "name": "fluxenture",
   "version": "1.1.0",
-  "description": "MacroTools - Web application for CD and employee management",
-  "author": "MacroTools",
+  "description": "Servaltek - Web application for CD and employee management",
+  "author": "Servaltek",
   "scripts": {
     "ng": "ng",
     "gen:version": "node scripts/generate-version.mjs",

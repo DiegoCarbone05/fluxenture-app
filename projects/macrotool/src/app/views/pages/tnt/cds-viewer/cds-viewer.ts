@@ -32,6 +32,10 @@ export class CdsViewer {
 
   @ViewChild('imprZone', { static: false }) imprZone!: ElementRef;
 
+  // Ancho con el que se renderiza el historial al exportarlo (igual al card en desktop)
+  private static readonly EXPORT_WIDTH = 1160;
+  private static readonly EXPORT_WINDOW_WIDTH = 1280;
+
   cd = signal<Cd | null>(null);
   trackingCode = computed(() => trackingCodeOf(this.cd()));
   employee = signal<EmployeeDTO | null>(null)
@@ -48,8 +52,26 @@ export class CdsViewer {
   async generarPdfDesdeHtml() {
     const data = this.imprZone.nativeElement;
 
-    // 2. Usar html2canvas para convertir el HTML en una imagen (canvas)
-    const canvas = await html2Canvas(data, { scale: 2 });
+    // 2. Usar html2canvas para convertir el HTML en una imagen (canvas).
+    // La captura se hace sobre un clon renderizado siempre en ancho desktop:
+    // windowWidth hace que las media queries del clon evaluen como desktop y
+    // el ancho fijo evita que la tabla salga aplastada si se exporta desde un celular.
+    const canvas = await html2Canvas(data, {
+      scale: 2,
+      windowWidth: CdsViewer.EXPORT_WINDOW_WIDTH,
+      onclone: (_doc, el) => {
+        // Como el card vive dentro de un custom element (<app-cds-viewer>), html2canvas
+        // le copia a cada nodo clonado su estilo computado como inline, con los anchos
+        // en px del layout actual (mobile). Se limpian para que el clon se re-maquete
+        // con las hojas de estilo, que en el clon evaluan como desktop.
+        [el, ...Array.from(el.querySelectorAll<HTMLElement>('*'))].forEach((n) => n.removeAttribute('style'));
+        el.style.width = `${CdsViewer.EXPORT_WIDTH}px`;
+        el.style.maxWidth = 'none';
+        el.querySelector<HTMLElement>('.tracking-section')?.style.setProperty('overflow', 'visible');
+        // Los indicadores "Actualizando…" / "Guardando en Drive…" no van en el PDF
+        el.querySelectorAll<HTMLElement>('.updating').forEach((n) => n.remove());
+      },
+    });
     const imgData = canvas.toDataURL('image/png');
     return imgData;
   }
